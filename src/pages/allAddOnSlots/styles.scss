@@ -1,0 +1,69 @@
+.all-add-on-slots-page {
+//   padding: 24px;
+  background: var(--background-color);
+  border-radius: 8px;
+  
+  .ant-btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--card-bg);
+    height: 40px;
+    font-weight: 500;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .left-col {
+      display: flex;
+      gap: 16px;
+      flex: 1;
+      min-width: 300px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .flex {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .add-btn {
+      white-space: nowrap;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .all-add-on-slots-page {
+    padding: 16px;
+    
+    .header-section {
+      flex-direction: column;
+      align-items: stretch;
+
+      .left-col {
+        flex-direction: column;
+      }
+
+      .flex {
+        flex-direction: column;
+      }
+
+      .add-btn,
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

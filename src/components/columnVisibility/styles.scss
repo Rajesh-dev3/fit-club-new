@@ -1,0 +1,15 @@
+  @import '../../styles/breakpoints.scss';
+  .columns-btn {
+      background: transparent;
+      border: 1px solid var(--muted);
+      color: var(--sider-text);
+      height: 40px;
+      margin-left: 0;
+      @include desktop {
+        margin-left: auto;
+      }
+      &:hover {
+        background: transparent !important;
+        border-color: var(--accent);
+      }
+    }

@@ -1,0 +1,52 @@
+// Responsive Tabs for Mobile
+@import '../../styles/breakpoints.scss';
+
+.mobile-tabs {
+	margin-bottom: 16px;
+	display: none;
+	.ant-menu-horizontal {
+		width: 100%;
+		background: var(--card-bg);
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+		border: none;
+		.ant-menu-item {
+			font-size: 15px;
+			font-weight: 500;
+			color: var(--sider-text);
+			padding: 8px 12px;
+			margin: 0;
+			border-radius: 0;
+		}
+		.ant-menu-item-selected {
+			color: var(--accent);
+			background: var(--hover-bg);
+		}
+		.ant-menu-overflow-item {
+			color: var(--sider-text);
+		}
+	}
+}
+
+@include laptop {
+	.mobile-tabs {
+		display: none;
+	}
+	.content {
+		display: flex;
+	}
+}
+
+
+
+@include laptop {
+	.sidebar {
+		display: none;
+	}
+	.mobile-tabs {
+		display: block;
+	}
+	.content {
+		display: block;
+	}
+}

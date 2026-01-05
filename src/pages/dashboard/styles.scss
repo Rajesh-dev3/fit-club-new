@@ -1,0 +1,44 @@
+.dashboard-wrapper {
+
+
+
+
+/* ----- RIGHT MINI CARDS ----- */
+.stats-grid {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 16px;
+}
+
+
+.mini-card {
+background: var(--card-bg);
+padding: 18px;
+border-radius: 12px;
+box-shadow: var(--boxShadow);
+}
+.mini-card h3 {
+font-size: 22px;
+margin-bottom: 4px;
+}
+.mini-card .label {
+color: var(--muted);
+font-size: 14px;
+}
+.green {
+color: #22c55e;
+margin: 3px 0;
+}
+
+
+.mini-card small {
+color: var(--muted);
+}
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+.db-grid { grid-template-columns: 1fr; }
+.plans-grid { grid-template-columns: 1fr 1fr; }
+.donut-box { margin-top: 20px; }
+}
