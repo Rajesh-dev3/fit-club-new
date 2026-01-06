@@ -10,6 +10,7 @@ import ColumnVisibility from "../../components/columnVisibility";
 import { getColumns } from './columns';
 import { useGetDirectorsQuery } from "../../services/director";
 import "./styles.scss";
+import CommonTable from "../../components/commonTable";
 
 const AllDirectors = () => {
   const navigate = useNavigate();
@@ -157,7 +158,7 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
 
       {/* Table */}
       <div className="directors-table-wrapper">
-        <Table
+        <CommonTable
           columns={columns}
           dataSource={paginatedData || []}
           loading={isLoading}

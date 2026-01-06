@@ -11,10 +11,19 @@ export const branches = createApi({
         url: `/branches`,
         method: "GET",
       }),
+      providesTags: ['Branches'],
+    }),
+    addBranch: builder.mutation({
+      query: (body) => ({
+        url: `/branches`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ['Branches'],
     }),
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetBranchesQuery } = branches
+export const { useGetBranchesQuery, useAddBranchMutation } = branches

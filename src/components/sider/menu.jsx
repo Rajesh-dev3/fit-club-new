@@ -18,7 +18,7 @@ import {
   SmileOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { AddEmployeeRoute, AddGeneralStaffRoute, AddRoleRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AllRolesRoute, AllTrainersRoute, AllDirectorsRoute, Home, AllUsersRoute, DirectorAttendanceRoute, AllPackagesRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute } from '../../routes/routepath';
+import { AddEmployeeRoute, AddGeneralStaffRoute, AddRoleRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AllRolesRoute, AllTrainersRoute, AllDirectorsRoute, Home, AllUsersRoute, DirectorAttendanceRoute, AllPackagesRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, AllBranchesRoute, AddBranchRoute } from '../../routes/routepath';
 
 const items = [
   {
@@ -144,8 +144,8 @@ const items = [
     label: 'Branch',
     icon: <ShopOutlined />,
     children: [
-      { key: '14-1', label: 'All Branches' },
-      { key: '14-2', label: 'Add Branch' },
+      { key: '14-1', label: <Link to={AllBranchesRoute}>All Branches</Link> },
+      { key: '14-2', label: <Link to={AddBranchRoute}>Add Branch</Link> },
     ],
   },
   {

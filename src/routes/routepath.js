@@ -14,6 +14,9 @@ const AllPackagesRoute = "/all-packages"
 const AddPackageRoute = "/add-package"
 const AllAddOnSlotsRoute = "/all-add-on-slots"
 const AddAddOnSlotRoute = "/add-add-on-slot"
+
+const AllBranchesRoute = "/all-branches"
+const AddBranchRoute = "/add-branch"
 const AllAddOnPackagesRoute = "/all-add-on-packages"
 
 const EmployeeDetailRoute = "/employee-detail"
@@ -81,5 +84,6 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
   UserDetailAssessmentRoute, UserDetailRefundHistoryRoute,
    UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute,
     UserDetailBiometricAccessRoute,
-    UserDetailRoute
+    UserDetailRoute,
+    AllBranchesRoute, AddBranchRoute
  }

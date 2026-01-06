@@ -1,0 +1,39 @@
+@import '../../styles/breakpoints.scss';
+.all-branches-page {
+  min-height: 100vh;
+  color: var(--sider-text);
+  font-family: 'Inter', sans-serif;
+
+  .header-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    @include mobile {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .branches-table-wrapper {
+    background: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    .ant-table-container {
+      &::before, &::after { box-shadow: none; }
+    }
+    .ant-table-content {
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      &::-webkit-scrollbar { display: none; }
+    }
+    .ant-table {
+      background: var(--card-bg);
+      color: var(--sider-text);
+      border-radius: 0;
+    }
+  }
+}
