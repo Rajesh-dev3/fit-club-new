@@ -4,6 +4,8 @@ import { Outlet, Link, useParams, useLocation, useNavigate } from 'react-router-
 import { useState } from 'react';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
+import CommonSider from '../../components/commonSider';
+import { UserDetailRoute } from '../../routes/routepath';
 
 const menuItems = [
   { id: 'attendance', label: 'Attendance', path: 'attendance' },
@@ -55,7 +57,16 @@ const UserDetailPage = () => {
   // Get current active tab from URL
   const currentPath = location.pathname;
   const pathSegments = currentPath.split('/');
-  const currentTab = pathSegments[pathSegments.length - 1] || 'attendance';
+  // Support both /membership, /membership-freezability, and /membership-days for active tab
+  let currentTab = pathSegments[pathSegments.length - 1] || 'attendance';
+  if (
+    currentTab === 'membership-freezability' ||
+    currentTab === 'freezability' ||
+    currentTab === 'membership-days' ||
+    currentTab === 'days'
+  ) {
+    currentTab = 'membership';
+  }
 
   return (
     <div className="user-detail-page">
@@ -112,30 +123,29 @@ const UserDetailPage = () => {
 
       {/* ================= CONTENT ================= */}
       <div className="content">
-        <div className="mobile-tabs">
-          <Menu
-            mode="horizontal"
-            overflowedIndicator="..."
-            selectedKeys={[currentTab]}
-            onClick={({ key }) => navigate(key)}
-            items={tabItems}
-          />
-        </div>
+        {/* Mobile tabs now handled in CommonSider */}
 
-        <div className="sidebar">
-          <ul>
-            {menuItems.map(item => {
-              const isActive = currentTab === item.path;
-              return (
-                <li key={item.id}>
-                  <Link to={item.path} className={isActive ? 'active' : ''}>
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+              <CommonSider
+                items={menuItems.map(item => ({
+                  key: item.id,
+                  label: item.label,
+                  icon: null,
+                  path: item.path,
+                }))}
+                activeKey={(() => {
+                  const found = menuItems.find(item => currentTab === item.path);
+                  return found ? found.id : menuItems[0].id;
+                })()}
+                onSelect={key => {
+                  const item = menuItems.find(i => i.id === key);
+                  if (item) navigate(`${UserDetailRoute}/${id}/${item.path}`);
+                }}
+                mobileTabsProps={{
+                  tabItems,
+                  currentTab,
+                  onTabClick: ({ key }) => navigate(key)
+                }}
+              />
 
         <div className="employee-detail-content">
           <Outlet context={{ employee }} />

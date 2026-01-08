@@ -1,3 +1,4 @@
+@use '../../styles/breakpoints.scss' as *;
 .employee-page {
   min-height: 100vh;
   color: var(--sider-text);

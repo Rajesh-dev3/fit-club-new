@@ -1,4 +1,4 @@
-@import '../../styles/breakpoints.scss';
+@use '../../styles/breakpoints.scss' as *;
 
 .all-add-on-packages-page {
   background: var(--background-color);

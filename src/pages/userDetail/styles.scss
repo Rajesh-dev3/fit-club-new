@@ -1,35 +1,8 @@
-@import '../../styles/breakpoints.scss';
+@use '../../styles/breakpoints.scss' as *;
 .user-detail-page {
   background: var(--content-bg);
 
   
-  // Responsive Tabs for Mobile
-  .mobile-tabs {
-      margin-bottom: 16px;
-      display: none;
-      .ant-menu-horizontal {
-          width: 100%;
-          background: var(--card-bg);
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-          border: none;
-          .ant-menu-item {
-              font-size: 15px;
-              font-weight: 500;
-              color: var(--sider-text);
-              padding: 8px 12px;
-              margin: 0;
-              border-radius: 0;
-          }
-          .ant-menu-item-selected {
-              color: var(--accent);
-              background: var(--hover-bg);
-          }
-          .ant-menu-overflow-item {
-              color: var(--sider-text);
-          }
-      }
-  }
   
   /* ================= PROFILE CARD ================= */
   .profile-card {
@@ -41,6 +14,7 @@
     padding: 20px;
   justify-content: space-between;
   position: relative;
+  box-shadow: none !important;
     .left {
       margin-right: 20px;
   
@@ -145,101 +119,17 @@
   .content {
     display: flex;
     gap: 20px;
+    @include mobile {
+      flex-direction: column;
+    }
+    @include tablet {
+      flex-direction: column;
+    }
   }
   
   /* ================= SIDEBAR ================= */
-  .sidebar {
-    width: 20%;
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 12px;
-  
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-  
-      li {
-        padding: 0;
-        margin: 0;
-  
-        a {
-          display: block;
-          padding: 12px 14px;
-          // border-radius: 8px;
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-          cursor: pointer;
-          font-size: 14px;
-          color: var(--sider-text);
-          text-decoration: none;
-          transition:font-weight all 0.3s ease;
-  
-          &:hover {
-            background: var(--hover-bg);
-            color: var(--sider-text);
-               transition: all 0.3s ease;
-          }
-  
-         &.active {
-    background: var(--accent-dark);
-    color: var(--white);
-    position: relative;
-  
-    &::before {
-      content: '';
-      position: absolute;
-      left: -6px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 80%;
-      background: var(--accent);
-      border-radius: 4px;
-    }
-  }
-        }
-      }
-    }
-  }
   
   /* ================= RESPONSIVE ================= */
-  @include desktop {
-      .mobile-tabs {
-          display: none;
-      }
-      .content {
-          display: flex;
-      }
-  }
-  
-  @include mobile {
-    .sidebar {
-      display: none;
-    }
-  
-    .mobile-tabs {
-      display: block;
-    }
-  
-    .content {
-      display: block;
-    }
-  }
-  
-  @include tablet {
-    .sidebar {
-      display: none;
-    }
-  
-    .mobile-tabs {
-      display: block;
-    }
-  
-    .content {
-      display: block;
-    }
-  }
   
   
   /* ================= TABLE SECTION ================= */

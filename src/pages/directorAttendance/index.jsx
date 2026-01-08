@@ -7,6 +7,7 @@ import PageBreadcrumb from "../../components/breadcrumb";
 import DateRangeSelector from "../../components/dateRange/DateRangeSelector";
 
 import "./styles.scss";
+import CommonTable from "../../components/commonTable";
 
 const dummyData = [
   {
@@ -93,7 +94,7 @@ const DirectorAttendance = () => {
         />
       </div>
       <div className="attendance-table-wrapper">
-        <Table
+        <CommonTable
           columns={columns}
           dataSource={filteredData}
           rowKey={record => record.id}

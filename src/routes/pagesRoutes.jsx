@@ -3,7 +3,7 @@ import {
   createBrowserRouter,
   Navigate,
 } from "react-router-dom";
-import { AddEmployeeRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, DirectorAttendanceRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute } from "./routepath";
+import { AddEmployeeRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, DirectorAttendanceRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute } from "./routepath";
 import AddBranch from "../pages/addBranch";
 import AllBranches from "../pages/allBranches";
 import MainLayout from "../common/mainLayout";
@@ -61,7 +61,11 @@ import RefundHistory from "../components/userDetail/refundHistory";
 import DietsPlan from "../components/userDetail/dietsPlan";
 import UserParkingHistory from "../components/userDetail/parkingHistory";
 import UserBiometricAccess from "../components/userDetail/biometricAccess";
+import AddUserBiometricAccess from "../components/userDetail/biometricAccess/AddUserBiometricAccess";
 import {ErrorBoundary} from "../components/errorBoundery";
+import EditBranch from "../pages/editBranch";
+import FreezabilityForm from "../components/userDetail/membership/FreezabilityForm";
+import DaysForm from "../components/userDetail/membership/DaysForm";
 export const router = createBrowserRouter([
   {
     path: Home,
@@ -88,6 +92,7 @@ export const router = createBrowserRouter([
       { path: AddAddOnSlotRoute, element:<AddAddOnSlot/> },
       { path: AddBranchRoute, element: <AddBranch/> },
       { path: AllBranchesRoute, element: <AllBranches /> },
+      { path: `${EditBranchRoute}/:id`, element: <EditBranch />, errorElement: <ErrorBoundary /> },
       {
         path: `${EmployeeDetailRoute}/:id`,
         element: <EmployeeDetailPage />,
@@ -135,12 +140,15 @@ export const router = createBrowserRouter([
         children: [
           { path: UserDetailAttendanceRoute.slice(1), element: <UserAttendance /> },
           { path: UserDetailMembershipRoute.slice(1), element: <UserMembership /> },
+          { path: UserDetailMembershipFreezabilityRoute.slice(1), element: <FreezabilityForm /> },
+          { path: UserDetailMembershipDaysRoute.slice(1), element: <DaysForm /> },
           { path: UserDetailAddonPackageRoute.slice(1), element: <AddonPackage /> },
           { path: UserDetailAssessmentRoute.slice(1), element: <Assessment /> },
           { path: UserDetailRefundHistoryRoute.slice(1), element: <RefundHistory /> },
           { path: UserDetailParkingHistoryRoute.slice(1), element: <UserParkingHistory /> },
           { path: UserDetailDietsPlanRoute.slice(1), element: <DietsPlan /> },
           { path: UserDetailBiometricAccessRoute.slice(1), element: <UserBiometricAccess /> },
+          { path: "add-biometric-access", element: <AddUserBiometricAccess /> },
           { index: true, element: <UserAttendance /> },
         ],
       },

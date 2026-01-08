@@ -1,15 +1,16 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, Dropdown, Tag, message, Modal } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, MoreOutlined, HomeOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined, MoreOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { useGetRolesQuery, useDeleteRoleMutation, useUpdateRoleMutation } from "../../services/role";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 // ...existing code...
-import { Home, AddRoleRoute } from "../../routes/routepath";
+import {  AddRoleRoute } from "../../routes/routepath";
 import "./styles.scss";
+import CommonTable from "../../components/commonTable";
 
 const { confirm } = Modal;
 
@@ -177,24 +178,28 @@ const AllRoles = () => {
 
       {/* Header with Search, Tabs, and Add Button */}
       <div className="header-section">
+        <div className="left-col">
+
         <SearchBar
           value={searchText}
           onChange={setSearchText}
           placeholder="Search roles..."
-        />
+          />
 
         <StatusTabs
           activeTab={activeTab}
           onTabChange={setActiveTab}
           tabs={tabsData}
-        />
+          />
+          </div>
+<div className="flex" style={{ gap: "10px" }}>
 
         <Button 
           type="primary" 
           icon={<PlusOutlined />}
           className="add-btn"
           onClick={handleAddRole}
-        >
+          >
           Add Role
         </Button>
 
@@ -202,12 +207,13 @@ const AllRoles = () => {
           columns={allColumns}
           visibleColumns={visibleColumns}
           onColumnToggle={handleColumnToggle}
-        />
+          />
+          </div>
       </div>
 
       {/* Table */}
       <div className="roles-table-wrapper">
-        <Table
+        <CommonTable
           columns={columns}
           dataSource={paginatedData || []}
           loading={isLoading || deleting || updating}

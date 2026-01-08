@@ -1,0 +1,96 @@
+.membership-card {
+  width: 340px;
+  border: 2px solid var(--accent);
+  border-radius: 18px;
+  background: var(--card-bg);
+  position: relative;
+  overflow: hidden;
+  &:hover{
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+ box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+ transform: scale3d(1.01, 1.01, 1.01);
+
+  }
+}
+
+/* Ribbon */
+.ribbon {
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 80px;
+  height: 80px;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 10px;
+
+  span {
+    color: var(--white);
+    font-size: 18px;
+  }
+}
+
+/* Header */
+.card-header {
+  padding: 24px 16px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--accent);
+
+  .logo {
+    max-width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .branch-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--sider-text);
+    margin-top: 10px;
+    margin-bottom: 0;
+    text-align: right;
+    font-size: .875rem;
+  }
+}
+
+/* Body */
+.card-body {
+  padding: 20px;
+
+  .plan-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--sider-text);
+    margin-top: 0%;
+  }
+
+  .info {
+    p {
+      font-size: 18px;
+      margin: 6px 0;
+      color: var(--sider-text);
+      strong {
+        color: var(--sider-text);
+        font-weight: 700;
+      }
+    }
+  }
+
+  .freeze {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--sider-text);
+
+    .arrow {
+      display: block;
+      font-size: 26px;
+      margin-top: 4px;
+    }
+  }
+}

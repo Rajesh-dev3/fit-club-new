@@ -17,6 +17,7 @@ const AddAddOnSlotRoute = "/add-add-on-slot"
 
 const AllBranchesRoute = "/all-branches"
 const AddBranchRoute = "/add-branch"
+const EditBranchRoute = "/edit-branch"
 const AllAddOnPackagesRoute = "/all-add-on-packages"
 
 const EmployeeDetailRoute = "/employee-detail"
@@ -29,6 +30,7 @@ const EmployeeDetailAttendanceRoute = "/attendance"
 const EmployeeDetailEmployeeIdRoute = "/employee-id"
 const EmployeeDetailSalaryRoute = "/salary"
 const EmployeeDetailSalesHistoryRoute = "/sales-history"
+const UserDetailMembershipDaysRoute = "/membership-days";
 const EmployeeDetailParkingHistoryRoute = "/parking-history"
 const EmployeeDetailBiometricAccessRoute = "/biometric-access"
 const EmployeeDetailAddBiometricAccessRoute = "/add-biometric-access"
@@ -48,6 +50,7 @@ const GeneralStaffDetailAddBiometricAccessRoute = "/add-biometric-access"
 const UserDetailRoute = "/user-detail";
 const UserDetailAttendanceRoute = "/attendance";
 const UserDetailMembershipRoute = "/membership";
+const UserDetailMembershipFreezabilityRoute = "/membership-freezability";
 const UserDetailAddonPackageRoute = "/addon-package";
 const UserDetailAssessmentRoute = "/assessment";
 const UserDetailRefundHistoryRoute = "/refund-history";
@@ -85,5 +88,7 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
    UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute,
     UserDetailBiometricAccessRoute,
     UserDetailRoute,
-    AllBranchesRoute, AddBranchRoute
+    AllBranchesRoute, AddBranchRoute, EditBranchRoute,
+    UserDetailMembershipFreezabilityRoute,
+    UserDetailMembershipDaysRoute
  }

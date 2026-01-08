@@ -1,8 +1,8 @@
 import { user } from '../../assets/index';
 import './styles.scss';
-import { Outlet, Link, useParams, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useGetTrainersDetailQuery } from '../../services/trainer';
-import { Menu } from 'antd';
+import CommonSider from '../../components/commonSider';
 import { TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute } from '../../routes/routepath';
 
 const menuItems = [
@@ -27,8 +27,14 @@ const TrainerDetailPage = () => {
     label: item.label,
   }));
 
+  // Get current active tab from URL
+  const currentPath = location.pathname;
+  const pathSegments = currentPath.split('/');
+  // /trainer-detail/:id/:tab
+  const currentTab = pathSegments[pathSegments.length - 1] || TrainerDetailAttendanceRoute.slice(1);
+
   return (
-    <div className="employee-page">
+    <div className="trainer-detail-page">
       {/* ================= PROFILE CARD ================= */}
       <div className="profile-card">
         <div className="left">
@@ -54,39 +60,29 @@ const TrainerDetailPage = () => {
       </div>
       {/* ================= CONTENT ================= */}
       <div className="content">
-        {/* Mobile Tabs */}
-        <div className="mobile-tabs">
-          <Menu
-            mode="horizontal"
-            overflowedIndicator="..."
-           selectedKeys={[location.pathname.replace(`/trainer-detail/${id}`, '').slice(1) || TrainerDetailAttendanceRoute.slice(1)]}
-
-            onClick={({ key }) => navigate(`/trainer-detail/${id}/${key}`)}
-            items={tabItems}
-          />
-        </div>
-
-        {/* Sidebar */}
-        <div className="sidebar">
-          <ul>
-            {menuItems.map((item) => {
-              const fullPath = `/trainer-detail/${id}/${item.path}`;
-              let isActive = false;
-              if (location.pathname === `/trainer-detail/${id}` && item.path === '/attendance') {
-                isActive = true;
-              } else {
-                isActive = location.pathname.includes(item.path);
-              }
-              return (
-                <li key={item.id} >
-                  <Link to={fullPath} className={isActive ? 'active' : ''}>{item.label}</Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <CommonSider
+          items={menuItems.map(item => ({
+            key: item.id,
+            label: item.label,
+            icon: null,
+            path: item.path.slice(1),
+          }))}
+          activeKey={(() => {
+            const found = menuItems.find(item => currentTab === item.path.slice(1));
+            return found ? found.id : menuItems[0].id;
+          })()}
+          onSelect={key => {
+            const item = menuItems.find(i => i.id === key);
+            if (item) navigate(`/trainer-detail/${id}/${item.path.slice(1)}`);
+          }}
+          mobileTabsProps={{
+            tabItems,
+            currentTab,
+            onTabClick: ({ key }) => navigate(`/trainer-detail/${id}/${key}`)
+          }}
+        />
         {/* Detail Content */}
-        <div className="employee-detail-content">
+        <div className="trainer-detail-content">
           <Outlet context={{ trainer }} />
         </div>
       </div>

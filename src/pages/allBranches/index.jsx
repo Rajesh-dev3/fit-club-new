@@ -2,6 +2,8 @@
 import  { useState, useMemo } from "react";
 import { Button, Dropdown } from "antd";
 import { EyeOutlined, MoreOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { EditBranchRoute } from "../../routes/routepath";
 import { useGetBranchesQuery } from "../../services/branches";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
@@ -41,23 +43,7 @@ const allColumns = [
     width: 120,
     render: (val) => val ? val.charAt(0).toUpperCase() + val.slice(1) : "-",
   },
-  {
-    title: "Actions",
-    key: "actions",
-    width: 100,
-    align: "center",
-    render: (_, record) => {
-      const menuItems = [
-        { key: 'edit', label: 'Edit', onClick: () => {} },
-        // Add more actions here if needed
-      ];
-      return (
-        <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
-          <Button type="text" icon={<MoreOutlined style={{ fontSize: 20 }} />} />
-        </Dropdown>
-      );
-    },
-  },
+  // Actions column will be injected in the component
 ];
 
 const defaultVisible = {
@@ -88,7 +74,35 @@ const AllBranches = () => {
     );
   }, [branchList, searchText]);
 
-  const columns = allColumns.filter(col => visibleColumns[col.key]);
+  const navigate = useNavigate();
+  const columns = [
+    ...allColumns,
+    {
+      title: "Actions",
+      key: "actions",
+      width: 100,
+      align: "center",
+      render: (_, record) => {
+        const menuItems = [
+          {
+            key: 'edit',
+            label: 'Edit',
+            onClick: () => navigate(`${EditBranchRoute}/${record._id || record.id}`)
+          },
+          // Add more actions here if needed
+        ];
+        return (
+          <Dropdown
+            menu={{ items: menuItems }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button type="text" icon={<MoreOutlined style={{ fontSize: 20 }} />} />
+          </Dropdown>
+        );
+      },
+    },
+  ].filter(col => visibleColumns[col.key]);
 
   // Pagination
   const paginatedData = useMemo(() => {

@@ -19,18 +19,21 @@ const StatusTabs = ({ activeTab, onTabChange, tabs }) => {
       </div>
 
       {/* Mobile View - Select Dropdown */}
+      <div className="mobile-tabs-select">
+
       <Select
         value={activeTab}
         onChange={onTabChange}
-        className="status-tabs mobile-tabs"
+        className="status-tabs"
         style={{ width: '100%',height:42 }}
-      >
+        >
         {tabs.map((tab) => (
           <Select.Option key={tab.key} value={tab.key}>
             {tab.label} ({tab.count})
           </Select.Option>
         ))}
       </Select>
+        </div>
     </>
   );
 };

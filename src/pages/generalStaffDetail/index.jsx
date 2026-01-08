@@ -1,6 +1,7 @@
 import { user } from '../../assets/index';
 import './styles.scss';
 import { Outlet, Link, useParams, useLocation, useNavigate } from 'react-router-dom';
+import CommonSider from '../../components/commonSider';
 import { useGetGeneralStaffDetailQuery } from '../../services/generalStaff';
 import { Menu } from 'antd';
 
@@ -25,7 +26,7 @@ const GeneralStaffDetailPage = () => {
   }));
 
   return (
-    <div className="employee-page">
+    <div className="general-staff-detail-page">
       {/* ================= PROFILE CARD ================= */}
       <div className="profile-card">
         <div className="left">
@@ -52,32 +53,40 @@ const GeneralStaffDetailPage = () => {
       {/* ================= CONTENT ================= */}
       <div className="content">
         {/* Mobile Tabs */}
-        <div className="mobile-tabs">
-          <Menu
-            mode="horizontal"
-            overflowedIndicator="..."
-            selectedKeys={[location.pathname.replace(`/general-staff-detail/${id}`, '') || '/attendance']}
-            onClick={({ key }) => navigate(`/general-staff-detail/${id}/${key}`)}
-            items={tabItems}
-          />
-        </div>
-
-        {/* Sidebar */}
-        <div className="sidebar">
-          <ul>
-            {menuItems.map((item) => {
-              const fullPath = `/general-staff-detail/${id}/${item.path}`;
-              const isActive = location.pathname.includes(item.path);
-              return (
-                <li key={item.id} >
-                  <Link to={fullPath} className={isActive ? 'active' : ''}>{item.label}</Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        {/* Mobile Tabs and Sidebar via CommonSider */}
+        {(() => {
+          // Get current active tab from URL
+          const currentPath = location.pathname;
+          const pathSegments = currentPath.split('/');
+          // /general-staff-detail/:id/:tab
+          const currentTab = pathSegments[pathSegments.length - 1] || menuItems[0].path;
+          return (
+            <CommonSider
+              items={menuItems.map(item => ({
+                key: item.id,
+                label: item.label,
+                icon: null,
+                path: item.path,
+              }))}
+              activeKey={(() => {
+                const found = menuItems.find(item => currentTab === item.path);
+                return found ? found.id : menuItems[0].id;
+              })()}
+              onSelect={key => {
+                const item = menuItems.find(i => i.id === key);
+                if (item) navigate(`/general-staff-detail/${id}/${item.path}`);
+              }}
+              mobileTabsProps={{
+                tabItems: menuItems.map(item => ({ key: item.path, label: item.label })),
+                currentTab,
+                onTabClick: ({ key }) => navigate(`/general-staff-detail/${id}/${key}`)
+              }}
+            />
+          );
+        })()}
         {/* Detail Content */}
-        <div className="employee-detail-content">
+        {/* Detail Content */}
+        <div className="general-staff-detail-content">
           <Outlet context={{ staff }} />
         </div>
       </div>

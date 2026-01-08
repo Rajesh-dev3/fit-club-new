@@ -1,4 +1,4 @@
-@import '../../styles/breakpoints.scss';
+@use '../../styles/breakpoints.scss' as *;
 
 .main-header {
   background: var(--header-bg);
@@ -8,6 +8,7 @@
   height: 64px;
   display: flex;
   align-items: center;
+  padding-left: 17px;
   justify-content: space-between;
   box-shadow: var(--boxShadow);
    @include phone {

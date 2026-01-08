@@ -6,7 +6,13 @@ import { useImageUploadMutation, useDeleteImageMutation } from '../../services/i
 import "./styles.scss"
 const ImagePicker = ({ form, name = 'photo', aspectRatio = 1 }) => {
   const [open, setOpen] = useState(false);
-  const [preview, setPreview] = useState(() => form.getFieldValue(name) || null);
+  const [preview, setPreview] = useState(() => {
+    const val = form.getFieldValue(name);
+    if (Array.isArray(val) && val.length > 0 && val[0].url) {
+      return val[0].url;
+    }
+    return typeof val === 'string' ? val : null;
+  });
   const [uploadingLocal, setUploadingLocal] = useState(false);
   const [uploadImage] = useImageUploadMutation();
   const [deleteImage] = useDeleteImageMutation();
@@ -29,9 +35,12 @@ const ImagePicker = ({ form, name = 'photo', aspectRatio = 1 }) => {
   console.log(storedImageUrl,"hjkl")
   useEffect(() => {
     const val = form.getFieldValue(name);
-    if (val) {
+    if (Array.isArray(val) && val.length > 0 && val[0].url) {
+      setPreview(val[0].url);
+      setStoredImageUrl(val[0].url);
+    } else if (typeof val === 'string' && val) {
       setPreview(val);
-      setStoredImageUrl(val); // Store the actual uploaded URL
+      setStoredImageUrl(val);
     }
   }, [form, name]);
 

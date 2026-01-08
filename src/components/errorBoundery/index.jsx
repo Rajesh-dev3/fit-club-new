@@ -1,5 +1,6 @@
 // components/ErrorBoundary.jsx
 import { useRouteError, Link } from 'react-router-dom';
+import './styles.scss';
 
 export function ErrorBoundary() {
   const error = useRouteError();
@@ -11,7 +12,7 @@ export function ErrorBoundary() {
       <p>
         <i>{error.statusText || error.message}</i>
       </p>
-      <Link to="/">Go back to home</Link>
+      <Link to="/">Go back to Home</Link>
     </div>
   );
 }

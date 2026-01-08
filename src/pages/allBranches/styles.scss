@@ -1,4 +1,4 @@
-@import '../../styles/breakpoints.scss';
+@use '../../styles/breakpoints.scss' as *;
 .all-branches-page {
   min-height: 100vh;
   color: var(--sider-text);

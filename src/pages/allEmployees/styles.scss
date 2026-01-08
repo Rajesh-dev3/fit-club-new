@@ -1,4 +1,4 @@
-@import '../../styles/breakpoints.scss';
+@use '../../styles/breakpoints.scss' as *;
 
 .all-employees-page {
   min-height: 100vh;

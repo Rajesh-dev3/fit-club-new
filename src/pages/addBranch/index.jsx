@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Select, Button, message } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import ImagePicker from "../../components/form/ImagePicker";
@@ -12,6 +12,7 @@ const { Option } = Select;
 
 const AddBranch = () => {
   const [form] = Form.useForm();
+  const [sameAddress, setSameAddress] = useState(false);
   const [addBranch, { isLoading: adding }] = useAddBranchMutation();
   const navigate = useNavigate();
 
@@ -81,7 +82,7 @@ const AddBranch = () => {
 
   const validateInvoiceMidfix = (_, value) => {
     if (!value) return Promise.resolve();
-    if (!/^\d{2}$/.test(value)) return Promise.reject(new Error('Must be exactly 2 digits'));
+    if (!/^\d{10}$/.test(value)) return Promise.reject(new Error('Must be exactly 10 digits'));
     return Promise.resolve();
   };
 
@@ -138,11 +139,11 @@ const AddBranch = () => {
             label="Branch Area" 
             name="branchArea" 
             rules={[
-              { required: true, message: 'Please enter branch area' },
+              { required: true, message: 'Please enter branch area sq/ft' },
               { min: 3, message: 'Branch area must be at least 3 characters' }
             ]}
           >
-            <Input placeholder="Branch Area" />
+            <Input placeholder="Branch Area (sq / ft)" />
           </Form.Item>
           
           <Form.Item 
@@ -184,14 +185,14 @@ const AddBranch = () => {
           </Form.Item>
           
           <Form.Item 
-            label="Invoice Midfix" 
+            label="Financial Year" 
             name="invoiceMidfix" 
             rules={[
-              { required: true, message: 'Please enter invoice midfix' },
-              { validator: validateInvoiceMidfix }
+              { required: true, message: 'Please enter financial year' },
+              // { validator: validateInvoiceMidfix }
             ]}
           >
-            <Input placeholder="Invoice Midfix" maxLength={2} />
+            <Input placeholder="Financial Year" maxLength={10} type="text" />
           </Form.Item>
           
           <Form.Item 
@@ -309,7 +310,7 @@ const AddBranch = () => {
             className="full-width-item" 
             label="Register Address" 
             name="registerAddress" 
-            rules={[
+            rules={[ 
               { required: true, message: 'Please enter register address' },
               { min: 10, message: 'Address must be at least 10 characters' },
               { max: 500, message: 'Address cannot exceed 500 characters' }
@@ -320,24 +321,50 @@ const AddBranch = () => {
               autoSize={{ minRows: 2, maxRows: 4 }} 
               maxLength={500}
               showCount
+              onChange={e => {
+                if (sameAddress) {
+                  form.setFieldsValue({ companyAddress: e.target.value });
+                }
+              }}
             />
           </Form.Item>
-          
+
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: 8 }}>
+            <input
+              type="checkbox"
+              id="sameAddress"
+              checked={sameAddress}
+              style={{ marginRight: 8 }}
+              onChange={e => {
+                setSameAddress(e.target.checked);
+                if (e.target.checked) {
+                  form.setFieldsValue({ companyAddress: form.getFieldValue('registerAddress') });
+                } else {
+                  form.setFieldsValue({ companyAddress: '' });
+                }
+              }}
+            />
+            <label htmlFor="sameAddress" style={{ cursor: 'pointer', userSelect: 'none' }}>
+              Same as Register Address
+            </label>
+          </div>
+
           <Form.Item 
             className="full-width-item" 
-            label="Company Address" 
+            label="Branch Address" 
             name="companyAddress" 
-            rules={[
-              { required: true, message: 'Please enter company address' },
+            rules={[ 
+              { required: true, message: 'Please enter Branch address' },
               { min: 10, message: 'Address must be at least 10 characters' },
               { max: 500, message: 'Address cannot exceed 500 characters' }
             ]}
           >
             <Input.TextArea 
-              placeholder="Company Address" 
+              placeholder="Branch Address" 
               autoSize={{ minRows: 2, maxRows: 4 }} 
               maxLength={500}
               showCount
+              disabled={sameAddress}
             />
           </Form.Item>
         </div>

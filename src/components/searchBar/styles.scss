@@ -1,4 +1,4 @@
-@import '../../styles/breakpoints.scss';
+@use '../../styles/breakpoints.scss' as *;
 .search-bar-container {
   width: 48px;
   transition: width 0.3s ease-in-out;

@@ -1,4 +1,4 @@
-@import '../../styles/breakpoints.scss';
+@use '../../styles/breakpoints.scss' as *;
 
 .all-roles-page {
   min-height: 100vh;
@@ -16,15 +16,25 @@
   }
 
   .header-section {
-    display: flex;
+     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 16px;
     margin-bottom: 24px;
     flex-wrap: wrap;
+    gap: 16px;
 
+   .left-col{
+      gap: 16px;
+      display: flex;
+        align-items: center;
+    flex-wrap: wrap;
+    
     @include mobile {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+         display: grid;
+         grid-template-columns: repeat(2 ,1fr);
+         align-items: center;
+         
+       }
     }
 
     .add-btn {

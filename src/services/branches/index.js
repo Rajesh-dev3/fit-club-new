@@ -13,10 +13,25 @@ export const branches = createApi({
       }),
       providesTags: ['Branches'],
     }),
+    getBranchesById: builder.query({
+      query: (id) => ({
+        url: `/branches/${id}`,
+        method: "GET",
+      }),
+      providesTags: ['Branches'],
+    }),
     addBranch: builder.mutation({
       query: (body) => ({
         url: `/branches`,
         method: "POST",
+        body,
+      }),
+      invalidatesTags: ['Branches'],
+    }),
+    updateBranch: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/branches/${id}`,
+        method: "PUT",
         body,
       }),
       invalidatesTags: ['Branches'],
@@ -26,4 +41,4 @@ export const branches = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetBranchesQuery, useAddBranchMutation } = branches
+export const { useGetBranchesQuery, useGetBranchesByIdQuery, useAddBranchMutation, useUpdateBranchMutation } = branches
