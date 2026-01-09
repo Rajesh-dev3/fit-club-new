@@ -3,7 +3,7 @@ import {
   createBrowserRouter,
   Navigate,
 } from "react-router-dom";
-import { AddEmployeeRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, DirectorAttendanceRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute } from "./routepath";
+import { AddEmployeeRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, DirectorAttendanceRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute, DirectorDetailPageRoute, DirectorAttendancePageRoute, DirectorBiometricAccessPageRoute } from "./routepath";
 import AddBranch from "../pages/addBranch";
 import AllBranches from "../pages/allBranches";
 import MainLayout from "../common/mainLayout";
@@ -66,6 +66,11 @@ import {ErrorBoundary} from "../components/errorBoundery";
 import EditBranch from "../pages/editBranch";
 import FreezabilityForm from "../components/userDetail/membership/FreezabilityForm";
 import DaysForm from "../components/userDetail/membership/DaysForm";
+import DirectorDetailPage from "../pages/directorDetail";
+
+import DirectorDetailAttendance from "../components/directorDetail/attendance";
+import DirectorDetailBiometricAccess from "../components/directorDetail/biometricAccess";
+
 export const router = createBrowserRouter([
   {
     path: Home,
@@ -150,6 +155,18 @@ export const router = createBrowserRouter([
           { path: UserDetailBiometricAccessRoute.slice(1), element: <UserBiometricAccess /> },
           { path: "add-biometric-access", element: <AddUserBiometricAccess /> },
           { index: true, element: <UserAttendance /> },
+        ],
+      },
+      // director Detail Route
+      {
+        path: `${DirectorDetailPageRoute}/:id`,
+        element: <DirectorDetailPage />, 
+          errorElement: <ErrorBoundary />,  // Add error boundary
+        children: [
+          { path: DirectorAttendancePageRoute.slice(1), element: <DirectorDetailAttendance /> },
+          { path: DirectorBiometricAccessPageRoute.slice(1), element: <DirectorDetailBiometricAccess /> },
+       
+          { index: true, element: <DirectorDetailAttendance /> },
         ],
       },
 

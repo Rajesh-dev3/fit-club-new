@@ -68,6 +68,11 @@ const TrainerDetailParkingHistoryRoute = "/parking-history"
 const TrainerDetailBiometricAccessRoute = "/biometric-access"
 const TrainerDetailAddBiometricAccessRoute = "/add-biometric-access"
 
+// director Detail Routes
+const DirectorDetailPageRoute = "/director-detail"
+const DirectorAttendancePageRoute = "/attendance"
+const DirectorBiometricAccessPageRoute = "/biometric-access"
+
 export { Home, AddUserRoute, AddEmployeeRoute,
      AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, 
      AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, 
@@ -90,5 +95,8 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
     UserDetailRoute,
     AllBranchesRoute, AddBranchRoute, EditBranchRoute,
     UserDetailMembershipFreezabilityRoute,
-    UserDetailMembershipDaysRoute
+    UserDetailMembershipDaysRoute,
+    DirectorDetailPageRoute,
+    DirectorAttendancePageRoute,
+    DirectorBiometricAccessPageRoute
  }

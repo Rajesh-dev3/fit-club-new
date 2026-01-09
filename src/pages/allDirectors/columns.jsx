@@ -1,5 +1,7 @@
 import { Tag, Button, Dropdown } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, HomeOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import { DirectorDetailPageRoute, UserDetailAttendanceRoute } from "../../routes/routepath";
 
 export const getColumns = (handleView, handleEdit, handleDelete, handleChangePassword) => [
   {
@@ -58,11 +60,13 @@ export const getColumns = (handleView, handleEdit, handleDelete, handleChangePas
     width: 80,
     align: 'center',
     render: (_, record) => (
+      <Link to={DirectorDetailPageRoute + `/${record._id}/${UserDetailAttendanceRoute}`}>
       <Button
         type="link"
         icon={<EyeOutlined />}
         onClick={() => handleView(record)}
-      />
+        />
+        </Link>
     ),
   },
   {
