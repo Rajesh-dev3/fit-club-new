@@ -1,6 +1,7 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi } from '@reduxjs/toolkit/query/react'
 import {dynamicBaseQuery} from "../badRequestHandler"
+import { id } from 'date-fns/locale';
 // Define a service using a base URL and expected endpoints
 export const user = createApi({
   reducerPath: 'user',
@@ -11,6 +12,13 @@ export const user = createApi({
         url: `/users`,
         method: "POST",
         body,
+      }),
+      invalidatesTags:["user"]
+    }),
+    userDetailData: builder.query({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: "GET",
       }),
       invalidatesTags:["user"]
     }),
@@ -42,4 +50,4 @@ export const user = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useAdduserMutation, useGetAttachUserListQuery,useGetAllUserQuery } = user
+export const { useUserDetailDataQuery,useAdduserMutation, useGetAttachUserListQuery,useGetAllUserQuery } = user

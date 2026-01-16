@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Select } from "antd";
-import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
-import { Home } from "../../routes/routepath";
+import { PlusOutlined } from "@ant-design/icons";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
@@ -24,7 +24,10 @@ const mapPackageToRow = (pkg) => ({
   status: pkg.status || '-',
 });
 
+import { AddAddOnPackageRoute } from "../../routes/routepath";
+
 const AllAddOnPackages = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [searchText, setSearchText] = useState("");
@@ -121,7 +124,12 @@ const AllAddOnPackages = () => {
             visibleColumns={visibleColumns}
             onColumnToggle={handleColumnToggle}
           />
-          <Button type="primary" icon={<PlusOutlined />} className="add-btn">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            className="add-btn"
+            onClick={() => navigate(AddAddOnPackageRoute)}
+          >
             Add Add On Package
           </Button>
         </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Button, Drawer, Space, Tooltip, Spin, message, Modal, Slider, Radio, Row, Col } from 'antd';
 import { CameraOutlined, PictureOutlined, CloudUploadOutlined, CloseOutlined, CheckOutlined, UploadOutlined, RotateLeftOutlined, RotateRightOutlined, ZoomInOutlined, UndoOutlined, BorderOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import Cropper from 'react-easy-crop';
@@ -32,7 +32,7 @@ const ImagePicker = ({ form, name = 'photo', aspectRatio = 1 }) => {
 
   const [storedImageUrl, setStoredImageUrl] = useState(null);
 
-  console.log(storedImageUrl,"hjkl")
+ 
   useEffect(() => {
     const val = form.getFieldValue(name);
     if (Array.isArray(val) && val.length > 0 && val[0].url) {

@@ -24,14 +24,14 @@ const GeneralStaffDetailPage = () => {
     key: item.path,
     label: item.label,
   }));
-
+console.log(staff,"userInfo")
   return (
     <div className="general-staff-detail-page">
       {/* ================= PROFILE CARD ================= */}
       <div className="profile-card">
         <div className="left">
           <div className="avatar">
-            <img src={staff.photo || user} alt="general-staff" />
+            <img src={staff?.photo || user} alt="general-staff" />
             <span className="status">{userInfo.status ? userInfo.status.charAt(0).toUpperCase() + userInfo.status.slice(1) : 'Active'}</span>
           </div>
         </div>

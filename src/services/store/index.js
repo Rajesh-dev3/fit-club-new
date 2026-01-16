@@ -13,11 +13,13 @@ import { employee } from '../employee'
 import { generalStaffApi } from '../generalStaff'
 import { plans } from '../package'
 import { director } from '../director'
+import { coupons } from '../coupons'
 
 export const store = configureStore({
   reducer: {
     // Add the generated reducer as a specific top-level slice
     [user.reducerPath]: user.reducer,
+    [coupons.reducerPath]: coupons.reducer,
     [countries.reducerPath]: countries.reducer,
     [branches.reducerPath]: branches.reducer,
     [imageService.reducerPath]: imageService.reducer,
@@ -45,6 +47,7 @@ export const store = configureStore({
      generalStaffApi.middleware,
     plans.middleware,
     director.middleware,
+    coupons.middleware,
   ),
 })
 

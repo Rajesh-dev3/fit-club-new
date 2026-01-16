@@ -1,3 +1,5 @@
+const AddCouponRoute = "/add-coupon"
+const AllCouponsRoute = "/all-coupons"
 const Home = "/"
 const AddUserRoute = "/add-user"
 const AddEmployeeRoute = "/add-employee"
@@ -18,7 +20,9 @@ const AddAddOnSlotRoute = "/add-add-on-slot"
 const AllBranchesRoute = "/all-branches"
 const AddBranchRoute = "/add-branch"
 const EditBranchRoute = "/edit-branch"
+
 const AllAddOnPackagesRoute = "/all-add-on-packages"
+const AddAddOnPackageRoute = "/add-add-on-package"
 
 const EmployeeDetailRoute = "/employee-detail"
 const DirectorAttendanceRoute = "/director-attendance"
@@ -77,7 +81,7 @@ export { Home, AddUserRoute, AddEmployeeRoute,
      AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, 
      AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, 
      AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute,
-      AddAddOnSlotRoute, AllAddOnPackagesRoute, AllUsersRoute,
+      AddAddOnSlotRoute, AllAddOnPackagesRoute, AddAddOnPackageRoute, AllUsersRoute,
        DirectorAttendanceRoute, loginRoute, EmployeeDetailRoute,
         EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute,
          EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, 
@@ -97,6 +101,8 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
     UserDetailMembershipFreezabilityRoute,
     UserDetailMembershipDaysRoute,
     DirectorDetailPageRoute,
-    DirectorAttendancePageRoute,
-    DirectorBiometricAccessPageRoute
+   DirectorAttendancePageRoute,
+   DirectorBiometricAccessPageRoute,
+   AllCouponsRoute,
+   AddCouponRoute
  }

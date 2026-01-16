@@ -1,0 +1,22 @@
+.all-coupons-page {
+  color: var(--sider-text);
+  font-family: 'Inter', sans-serif;
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    .left-col {
+      display: flex;
+      gap: 12px;
+    }
+  }
+
+  .coupons-table-wrapper {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin-bottom: 10px;
+  }
+}

@@ -18,7 +18,7 @@ import {
   SmileOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { AddEmployeeRoute, AddGeneralStaffRoute, AddRoleRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AllRolesRoute, AllTrainersRoute, AllDirectorsRoute, Home, AllUsersRoute, DirectorAttendanceRoute, AllPackagesRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, AllBranchesRoute, AddBranchRoute } from '../../routes/routepath';
+import { AddEmployeeRoute, AddGeneralStaffRoute, AddRoleRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AllRolesRoute, AllTrainersRoute, AllDirectorsRoute, Home, AllUsersRoute, DirectorAttendanceRoute, AllPackagesRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, AllBranchesRoute, AddBranchRoute, AllCouponsRoute, AddCouponRoute } from '../../routes/routepath';
 
 const items = [
   {
@@ -167,8 +167,8 @@ const items = [
     label: 'Coupon',
     icon: <GiftOutlined />,
     children: [
-      { key: '16-1', label: 'All Coupons' },
-      { key: '16-2', label: 'Add Coupon' },
+      { key: '16-1', label: <Link to={AllCouponsRoute}>All Coupons</Link> },
+      { key: '16-2', label: <Link to={AddCouponRoute}>Add Coupon</Link> },
       { key: '16-3', label: 'Activity Log' },
     ],
   },

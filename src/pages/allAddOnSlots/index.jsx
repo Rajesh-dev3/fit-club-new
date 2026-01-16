@@ -1,13 +1,11 @@
-import React, { useState, useMemo } from "react";
+import  { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Dropdown, Select, Spin } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, MoreOutlined, HomeOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import {  PlusOutlined, HomeOutlined } from "@ant-design/icons";
 import { Home, AddAddOnSlotRoute } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
-import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
-import PageBreadcrumb from "../../components/breadcrumb";
 import CommonTable from '../../components/commonTable';
 import "./styles.scss";
 import { getAddOnSlotColumns } from './columns';

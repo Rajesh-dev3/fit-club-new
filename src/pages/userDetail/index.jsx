@@ -1,11 +1,11 @@
 import { user as userImg } from '../../assets/index';
 import './styles.scss';
-import { Outlet, Link, useParams, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { Menu } from 'antd';
 import CommonSider from '../../components/commonSider';
 import { UserDetailRoute } from '../../routes/routepath';
+import { useUserDetailDataQuery } from '../../services/user';
 
 const menuItems = [
   { id: 'attendance', label: 'Attendance', path: 'attendance' },
@@ -22,10 +22,10 @@ const UserDetailPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-
-  const data = {};
-  const userData = data?.data || {};
+const { data } = useUserDetailDataQuery(id); // TODO: Fetch user detail data using RTK Query
+  const userData = data?.user || {};
   const member = userData.member || {};
+  const memberShip = userData.memberShip || {};
 
   const userInfo = {
     name: 'Bhumika',
@@ -67,46 +67,46 @@ const UserDetailPage = () => {
   ) {
     currentTab = 'membership';
   }
-
+console.log('User Data:', member);
   return (
     <div className="user-detail-page">
       {/* ================= PROFILE CARD ================= */}
       <div className="profile-card">
         <div className="left">
           <div className="avatar">
-            <img src={userImg} alt="employee" />
-            <span className="status">Active</span>
+            <img src={member.photo || userImg} alt="employee" />
+            <span className="status">{userData?.status}</span>
           </div>
         </div>
 
         <div className="right">
           {/* ===== ALWAYS VISIBLE ===== */}
           <div className="row">
-            <span><b>Name:</b> <span className="value">{userInfo.name}</span></span>
-            <span><b>Age:</b> <span className="value">{userInfo.age}</span></span>
-            <span><b>DOB:</b> <span className="value">{userInfo.dob}</span></span>
-            <span><b>Gender:</b> <span className="value">{userInfo.gender}</span></span>
+            <span><b>Name:</b> <span className="value">{userData?.name}</span></span>
+            <span><b>Age:</b> <span className="value">{member?.age}</span></span>
+            <span><b>DOB:</b> <span className="value">{member?.dob}</span></span>
+            <span><b>Gender:</b> <span className="value">{member?.gender}</span></span>
           </div>
 
           <div className="row">
-            <span><b>Mobile No.:</b> <span className="value">{userInfo.phoneNumber}</span></span>
-            <span><b>Email:</b> <span className="value">{userInfo.email}</span></span>
+            <span><b>Mobile No.:</b> <span className="value">{userData?.phoneNumber}</span></span>
+            <span><b>Email:</b> <span className="value">{userData?.email}</span></span>
           </div>
 
           {/* ===== COLLAPSIBLE CONTENT (NEW – NOTHING REMOVED) ===== */}
           <div className={`profile-expand-wrapper ${expanded ? 'expanded' : ''}`}>
             <div className="row">
-              <span><b>Alternate No.:</b> <span className="value">{userInfo.alternateNumber}</span></span>
+              <span><b>Alternate No.:</b> <span className="value">{member?.alternativePhoneNumber}</span></span>
               <span><b>Address:</b> <span className="value">{employee.address}</span></span>
-              <span><b>ID Type:</b> <span className="value">{employee.idType}</span></span>
+              <span><b>ID Type:</b> <span className="value">{member.idType}</span></span>
             </div>
 
             <div className="row">
-              <span><b>ID No.:</b> <span className="value">{employee.idNo}</span></span>
-              <span><b>Biometric Id:</b> <span className="value">{userInfo.biometricId}</span></span>
+              <span><b>ID No.:</b> <span className="value">{member.idNumber}</span></span>
+              <span><b>Biometric Id:</b> <span className="value">{userData?.biometricId}</span></span>
               <span><b>Designation:</b> <span className="value">{employee.designation}</span></span>
               <span><b>Work:</b> <span className="value">{employee.work}</span></span>
-              <span><b>BMI:</b> <span className="value">{userInfo.bmi}</span></span>
+              <span><b>BMI:</b> <span className="value">{userData?.bmi}</span></span>
             </div>
           </div>
 

@@ -1,3 +1,4 @@
+
 .status-tabs {
   &.desktop-tabs {
     display: flex;
@@ -55,6 +56,23 @@
       &.count-block {
         background: #fa541c;
       }
+      // Coupon status bar custom count backgrounds
+&.count-all {
+  background: #bdbdbd !important;
+}
+&.count-regular {
+  background: #1976d2 !important;
+}
+&.count-single_use {
+  background: #388e3c !important;
+}
+&.count-used {
+  background: #fbc02d !important;
+  color: #222 !important;
+}
+&.count-unused {
+  background: #d32f2f !important;
+}
     }
 
     &:hover {
