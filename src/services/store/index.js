@@ -14,6 +14,10 @@ import { generalStaffApi } from '../generalStaff'
 import { plans } from '../package'
 import { director } from '../director'
 import { coupons } from '../coupons'
+import { feedbacks } from '../feedbacks'
+import { qrCodes } from '../qrCodes'
+import { departments } from '../departments'
+import branchReducer from '../branchSlice'
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +35,10 @@ export const store = configureStore({
     [generalStaffApi.reducerPath]: generalStaffApi.reducer,
     [plans.reducerPath]: plans.reducer,
     [director.reducerPath]: director.reducer,
+    [feedbacks.reducerPath]: feedbacks.reducer,
+    [qrCodes.reducerPath]: qrCodes.reducer,
+    [departments.reducerPath]: departments.reducer,
+    branch: branchReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -48,6 +56,9 @@ export const store = configureStore({
     plans.middleware,
     director.middleware,
     coupons.middleware,
+    feedbacks.middleware,
+    qrCodes.middleware,
+    departments.middleware,
   ),
 })
 

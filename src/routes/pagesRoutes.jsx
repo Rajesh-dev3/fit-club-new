@@ -1,3 +1,5 @@
+import AllFeedbacks from "../pages/allFeedbacks";
+import { AllFeedbacksRoute } from "./routepath";
 import AddCoupon from "../pages/addCoupon";
 import { AddCouponRoute } from "./routepath";
 import AllCoupons from "../pages/allCoupons";
@@ -244,6 +246,7 @@ export const router = createBrowserRouter([
       },
       { path: AllCouponsRoute, element: <AllCoupons /> },
       { path: AddCouponRoute, element: <AddCoupon /> },
+      { path: AllFeedbacksRoute, element: <AllFeedbacks /> },
 
     ]
     

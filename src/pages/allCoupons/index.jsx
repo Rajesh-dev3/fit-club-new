@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { message, Modal, Dropdown } from "antd";
+import { message, Modal, Dropdown, Button } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
@@ -8,7 +8,7 @@ import ColumnVisibility from "../../components/columnVisibility";
 import PageBreadcrumb from "../../components/breadcrumb";
 import CustomPagination from "../../components/pagination";
 import { HomeOutlined } from "@ant-design/icons";
-import { Home } from "../../routes/routepath";
+import { Home, AddCouponRoute } from "../../routes/routepath";
 import "./styles.scss";
 import { useGetAllCouponQuery } from "../../services/coupons";
 
@@ -284,7 +284,10 @@ const AllCoupons = () => {
             tabs={updatedStatusTabs}
           />
         </div>
-        <div className="flex" style={{ gap: "10px" }}>
+        <div className="flex" style={{ gap: "10px", alignItems: 'center' }}>
+          <Button type="primary" href={AddCouponRoute} style={{ fontWeight: 500 }}>
+            Add Coupon
+          </Button>
           <ColumnVisibility
             columns={allColumns}
             visibleColumns={visibleColumns}

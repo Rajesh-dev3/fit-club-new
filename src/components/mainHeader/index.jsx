@@ -1,16 +1,22 @@
 import React from "react";
 import { IoMenu } from "react-icons/io5";
 import { FiMoon, FiSun } from "react-icons/fi";
-import { Select, Avatar, Dropdown } from "antd";
+import { Select, Avatar, Dropdown, Spin } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useTheme } from "../../context/ThemeContext";
+import { useGetBranchesQuery } from "../../services/branches";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedBranch } from "../../services/branchSlice";
 import "./styles.scss";
 
 const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) => {
   const { theme, toggleTheme } = useTheme();
   const isLight = theme === "light";
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const selectedBranch = useSelector(state => state.branch.selectedBranch);
+  const { data: branchData, isLoading: branchLoading } = useGetBranchesQuery();
 
   const handleMenuClick = () => {
     if (isMobile) {
@@ -68,15 +74,21 @@ const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) =
         </button>
 
         <Select
-          defaultValue="All"
+          value={selectedBranch || undefined}
           className="dark-select"
           classNames={{ popup: { root: 'dark-select-dropdown' } }}
-          options={[
-            { value: "All", label: "All" },
-            { value: "Golf Course", label: "Golf Course" },
-            { value: "Shushant Lok", label: "Shushant Lok" },
-          ]}
-        />
+          style={{ minWidth: 180 }}
+          loading={branchLoading}
+          placeholder="Select Branch"
+          onChange={val => dispatch(setSelectedBranch(val))}
+          optionFilterProp="children"
+          showSearch
+        >
+          <Select.Option value="all">All</Select.Option>
+          {branchData?.data?.map(b => (
+            <Select.Option key={b._id} value={b._id}>{b.name}</Select.Option>
+          ))}
+        </Select>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

@@ -1,0 +1,38 @@
+@use '../../styles/breakpoints.scss' as *;
+
+.all-feedbacks-page {
+  min-height: 100vh;
+
+  .header-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    @include mobile {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .page-title {
+      color: var(--sider-text);
+      font-size: 22px;
+      font-weight: 600;
+    }
+    .select-department{
+      height: 40px !important;
+    }
+    .create-dept-btn{
+      height: 40px;
+    }
+    .generate-qr-btn{
+      height: 40px;
+      background-color: var(--accent);
+      border: none;
+      outline: none;
+    }
+  }
+
+  .feedbacks-table-wrapper {
+   
+  }
+}

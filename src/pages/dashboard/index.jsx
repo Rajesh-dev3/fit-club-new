@@ -1,13 +1,10 @@
-import React from "react";
+
 import "./styles.scss";
 
 const Dashboard = () => {
   return (
     <div className="dashboard-wrapper">
       <h1 className="db-title">Dashboard</h1>
-
-    
-
         {/* RIGHT SIDE SMALL STATS CARDS */}
         <div className="stats-grid">
           {[1,2,3,4].map((i) => (

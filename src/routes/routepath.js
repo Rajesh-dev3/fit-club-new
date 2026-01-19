@@ -1,3 +1,4 @@
+const AllFeedbacksRoute = "/all-feedbacks";
 const AddCouponRoute = "/add-coupon"
 const AllCouponsRoute = "/all-coupons"
 const Home = "/"
@@ -103,6 +104,7 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
     DirectorDetailPageRoute,
    DirectorAttendancePageRoute,
    DirectorBiometricAccessPageRoute,
-   AllCouponsRoute,
-   AddCouponRoute
+  AllCouponsRoute,
+  AddCouponRoute,
+  AllFeedbacksRoute
  }
