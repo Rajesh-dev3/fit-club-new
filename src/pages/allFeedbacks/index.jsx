@@ -1,107 +1,32 @@
 import React, { useMemo, useState } from "react";
 import { Modal, Carousel } from "antd";
 import { Image, Tag, Select, Button } from "antd";
+import GoodSmileIcon from "../../assets/svg/goodSmile";
+import BadSmileIcon from "../../assets/svg/badSmile";
+import NeutralSmileIcon from "../../assets/svg/neutralIcon";
 import QRModal from "../../components/QRModal";
 import DepartmentModal from "../../components/DepartmentModal";
 import { useAssignToMutation, useGetAllFeedbacksQuery, useGetEmployeesByBranchQuery, useUpdateFeedbackStatusMutation } from "../../services/feedbacks";
 import { useGetDepartmentsQuery } from "../../services/departments";
 import CommonTable from "../../components/commonTable";
+import CustomPagination from "../../components/pagination";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 import "./styles.scss";
 import { useSelector } from "react-redux";
 import StatusTabs from "../../components/statusTabs";
+import { getColumns } from "./colums";
 
-const getColumns = (onViewFeedback, onViewImages, employees = [], onAssignTo, onStatusChange) => [
-  {
-    title: "S.NO",
-    dataIndex: "serial",
-    key: "serial",
-    align: "center",
-    render: (_, __, idx) => idx + 1,
-  },
-  { title: "Ticket Id", dataIndex: "ticketId", key: "ticketId" },
-  { title: "Department", dataIndex: "department", key: "department" },
-  { title: "Branch", dataIndex: "branch", key: "branch" },
-  { title: "Customer Name", dataIndex: "customerName", key: "customerName" },
-  { title: "Mobile Number", dataIndex: "mobileNumber", key: "mobileNumber" },
-  { title: "Email", dataIndex: "email", key: "email" },
-  {
-    title: "Feedback",
-    dataIndex: "feedback",
-    key: "feedback",
-    render: (text, row) => (
-      <Tag color="blue" style={{ cursor: "pointer" }} onClick={() => onViewFeedback(row)}>
-        View
-      </Tag>
-    ),
-  },
-  {
-    title: "Images",
-    dataIndex: "images",
-    key: "images",
-    render: (imgs, row) =>
-      imgs && imgs.length ? (
-        <Tag color="blue" style={{ cursor: "pointer" }} onClick={() => onViewImages(imgs, 0)}>
-          View
-        </Tag>
-      ) : (
-        "-"
-      ),
-  },
-  { title: "Staff Behavior", dataIndex: "staffBehavior", key: "staffBehavior" },
-  { title: "Gym Hygiene", dataIndex: "gymHygiene", key: "gymHygiene" },
-  { title: "Date & Time", dataIndex: "dateTime", key: "dateTime" },
-  {
-    title: "Status",
-    dataIndex: "status",
-    key: "status",
-    render: (status, row) => (
-      <Select
-        value={status}
-        style={{ minWidth: 120 }}
-        options={[
-          { value: "pending", label: "Pending" },
-          { value: "in_process", label: "In Process" },
-          { value: "completed", label: "Completed" },
-        ]}
-        onChange={value => onStatusChange && onStatusChange(value, row.key)}
-        disabled={false}
-      />
-    ),
-  },
-  {
-    title: "Assign To",
-    dataIndex: "assignToId",
-    key: "assignTo",
-    render: (assignToId, row) => {
-      const employeeOptions = employees.map(emp => ({
-        value: emp._id,
-        label: emp.name
-      }));
-      const assignedEmployee = employees.find(emp => emp._id === assignToId);
-      return (
-        <Select
-          value={assignedEmployee ? assignedEmployee._id : undefined}
-          style={{ minWidth: 140 }}
-          placeholder="Assign user"
-          options={employeeOptions}
-          onChange={(selectedValue) => {
-            if (typeof onAssignTo === 'function' && selectedValue) {
-              onAssignTo(selectedValue, row.key);
-            }
-          }}
-          disabled={employees.length === 0}
-          showSearch
-          allowClear
-          filterOption={(input, option) =>
-            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-          }
-        />
-      );
-    },
-  },
-];
+
+
+// Helper to determine sentiment from feedback (simple keyword-based)
+function getSentiment(feedback) {
+  if (!feedback) return "neutral";
+  const text = feedback.toLowerCase();
+  if (/(accha|good|excellent|awesome|best|satisfied|great|very good|nice|helpful|supportive|positive)/.test(text)) return "good";
+  if (/(bura|bad|poor|worst|not good|disappointed|negative|rude|problem|issue|complain|complaint)/.test(text)) return "bad";
+  return "neutral";
+}
 
 const mapFeedbackToRow = (fb, idx) => {
   // Check for assignTo structure
@@ -122,6 +47,7 @@ const mapFeedbackToRow = (fb, idx) => {
     }
   }
   
+  const feedbackText = fb.messageText || fb.feedback || fb.message || "-";
   return {
     key: fb._id || idx,
     ticketId: fb.ticketId || "-",
@@ -130,7 +56,8 @@ const mapFeedbackToRow = (fb, idx) => {
     customerName: fb.customerName || fb.name || "-",
     mobileNumber: fb.mobileNumber || fb.phoneNumber || fb.phone || "-",
     email: fb.email || "-",
-    feedback: fb.messageText || fb.feedback || fb.message || "-",
+    feedback: feedbackText,
+    sentiment: getSentiment(feedbackText),
     images: fb.images || [],
     staffBehavior: fb.staffBehavior || "-",
     gymHygiene: fb.gymHygiene || "-",
@@ -157,10 +84,14 @@ const AllFeedbacks = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const { data: departmentsData, isLoading: departmentsLoading } = useGetDepartmentsQuery();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const { data, isLoading, refetch } = useGetAllFeedbacksQuery({
     status: activeTab === 'all' ? undefined : activeTab,
     department: selectedDepartment || undefined,
     branchId: branchId || undefined,
+    page,
+    limit: pageSize,
   });
   const [assignTo] = useAssignToMutation();
   const { data: employeesData, isLoading: employeesLoading } = useGetEmployeesByBranchQuery(branchId);
@@ -280,6 +211,13 @@ const AllFeedbacks = () => {
           loading={isLoading}
           rowKey="key"
           scroll={{ x: 1200 }}
+        />
+        <CustomPagination
+          current={data?.pagination?.page || page}
+          pageSize={data?.pagination?.limit || pageSize}
+          total={data?.pagination?.total || 0}
+          onPageChange={p => setPage(p)}
+          onPageSizeChange={size => { setPageSize(size); setPage(1); }}
         />
       </div>
       <QRModal open={qrModalOpen} onClose={() => setQrModalOpen(false)} />

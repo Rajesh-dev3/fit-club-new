@@ -84,7 +84,7 @@ const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) =
           optionFilterProp="children"
           showSearch
         >
-          <Select.Option value="all">All</Select.Option>
+          <Select.Option value="all" >All</Select.Option>
           {branchData?.data?.map(b => (
             <Select.Option key={b._id} value={b._id}>{b.name}</Select.Option>
           ))}

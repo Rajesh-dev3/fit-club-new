@@ -17,6 +17,7 @@ const AllPackagesRoute = "/all-packages"
 const AddPackageRoute = "/add-package"
 const AllAddOnSlotsRoute = "/all-add-on-slots"
 const AddAddOnSlotRoute = "/add-add-on-slot"
+const userFeedbackRoute = "/user-feedback"
 
 const AllBranchesRoute = "/all-branches"
 const AddBranchRoute = "/add-branch"
@@ -106,5 +107,6 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
    DirectorBiometricAccessPageRoute,
   AllCouponsRoute,
   AddCouponRoute,
-  AllFeedbacksRoute
+  AllFeedbacksRoute,
+  userFeedbackRoute
  }

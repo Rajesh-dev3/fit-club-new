@@ -1,5 +1,5 @@
 import AllFeedbacks from "../pages/allFeedbacks";
-import { AllFeedbacksRoute } from "./routepath";
+import { AllFeedbacksRoute, userFeedbackRoute } from "./routepath";
 import AddCoupon from "../pages/addCoupon";
 import { AddCouponRoute } from "./routepath";
 import AllCoupons from "../pages/allCoupons";
@@ -78,6 +78,7 @@ import DirectorDetailPage from "../pages/directorDetail";
 
 import DirectorDetailAttendance from "../components/directorDetail/attendance";
 import DirectorDetailBiometricAccess from "../components/directorDetail/biometricAccess";
+import UserFeedback from "../components/userDetail/userFeedback";
 
 export const router = createBrowserRouter([
   {
@@ -162,6 +163,7 @@ export const router = createBrowserRouter([
           { path: UserDetailParkingHistoryRoute.slice(1), element: <UserParkingHistory /> },
           { path: UserDetailDietsPlanRoute.slice(1), element: <DietsPlan /> },
           { path: UserDetailBiometricAccessRoute.slice(1), element: <UserBiometricAccess /> },
+          { path: userFeedbackRoute.slice(1), element: <UserFeedback /> },
           { path: "add-biometric-access", element: <AddUserBiometricAccess /> },
           { index: true, element: <UserAttendance /> },
         ],

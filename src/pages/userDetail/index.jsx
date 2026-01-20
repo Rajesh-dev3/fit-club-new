@@ -1,12 +1,13 @@
 import { user as userImg } from '../../assets/index';
 import './styles.scss';
 import { Outlet, useParams, useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import CommonSider from '../../components/commonSider';
-import { UserDetailRoute } from '../../routes/routepath';
+
 import { useUserDetailDataQuery } from '../../services/user';
 
+// Menu items में variables का उपयोग करें
 const menuItems = [
   { id: 'attendance', label: 'Attendance', path: 'attendance' },
   { id: 'membership', label: 'Membership', path: 'membership' },
@@ -16,58 +17,70 @@ const menuItems = [
   { id: 'parkingHistory', label: 'Parking History', path: 'parking-history' },
   { id: 'dietsPlan', label: 'Diets Plan', path: 'diets-plan' },
   { id: 'biometricAccess', label: 'Biometric Access', path: 'biometric-access' },
+  { id: 'feedback', label: 'Feedback', path: 'user-feedback' },
 ];
 
 const UserDetailPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-const { data } = useUserDetailDataQuery(id); // TODO: Fetch user detail data using RTK Query
+  const { data } = useUserDetailDataQuery(id);
   const userData = data?.user || {};
   const member = userData.member || {};
   const memberShip = userData.memberShip || {};
 
-  const userInfo = {
-    name: 'Bhumika',
-    age: 25,
-    dob: '2000-08-13',
-    gender: 'Female',
-    phoneNumber: '+91 9560385845',
-    email: 'Bhumika.m000@gmail.com',
-    alternateNumber: 'Null',
-    biometricId: '2402',
-    bmi: '12.0',
+ 
+
+  const [expanded, setExpanded] = useState(false);
+  const [currentTab, setCurrentTab] = useState(menuItems[0].id); // Default to first tab
+
+  // Function to extract the last segment from path
+  const getLastPathSegment = (path) => {
+    // Remove trailing slash if exists
+    const cleanPath = path.replace(/\/$/, '');
+    const segments = cleanPath.split('/');
+    return segments[segments.length - 1];
   };
 
-  const employee = {
-    address: 'Sector 41, haryana',
-    designation: 'Null',
-    work: 'Null',
-    idType: 'Aadhar',
-    idNo: '429279383894',
-  };
+  // Current active tab को location से update करें
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const currentSegment = getLastPathSegment(currentPath);
+    
+    // Check for special membership sub-routes first
+    if (
+      currentSegment === 'membership-freezability' ||
+      currentSegment === 'freezability' ||
+      currentSegment === 'membership-days' ||
+      currentSegment === 'days'
+    ) {
+      setCurrentTab('membership');
+      return;
+    }
 
+    // Find matching menu item
+    const matchedItem = menuItems.find(item => {
+      const itemLastSegment = getLastPathSegment(item.path);
+      return itemLastSegment === currentSegment;
+    });
+
+    if (matchedItem) {
+      setCurrentTab(matchedItem.id);
+    } else {
+      // If no match found, default to first tab
+      setCurrentTab(menuItems[0].id);
+    }
+  }, [location.pathname]);
+
+  // tabItems for mobile (using path as key)
   const tabItems = menuItems.map(item => ({
-    key: item.path,
+    key: getLastPathSegment(item.path), // Use only the last segment as key
     label: item.label,
   }));
 
-  const [expanded, setExpanded] = useState(false);
+  console.log('Current tab:', currentTab);
+  console.log('Current location:', location.pathname);
 
-  // Get current active tab from URL
-  const currentPath = location.pathname;
-  const pathSegments = currentPath.split('/');
-  // Support both /membership, /membership-freezability, and /membership-days for active tab
-  let currentTab = pathSegments[pathSegments.length - 1] || 'attendance';
-  if (
-    currentTab === 'membership-freezability' ||
-    currentTab === 'freezability' ||
-    currentTab === 'membership-days' ||
-    currentTab === 'days'
-  ) {
-    currentTab = 'membership';
-  }
-console.log('User Data:', member);
   return (
     <div className="user-detail-page">
       {/* ================= PROFILE CARD ================= */}
@@ -97,15 +110,15 @@ console.log('User Data:', member);
           <div className={`profile-expand-wrapper ${expanded ? 'expanded' : ''}`}>
             <div className="row">
               <span><b>Alternate No.:</b> <span className="value">{member?.alternativePhoneNumber}</span></span>
-              <span><b>Address:</b> <span className="value">{employee.address}</span></span>
-              <span><b>ID Type:</b> <span className="value">{member.idType}</span></span>
+              <span><b>Address:</b> <span className="value">{member?.address}</span></span>
+              <span><b>ID Type:</b> <span className="value">{member?.idType}</span></span>
             </div>
 
             <div className="row">
-              <span><b>ID No.:</b> <span className="value">{member.idNumber}</span></span>
+              <span><b>ID No.:</b> <span className="value">{member?.idNumber}</span></span>
               <span><b>Biometric Id:</b> <span className="value">{userData?.biometricId}</span></span>
-              <span><b>Designation:</b> <span className="value">{employee.designation}</span></span>
-              <span><b>Work:</b> <span className="value">{employee.work}</span></span>
+              <span><b>Designation:</b> <span className="value">{userData?.designation}</span></span>
+              <span><b>Work:</b> <span className="value">{userData?.work}</span></span>
               <span><b>BMI:</b> <span className="value">{userData?.bmi}</span></span>
             </div>
           </div>
@@ -123,32 +136,31 @@ console.log('User Data:', member);
 
       {/* ================= CONTENT ================= */}
       <div className="content">
-        {/* Mobile tabs now handled in CommonSider */}
-
-              <CommonSider
-                items={menuItems.map(item => ({
-                  key: item.id,
-                  label: item.label,
-                  icon: null,
-                  path: item.path,
-                }))}
-                activeKey={(() => {
-                  const found = menuItems.find(item => currentTab === item.path);
-                  return found ? found.id : menuItems[0].id;
-                })()}
-                onSelect={key => {
-                  const item = menuItems.find(i => i.id === key);
-                  if (item) navigate(`${UserDetailRoute}/${id}/${item.path}`);
-                }}
-                mobileTabsProps={{
-                  tabItems,
-                  currentTab,
-                  onTabClick: ({ key }) => navigate(key)
-                }}
-              />
+        <CommonSider
+          items={menuItems.map(item => ({
+            key: item.id,
+            label: item.label,
+            icon: null,
+            path: item.path,
+          }))}
+          activeKey={currentTab}
+          onSelect={key => {
+            const item = menuItems.find(i => i.id === key);
+            if (item) {
+              // Extract only the last segment from the path variable
+              const pathSegment = getLastPathSegment(item.path);
+              navigate(`/user-detail/${id}/${pathSegment}`);
+            }
+          }}
+          mobileTabsProps={{
+            tabItems,
+            currentTab: getLastPathSegment(location.pathname),
+            onTabClick: ({ key }) => navigate(`/user-detail/${id}/${key}`)
+          }}
+        />
 
         <div className="employee-detail-content">
-          <Outlet context={{ employee }} />
+          <Outlet context={{ userData }} />
         </div>
       </div>
     </div>

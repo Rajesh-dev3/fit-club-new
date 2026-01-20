@@ -37,7 +37,15 @@ export const feedbacks = createApi({
       }),
       invalidatesTags: ['Feedbacks'],
     }),
+
+    getFeedbacksByPhone: builder.query({
+      query: (mobileNumber) => ({
+        url: `/feedbacks/by-phone?mobileNumber=${mobileNumber}`,
+        method: 'GET',
+      }),
+      providesTags: ['Feedbacks'],
+    }),
 })
 });
 
-export const { useGetAllFeedbacksQuery, useGetEmployeesByBranchQuery,useAssignToMutation,useUpdateFeedbackStatusMutation } = feedbacks;
+export const { useGetAllFeedbacksQuery,useGetFeedbacksByPhoneQuery, useGetEmployeesByBranchQuery,useAssignToMutation,useUpdateFeedbackStatusMutation } = feedbacks;
