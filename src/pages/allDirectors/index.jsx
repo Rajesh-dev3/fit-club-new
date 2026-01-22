@@ -1,16 +1,17 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button } from "antd";
+import { Table, Button, message, Modal, Form, Input } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { Home } from "../../routes/routepath";
+import { Home, EditDirectorRoute } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 import { getColumns } from './columns';
-import { useGetDirectorsQuery } from "../../services/director";
-import "./styles.scss";
+import { useGetDirectorsQuery, useUpdateDirectorStatusMutation } from "../../services/director";
+import "./styles.scss"
 import CommonTable from "../../components/commonTable";
+import { useChangePasswordMutation } from "../../services/user";
 
 const AllDirectors = () => {
   const navigate = useNavigate();
@@ -19,6 +20,9 @@ const AllDirectors = () => {
   const [searchText, setSearchText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [branchTypeFilter, setBranchTypeFilter] = useState("all");
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [selectedDirector, setSelectedDirector] = useState(null);
+  const [passwordForm] = Form.useForm();
   
   // Initialize all columns as visible
   const [visibleColumns, setVisibleColumns] = useState({
@@ -34,6 +38,15 @@ const AllDirectors = () => {
 
   // Fetch directors data
 const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit });
+const [changePassword, { isLoading: changingPassword }] = useChangePasswordMutation();
+  const [updateDirectorStatus, { isLoading: updatingStatus }] = useUpdateDirectorStatusMutation();
+
+  const handleStatusToggle = async (record, newStatus) => {
+    try {
+      await updateDirectorStatus(record._id).unwrap();
+    } catch (error) {
+    }
+  };
   // Map API data to table row structure
   const directors = useMemo(() => {
     const arr = directorsData?.data || directorsData?.directors || [];
@@ -56,14 +69,17 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
   };
 
   const handleEdit = (record) => {
-    console.log('Edit director:', record);
-    // TODO: Navigate to edit page or open edit modal
-    // navigate(`/edit-director/${record._id || record.id}`);
+    if (record && record._id) {
+      navigate(`${EditDirectorRoute}/${record._id}`);
+    } else {
+      console.error('Director ID not found');
+    }
   };
 
   const handleChangePassword = (record) => {
     console.log('Change password for:', record);
-    // TODO: Implement change password logic/modal
+    setSelectedDirector(record);
+    setShowPasswordModal(true);
   };
 
   const handleDelete = (record) => {
@@ -72,7 +88,7 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
   };
 
   // Get all columns with handlers
-  const allColumns = getColumns(handleView, handleEdit, handleDelete, handleChangePassword);
+  const allColumns = getColumns(handleView, handleEdit, handleDelete, handleChangePassword, handleStatusToggle, updatingStatus);
   
   // Filter visible columns based on user selection
   const columns = allColumns.filter(col => visibleColumns[col.key]);
@@ -86,6 +102,40 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
 
   const handleAddDirector = () => {
     navigate('/add-director');
+  };
+
+  // Password validation
+  const validateConfirmPassword = ({ getFieldValue }) => ({
+    validator(_, value) {
+      if (!value || getFieldValue('newPassword') === value) {
+        return Promise.resolve();
+      }
+      return Promise.reject(new Error('Passwords do not match!'));
+    },
+  });
+
+  const handlePasswordSubmit = async (values) => {
+    try {
+      await changePassword({
+        userId: selectedDirector.userId?._id || selectedDirector._id,
+        newPassword: values.newPassword,
+        sendEmail: true
+      }).unwrap();
+      
+      // message.success(`Password changed successfully for ${selectedDirector?.name}! Email sent to user.`);
+      setShowPasswordModal(false);
+      passwordForm.resetFields();
+      setSelectedDirector(null);
+    } catch (error) {
+      // message.error('Failed to change password. Please try again.');
+      console.error('Password change error:', error);
+    }
+  };
+
+  const handlePasswordModalCancel = () => {
+    setShowPasswordModal(false);
+    passwordForm.resetFields();
+    setSelectedDirector(null);
   };
 
   // Filter data based on search and tab
@@ -178,6 +228,70 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
           setPage(1);
         }}
       />
+
+      {/* Change Password Modal */}
+
+      <Modal
+        title={`Change Password`}
+        open={showPasswordModal}
+        onCancel={handlePasswordModalCancel}
+        footer={null}
+        width={500}
+        className="channge-password-modal"
+      >
+        <Form
+          form={passwordForm}
+          layout="vertical"
+          onFinish={handlePasswordSubmit}
+          className="password-form"
+        >
+          <Form.Item
+            label="New Password"
+            name="newPassword"
+            rules={[
+              { required: true, message: 'Please enter new password' },
+              { min: 6, message: 'Password must be at least 6 characters' },
+              {
+                pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+              }
+            ]}
+          >
+            <Input.Password placeholder="Enter new password" />
+          </Form.Item>
+
+          <Form.Item
+            label="Confirm New Password"
+            name="confirmPassword"
+            dependencies={['newPassword']}
+            rules={[
+              { required: true, message: 'Please confirm new password' },
+              validateConfirmPassword(passwordForm)
+            ]}
+          >
+            <Input.Password placeholder="Confirm new password" />
+          </Form.Item>
+
+          <div className="modal-actions">
+            <Button 
+              type="default" 
+              onClick={handlePasswordModalCancel}
+              className="cancel-btn"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              className="submit-btn"
+              loading={changingPassword}
+            >
+              Change Password
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
     </div>
   );
 };

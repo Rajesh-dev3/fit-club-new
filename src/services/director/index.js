@@ -37,6 +37,20 @@ export const director = createApi({
       }),
       invalidatesTags: ['Directors'],
     }),
+    updateDirectorStatus: builder.mutation({
+      query: (id) => ({
+        url: `/directors/toggle-status/${id}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ['Directors'],
+    }),
+    getDirectorDetail: builder.query({
+      query: (id) => ({
+        url: `/directors/${id}`,
+        method: "GET",
+      }),
+      providesTags: ['Directors'],
+    }),
   }),
   tagTypes: ['Directors'],
 })
@@ -47,5 +61,7 @@ export const {
   useGetDirectorsQuery, 
   useAddDirectorMutation, 
   useUpdateDirectorMutation, 
-  useDeleteDirectorMutation 
+  useDeleteDirectorMutation,
+  useUpdateDirectorStatusMutation,
+  useGetDirectorDetailQuery,
 } = director

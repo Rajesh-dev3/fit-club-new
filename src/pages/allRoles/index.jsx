@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Dropdown, Tag, message, Modal } from "antd";
+import { Table, Button, Dropdown, Tag, message, Modal, Switch } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined, MoreOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { useGetRolesQuery, useDeleteRoleMutation, useUpdateRoleMutation } from "../../services/role";
+import { useGetRolesQuery, useDeleteRoleMutation, useUpdateRoleMutation, useUpdateRoleStatusMutation } from "../../services/role";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 // ...existing code...
-import {  AddRoleRoute } from "../../routes/routepath";
+import {  AddRoleRoute, EditRoleRoute } from "../../routes/routepath";
 import "./styles.scss";
 import CommonTable from "../../components/commonTable";
 
@@ -30,7 +30,18 @@ const AllRoles = () => {
   
   const { data: rolesData, isLoading } = useGetRolesQuery();
   const [deleteRole, { isLoading: deleting }] = useDeleteRoleMutation();
-  const [updateRole, { isLoading: updating }] = useUpdateRoleMutation();
+ 
+  const [updateRoleStatus, { isLoading: updatingStatus }] = useUpdateRoleStatusMutation();
+
+  const handleStatusToggle = async (record, newStatus) => {
+    try {
+      await updateRoleStatus(record?._id).unwrap();
+      // message.success(`Role ${newStatus ? 'activated' : 'deactivated'} successfully`);
+    } catch (error) {
+      // message.error(error?.data?.message || 'Failed to update role status');
+    }
+  };
+ 
 
   const allColumns = [
     {
@@ -64,12 +75,20 @@ const AllRoles = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      width: 120,
+      width: 150,
       align: 'center',
-      render: (status) => (
-        <Tag color={status === 'active' ? 'green' : 'red'}>
-          {status === 'active' ? 'ACTIVE' : 'INACTIVE'}
-        </Tag>
+      render: (status, record) => (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <Switch
+            checked={status === 'active'}
+            onChange={(checked) => handleStatusToggle(record, checked)}
+            loading={updatingStatus}
+            size="small"
+            checkedChildren="On"
+            unCheckedChildren="Off"
+            style={{ minWidth: 40,width:40 }}
+          />
+        </div>
       ),
     },
     {
@@ -113,9 +132,11 @@ const AllRoles = () => {
   };
 
   const handleEdit = (record) => {
-    console.log('Edit role:', record);
-    // TODO: Navigate to edit page or open edit modal
-    message.info('Edit functionality coming soon');
+    if (record && record._id) {
+      navigate(`${EditRoleRoute}/${record._id}`);
+    } else {
+      message.error('Role ID not found');
+    }
   };
 
   const handleDelete = (record) => {
@@ -216,7 +237,7 @@ const AllRoles = () => {
         <CommonTable
           columns={columns}
           dataSource={paginatedData || []}
-          loading={isLoading || deleting || updating}
+          loading={isLoading || deleting}
           pagination={false}
           rowKey={(record) => record._id || record.id}
           scroll={{ x: 800 }}

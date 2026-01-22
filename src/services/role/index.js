@@ -12,6 +12,7 @@ export const roles = createApi({
         method: "GET",
    
       }),
+      providesTags: ['Roles']
     }),
     addRole: builder.mutation({
       query: (payload) => ({
@@ -23,7 +24,7 @@ export const roles = createApi({
     }),
     updateRole: builder.mutation({
       query: ({ id, ...payload }) => ({
-        url: `/roles/${id}`,
+        url: `/roles/permissions/${id}`,
         method: "PUT",
         body: payload,
       }),
@@ -36,10 +37,25 @@ export const roles = createApi({
       }),
       invalidatesTags: ['Roles'],
     }),
+    getRoleById: builder.query({
+      query: (id) => ({
+        url: `/roles/permissions/${id}`,
+        method: "GET",
+      }),
+      providesTags: ['Roles'],
+    }),
+    updateRoleStatus: builder.mutation({
+      query: (id) => ({
+        url: `/roles/toggle-status/${id}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ['Roles'],
+    }),
+  
   }),
   tagTypes: ['Roles'],
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetRolesQuery, useAddRoleMutation, useUpdateRoleMutation, useDeleteRoleMutation } = roles
+export const { useUpdateRoleStatusMutation,useGetRolesQuery,useGetRoleByIdQuery, useAddRoleMutation, useUpdateRoleMutation, useDeleteRoleMutation } = roles

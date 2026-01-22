@@ -61,24 +61,7 @@ const AddDirector = () => {
     return Promise.resolve();
   };
 
-  // Custom validator for name
-  const validateName = (_, value) => {
-    if (!value) {
-      return Promise.reject(new Error('Please enter director name'));
-    }
-    
-    // Name should contain only letters and spaces
-    const nameRegex = /^[A-Za-z\s]+$/;
-    if (!nameRegex.test(value.trim())) {
-      return Promise.reject(new Error('Name should contain only letters'));
-    }
-    
-    if (value.trim().length < 2) {
-      return Promise.reject(new Error('Name should be at least 2 characters'));
-    }
-    
-    return Promise.resolve();
-  };
+  
 
   return (
     <div className="add-director-page">
@@ -108,7 +91,6 @@ const AddDirector = () => {
             name="name" 
             rules={[
               { required: true, message: 'Please enter director name' },
-              { validator: validateName }
             ]}
           >
             <Input placeholder="Director Name" />

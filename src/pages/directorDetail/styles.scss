@@ -2,7 +2,18 @@
 .director-detail-page {
   background: var(--content-bg);
 
-  
+  // Loading and error states
+  &.loading-container, &.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    
+    p {
+      color: var(--text-color);
+      font-size: 16px;
+    }
+  }
   
   /* ================= PROFILE CARD ================= */
   .profile-card {

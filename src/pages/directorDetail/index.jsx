@@ -3,9 +3,10 @@ import './styles.scss';
 import { Outlet, Link, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { Menu } from 'antd';
+import { Menu, Spin } from 'antd';
 import CommonSider from '../../components/commonSider';
 import {  DirectorAttendancePageRoute, DirectorBiometricAccessPageRoute, DirectorDetailPageRoute, UserDetailRoute } from '../../routes/routepath';
+import { useGetDirectorDetailQuery } from '../../services/director';
 
 const menuItems = [
   { id: 'attendance', label: 'Attendance', path: DirectorAttendancePageRoute },
@@ -17,28 +18,31 @@ const DirectorDetailPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const data = {};
-  const userData = data?.data || {};
-  const member = userData.member || {};
-const user = userData.user || {};
-  const userInfo = {
-    name: 'Bhumika',
-    age: 25,
-    dob: '2000-08-13',
-    gender: 'Female',
-    phoneNumber: '+91 9560385845',
-    email: 'Bhumika.m000@gmail.com',
-    alternateNumber: 'Null',
-    biometricId: '2402',
-    bmi: '12.0',
-  };
+  // API call to get director detail
+  const { 
+    data: directorData, 
+    error, 
+    isLoading, 
+    isError 
+  } = useGetDirectorDetailQuery(id, {
+    skip: !id,
+  });
 
-  const employee = {
-    address: 'Sector 41, haryana',
-    designation: 'Null',
-    work: 'Null',
-    idType: 'Aadhar',
-    idNo: '429279383894',
+  const directorDetail = directorData?.data || {};
+  // Map the API response structure
+  const userInfo = {
+    name: directorDetail.name || '',
+    email: directorDetail.email || '',
+    phone: directorDetail.number || '',
+    address: directorDetail.address || '',
+    status: directorDetail.status || directorDetail.userId?.status || 'ACTIVE'
+  };
+  const employeeInfo = {
+    photo: directorDetail.photo || directorDetail.image || '',
+    directorId: directorDetail._id || '',
+    role: directorDetail.role?.name || '',
+    branch: directorDetail.branch?.name || '',
+    status: directorDetail.status || directorDetail.userId?.status || 'ACTIVE'
   };
 
   const tabItems = menuItems.map(item => ({
@@ -62,30 +66,51 @@ const user = userData.user || {};
     currentTab = 'membership';
   }
 
+  // Show loading spinner while fetching data
+  if (isLoading) {
+    return (
+      <div className="director-detail-page loading-container">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  // Show error message if API call fails
+  if (isError) {
+    return (
+      <div className="director-detail-page error-container">
+        <p>Error loading director details: {error?.message || 'Something went wrong'}</p>
+      </div>
+    );
+  }
+
 return (
     <div className="director-detail-page">
       {/* ================= PROFILE CARD ================= */}
       <div className="profile-card">
         <div className="left">
           <div className="avatar">
-            <img src={employee.photo} alt="employee" />
-            <span className="status">{userInfo.status ? userInfo.status.charAt(0).toUpperCase() + userInfo.status.slice(1) : 'Active'}</span>
+            <img src={employeeInfo.photo || userImg} alt="director" />
+            <span className="status">
+              {employeeInfo.status ? employeeInfo.status.charAt(0).toUpperCase() + employeeInfo.status.slice(1) : 'Active'}
+            </span>
           </div>
         </div>
 
         <div className="right">
           <div className="row">
             <span><b>Name:</b> <span className="value">{userInfo.name || '-'}</span></span>
-            <span><b>Mobile No:</b> <span className="value">{userInfo.phoneNumber || '-'}</span></span>
-            <span><b>Employee ID:</b> <span className="value">{employee.employeeId || id}</span></span>
+            <span><b>Mobile No:</b> <span className="value">{userInfo.phone || '-'}</span></span>
+            <span><b>Director ID:</b> <span className="value">{employeeInfo.directorId || id}</span></span>
           </div>
 
           <div className="row">
             <span><b>Email:</b> <span className="value">{userInfo.email || '-'}</span></span>
-            <span><b>Biometric ID:</b> <span className="value">{userInfo?.biometricId || '-'}</span></span>
+            <span><b>Role:</b> <span className="value">{employeeInfo.role || '-'}</span></span>
           </div>
           <div className="row">
-            <span><b>Address:</b> <span className="value">{employee.address || '-'}</span></span>
+            <span><b>Branch:</b> <span className="value">{employeeInfo.branch || '-'}</span></span>
+            <span><b>Address:</b> <span className="value">{userInfo.address || '-'}</span></span>
           </div>
         </div>
       </div>
@@ -115,7 +140,7 @@ return (
         />
         {/* Detail Content */}
         <div className="employee-detail-content">
-          <Outlet context={{ employee }} />
+          <Outlet context={{ director: directorDetail, userInfo, employeeInfo }} />
         </div>
       </div>
     </div>

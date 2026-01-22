@@ -1,9 +1,9 @@
-import { Tag, Button, Dropdown } from "antd";
+import { Tag, Button, Dropdown, Switch } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, HomeOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { DirectorDetailPageRoute, UserDetailAttendanceRoute } from "../../routes/routepath";
 
-export const getColumns = (handleView, handleEdit, handleDelete, handleChangePassword) => [
+export const getColumns = (handleView, handleEdit, handleDelete, handleChangePassword, handleStatusToggle, updatingStatus) => [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -46,12 +46,21 @@ export const getColumns = (handleView, handleEdit, handleDelete, handleChangePas
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
-    width: 100,
+    width: 120,
     align: 'center',
-    render: (status) => (
-      <Tag color={status === 'active' ? 'green' : 'red'}>
-        {status === 'active' ? 'ACTIVE' : 'INACTIVE'}
-      </Tag>
+    render: (status, record) => (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        <Switch
+          checked={status === 'ACTIVE'}
+          onChange={(checked) => handleStatusToggle(record, checked)}
+          loading={updatingStatus}
+          size="small"
+         checkedChildren="On"
+            unCheckedChildren="Off"
+          style={{ minWidth: 40, width: 40 }}
+        />
+ 
+      </div>
     ),
   },
   {

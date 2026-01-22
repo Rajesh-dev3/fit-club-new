@@ -182,4 +182,52 @@
       }
     }
   }
+  
+}
+
+
+.channge-password-modal{
+
+  .password-form{
+   .ant-input-password{
+  padding-block: 14px;
+  background-color: var(--card-bg);
+  border-color: var(--muted);
+   }
+  .ant-input-suffix{
+    span{
+
+      color: var(--muted);
+      &:hover{
+        color: var(--card-bg) !important;
+      }
+    }
+  }
+  }
+  
+  .ant-modal-title{
+    margin-bottom: 20px !important;
+    font-size: 25px !important;
+  }
+   .modal-actions{
+    justify-content: end;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    .cancel-btn{
+      border-color: var(--muted);
+      background-color: transparent !important;
+      &:hover{
+        
+        background-color: transparent !important;
+      }
+    }
+    .submit-btn{
+      background-color: var(--accent);
+      border-color: var(--muted);
+      &:hover{
+        background-color: var(--accent) !important;
+      }
+    }
+   }
 }

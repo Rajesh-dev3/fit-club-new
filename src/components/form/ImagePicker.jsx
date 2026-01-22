@@ -4,9 +4,14 @@ import { CameraOutlined, PictureOutlined, CloudUploadOutlined, CloseOutlined, Ch
 import Cropper from 'react-easy-crop';
 import { useImageUploadMutation, useDeleteImageMutation } from '../../services/imageService';
 import "./styles.scss"
-const ImagePicker = ({ form, name = 'photo', aspectRatio = 1 }) => {
+const ImagePicker = ({ form, name = 'photo', aspectRatio = 1, initialImageUrl }) => {
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(() => {
+    // First check for initialImageUrl prop
+    if (initialImageUrl) {
+      return initialImageUrl;
+    }
+    
     const val = form.getFieldValue(name);
     if (Array.isArray(val) && val.length > 0 && val[0].url) {
       return val[0].url;
@@ -34,6 +39,13 @@ const ImagePicker = ({ form, name = 'photo', aspectRatio = 1 }) => {
 
  
   useEffect(() => {
+    // Check for initialImageUrl first
+    if (initialImageUrl && !preview) {
+      setPreview(initialImageUrl);
+      setStoredImageUrl(initialImageUrl);
+      return;
+    }
+    
     const val = form.getFieldValue(name);
     if (Array.isArray(val) && val.length > 0 && val[0].url) {
       setPreview(val[0].url);
@@ -42,7 +54,7 @@ const ImagePicker = ({ form, name = 'photo', aspectRatio = 1 }) => {
       setPreview(val);
       setStoredImageUrl(val);
     }
-  }, [form, name]);
+  }, [form, name, initialImageUrl, preview]);
 
   // Image processing functions
   const createImage = (url) =>

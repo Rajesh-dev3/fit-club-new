@@ -13,6 +13,7 @@ const AllRolesRoute = "/all-roles"
 const AddRoleRoute = "/add-role"
 const AllDirectorsRoute = "/all-directors"
 const AddDirectorRoute = "/add-director"
+const EditDirectorRoute = "/edit-director"
 const AllPackagesRoute = "/all-packages"
 const AddPackageRoute = "/add-package"
 const AllAddOnSlotsRoute = "/all-add-on-slots"
@@ -77,9 +78,11 @@ const TrainerDetailAddBiometricAccessRoute = "/add-biometric-access"
 // director Detail Routes
 const DirectorDetailPageRoute = "/director-detail"
 const DirectorAttendancePageRoute = "/attendance"
-const DirectorBiometricAccessPageRoute = "/biometric-access"
 
-export { Home, AddUserRoute, AddEmployeeRoute,
+const DirectorBiometricAccessPageRoute = "/biometric-access"
+const EditRoleRoute = "/edit-role"
+
+export {EditDirectorRoute, EditRoleRoute, Home, AddUserRoute, AddEmployeeRoute,
      AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, 
      AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, 
      AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute,

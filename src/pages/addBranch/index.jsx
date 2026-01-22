@@ -6,6 +6,7 @@ import PageBreadcrumb from "../../components/breadcrumb";
 import { useAddBranchMutation } from "../../services/branches";
 import { useNavigate } from "react-router-dom";
 import { AllBranchesRoute, Home } from "../../routes/routepath";
+import statesData from "../../data/countryStateList.json";
 import "./styles.scss";
 
 const { Option } = Select;
@@ -227,11 +228,20 @@ const AddBranch = () => {
             label="Place of Supply / State Name" 
             name="placeOfSupply" 
             rules={[
-              { required: true, message: 'Please enter place of supply' },
-              { min: 2, message: 'State name must be at least 2 characters' }
+              { required: true, message: 'Please select place of supply' }
             ]}
           >
-            <Input placeholder="Place of Supply / State Name" />
+            <Select
+              placeholder="Search and select state"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              options={statesData.map(state => ({
+                label: state.label,
+                value: state.label
+              }))}
+            />
           </Form.Item>
           
           <Form.Item 

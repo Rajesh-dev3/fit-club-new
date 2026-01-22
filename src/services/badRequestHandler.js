@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 export const dynamicBaseQuery = async (args, WebApi, extraOptions) => {
   const rawBaseQuery = fetchBaseQuery({
-    // baseUrl: "http://172.20.10.3:5001/api/",
+    // baseUrl: "http://192.168.2.107:5001/api/",
     baseUrl: "http://13.232.199.92:5000/api",
   
     headers: {
