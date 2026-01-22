@@ -6,7 +6,8 @@ import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
-import allColumns from "./columns";
+import ChangePasswordModal from "../../components/ChangePasswordModal";
+import allColumns, { getUserColumns } from "./columns";
 // ...existing code...
 import "./styles.scss";
 import { useGetAllUserQuery } from "../../services/user";
@@ -45,6 +46,8 @@ const AllUsers = () => {
   const [searchText, setSearchText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [remainingDays, setRemainingDays] = useState("all");
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
     branch: true,
@@ -65,6 +68,32 @@ const AllUsers = () => {
     gymKit: true,
     actions: true,
   });
+
+  // Handlers for user actions
+  const handleEdit = (record) => {
+    console.log('Edit user:', record);
+    // TODO: Navigate to edit user page or open modal
+  };
+
+  const handleDelete = (record) => {
+    console.log('Delete user:', record);
+    // TODO: Show confirmation modal and call delete API
+  };
+
+  const handleChangePassword = (record) => {
+    console.log('Change password for user:', record);
+    setSelectedUser(record);
+    setShowPasswordModal(true);
+  };
+
+  const handlePasswordModalCancel = () => {
+    setShowPasswordModal(false);
+    setSelectedUser(null);
+  };
+
+  // Get columns with handlers
+  const columnsWithHandlers = getUserColumns(handleEdit, handleDelete, handleChangePassword);
+  
   // Use the actual API hook for all users
   const { data, isLoading } = useGetAllUserQuery({ page, limit });
 
@@ -74,7 +103,7 @@ const AllUsers = () => {
     return data.users.map((user) => {
       const member = user.member || {};
       return {
-        _id: user._id,
+        _id: user?._id,
         name: user.name,
         branch: user.branchIds?.length > 0 ? user.branchIds[0]?.name : '-',
         phoneNumber: user.phoneNumber,
@@ -135,17 +164,10 @@ const AllUsers = () => {
     { key: 'block', label: 'Block', count: filteredData?.filter(u => u.status === 'block').length || 0 },
   ];
 
-  const columns = allColumns.filter(col => visibleColumns[col.key]);
+  const columns = columnsWithHandlers.filter(col => visibleColumns[col.key]);
 
   const handleColumnToggle = (columnKey) => {
     setVisibleColumns(prev => ({ ...prev, [columnKey]: !prev[columnKey] }));
-  };
-
-  const handleEdit = (record) => {
-    // TODO: Edit logic
-  };
-  const handleDelete = (record) => {
-    // TODO: Delete logic
   };
 
   // Pagination
@@ -182,7 +204,7 @@ const AllUsers = () => {
           <Select.Option value="30">30 Days</Select.Option>
         </Select>
         <ColumnVisibility
-          columns={allColumns}
+          columns={columnsWithHandlers}
           visibleColumns={visibleColumns}
           onColumnToggle={handleColumnToggle}
         />
@@ -206,6 +228,14 @@ const AllUsers = () => {
           setLimit(newLimit);
           setPage(1);
         }}
+      />
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        visible={showPasswordModal}
+        onCancel={handlePasswordModalCancel}
+        selectedUser={selectedUser}
+        userType="user"
       />
     </div>
   );

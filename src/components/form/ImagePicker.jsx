@@ -157,26 +157,29 @@ const ImagePicker = ({ form, name = 'photo', aspectRatio = 1, initialImageUrl })
     if (!imageSrc || !croppedAreaPixels) return;
     setCropModalOpen(false);
     setUploadingLocal(true);
+    
+    // Don't show preview until backend responds
     try {
       const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
-      const previewUrl = URL.createObjectURL(croppedImageBlob);
-      setPreview(previewUrl);
+      
       const fd = new FormData();
       fd.append('images', croppedImageBlob, 'cropped-image.jpg');
       const res = await uploadImage(fd).unwrap();
       const imageUrl = res?.images?.[0];
       if (!imageUrl) {
         message.error('Upload succeeded but no image URL returned');
+        setPreview(null);
       } else {
+        // Only set preview after successful backend response
         setPreview(imageUrl);
-        setStoredImageUrl(imageUrl); // Store the actual uploaded URL
+        setStoredImageUrl(imageUrl);
         form.setFieldsValue({ [name]: imageUrl });
-      
+        message.success('Image uploaded successfully');
       }
-      URL.revokeObjectURL(previewUrl);
     } catch (err) {
       console.error('Image processing/upload failed', err);
-      message.error('Image processing failed');
+      message.error('Image upload failed');
+      setPreview(null);
     } finally {
       setUploadingLocal(false);
       resetCropState();
@@ -239,6 +242,21 @@ const handleRemove = async (e) => {
               <Spin size="small" />
               <span>Deleting...</span>
             </div>
+          ) : uploadingLocal ? (
+            <div style={{ 
+              padding: 24, 
+              display: 'flex', 
+              flexDirection: 'column',
+              alignItems: 'center', 
+              gap: 12, 
+              border: '2px dashed #d9d9d9',
+              borderRadius: 8,
+              background: '#fafafa'
+            }}>
+              <Spin size="large" />
+              <span>Uploading image...</span>
+              <span style={{ fontSize: '12px', color: '#999' }}>Please wait</span>
+            </div>
           ) : !preview ? (
             <div>
               <Button
@@ -247,14 +265,7 @@ const handleRemove = async (e) => {
                 onClick={() => !deletingLocal && setOpen(true)}
                 disabled={uploadingLocal || deletingLocal}
               >
-                {uploadingLocal ? (
-                  <>
-                    <Spin size="small" />
-                    <span style={{ marginLeft: 8 }}>Uploading...</span>
-                  </>
-                ) : (
-                  'Upload Image'
-                )}
+                Upload Image
               </Button>
             </div>
           ) : (

@@ -8,6 +8,7 @@ import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 import PageBreadcrumb from "../../components/breadcrumb";
+import ChangePasswordModal from "../../components/ChangePasswordModal";
 import CommonTable from '../../components/commonTable';
 import "./styles.scss";
 import { useGetEmployeeQuery } from "../../services/employee";
@@ -22,6 +23,8 @@ const AllEmployees = () => {
   const [searchText, setSearchText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [designationFilter, setDesignationFilter] = useState("all");
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
     email: true,
@@ -51,8 +54,12 @@ const AllEmployees = () => {
     // Delete logic
     console.log('Delete', record);
   };
-
-  const allColumns = getEmployeeColumns(handleView, handleEdit, handleDelete);
+  const handleChangePassword = (record) => {
+    console.log('Change password for employee:', record);
+    setSelectedEmployee(record);
+    setShowPasswordModal(true);
+  };
+  const allColumns = getEmployeeColumns(handleView, handleEdit, handleDelete, handleChangePassword);
    
  
 
@@ -77,9 +84,11 @@ const AllEmployees = () => {
     // TODO: Call hide/show API
   };
 
-  const handleChangePassword = (record) => {
-    console.log('Change password for employee:', record);
-    // TODO: Open change password modal
+
+
+  const handlePasswordModalCancel = () => {
+    setShowPasswordModal(false);
+    setSelectedEmployee(null);
   };
 
 
@@ -97,7 +106,7 @@ const AllEmployees = () => {
   const mappedEmployees = useMemo(() => {
     if (!employeesData?.data) return [];
     return employeesData.data.map(emp => ({
-      id: emp._id,
+      "_id": emp.user?._id,
       name: emp.user?.name || '-',
       email: emp.user?.email || '-',
       designation: emp.designation || (emp.user?.roleId?.name || '-'),
@@ -210,6 +219,14 @@ const AllEmployees = () => {
           setLimit(newLimit);
           setPage(1);
         }}
+      />
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        visible={showPasswordModal}
+        onCancel={handlePasswordModalCancel}
+        selectedUser={selectedEmployee}
+        userType="employee"
       />
     </div>
   );

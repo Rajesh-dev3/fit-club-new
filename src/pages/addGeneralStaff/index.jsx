@@ -4,7 +4,7 @@ import { DeleteOutlined, HomeOutlined } from "@ant-design/icons";
 import ImagePicker from "../../components/form/ImagePicker";
 import "./styles.scss";
 import { useGetRolesQuery } from "../../services/role";
-import { useAddGeneralStaffMutation, useGetGeneralStaffQuery, useStaffTypeQuery } from "../../services/generalStaff";
+import { useAddGeneralStaffMutation, useGetGeneralStaffQuery } from "../../services/generalStaff";
 import { useGetBranchesQuery } from "../../services/branches";
 import PageBreadcrumb from "../../components/breadcrumb";
 import { Home, AllGeneralStaffRoute } from "../../routes/routepath";
@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 const AddGeneralStaff = () => {
   const [form] = Form.useForm();
-  const { data: staffTypeData } = useStaffTypeQuery();
+  const { data: rolesData } = useGetRolesQuery();
   const { data: branchesData } = useGetBranchesQuery();
   const [addGeneralStaff, { isLoading: adding }] = useAddGeneralStaffMutation();
 
@@ -22,7 +22,7 @@ const AddGeneralStaff = () => {
     const payload = {
       name: values.name,
       phoneNumber: values.phone,
-      staffTypeId: values.role || null, // role select sets staffTypeId
+      roleId: values.role || null, // role select sets roleId
       employeeType: 'general-staff',
       address: values.address,
       idType: values.idType,
@@ -40,7 +40,6 @@ const AddGeneralStaff = () => {
 
     const res = await addGeneralStaff(payload).unwrap();
     if (res && res.success) {
-      message.success('General Staff added successfully');
       form.resetFields();
 
       navigate(AllGeneralStaffRoute);
@@ -49,13 +48,13 @@ const AddGeneralStaff = () => {
 
 
 
-  // Use staffTypeData for role options
+  // Use rolesData for role options
   const rolesOptions = useMemo(() => {
-    if (staffTypeData && Array.isArray(staffTypeData.data) && staffTypeData.data.length) {
-      return staffTypeData.data.map((r) => ({ label: r.name, value: r._id }));
+    if (rolesData && Array.isArray(rolesData.data) && rolesData.data.length) {
+      return rolesData.data.map((r) => ({ label: r.name, value: r._id }));
     }
     return [];
-  }, [staffTypeData]);
+  }, [rolesData]);
 
   const branchOptions = useMemo(() => {
     if (!branchesData || !Array.isArray(branchesData.data)) return [];

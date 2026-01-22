@@ -4,8 +4,8 @@ import { toast } from "react-toastify";
 
 export const dynamicBaseQuery = async (args, WebApi, extraOptions) => {
   const rawBaseQuery = fetchBaseQuery({
-    // baseUrl: "http://192.168.2.107:5001/api/",
-    baseUrl: "http://13.232.199.92:5000/api",
+    baseUrl: "http://192.168.2.107:5001/api/",
+    // baseUrl: "http://13.232.199.92:5000/api",
   
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -16,8 +16,8 @@ export const dynamicBaseQuery = async (args, WebApi, extraOptions) => {
     const responseMessage = result?.error?.data?.error || result?.error?.data?.message || 'An error occurred';
     const status = result?.error?.status;
     if (status === 401) {
-      localStorage.clear();
-      window.location.replace("/login");
+      // localStorage.clear();
+      // window.location.replace("/login");
     } else {
       console.log('Error message from server:', responseMessage);
       message.error(responseMessage);

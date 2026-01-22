@@ -8,6 +8,7 @@ import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 import { getGeneralStaffColumns } from "./columns";
+import ChangePasswordModal from "../../components/ChangePasswordModal";
 // ...existing code...
 import "./styles.scss";
 import { useGetGeneralStaffQuery } from "../../services/generalStaff";
@@ -30,6 +31,8 @@ const AllGeneralStaff = () => {
     view: true,
     actions: true,
   });
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   
   const { data: staffData, isLoading } = useGetGeneralStaffQuery({ employeeType: 'general-staff', page, limit });
 
@@ -55,11 +58,16 @@ const AllGeneralStaff = () => {
     // TODO: Show confirmation modal and call delete API
   };
 
+  const handleChangePassword = (record) => {
+    setSelectedUser(record);
+    setIsPasswordModalVisible(true);
+  };
+
   // Get columns with handlers
-  const columns = getGeneralStaffColumns(handleView, handleVerify, handleEdit, handleDelete).filter(col => visibleColumns[col.key]);
+  const columns = getGeneralStaffColumns(handleView, handleVerify, handleEdit, handleDelete, handleChangePassword).filter(col => visibleColumns[col.key]);
 
   // For ColumnVisibility, get all columns (without filtering)
-  const allColumns = getGeneralStaffColumns(handleView, handleVerify, handleEdit, handleDelete);
+  const allColumns = getGeneralStaffColumns(handleView, handleVerify, handleEdit, handleDelete, handleChangePassword);
 
   const handleColumnToggle = (columnKey) => {
     setVisibleColumns(prev => ({
@@ -78,7 +86,7 @@ const AllGeneralStaff = () => {
       ...item,
       name: item.user?.name || '-',
       phoneNumber: item.user?.phone || item.user?.phoneNumber || '-',
-      role: item.staffTypeId?.name || '-',
+      role: item.roleId?.name || '-',
       branchName,
       status: item.status || (item.user?.status === 'active' ? 'ACTIVE' : 'INACTIVE'),
       staffId: item.staffId || '-',
@@ -177,6 +185,16 @@ const AllGeneralStaff = () => {
           setLimit(newLimit);
           setPage(1);
         }}
+      />
+
+      <ChangePasswordModal
+        visible={isPasswordModalVisible}
+        onCancel={() => {
+          setIsPasswordModalVisible(false);
+          setSelectedUser(null);
+        }}
+        selectedUser={selectedUser?.user}
+        userName={selectedUser?.name}
       />
     </div>
   );

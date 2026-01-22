@@ -20,10 +20,24 @@ export const auth = createApi({
         body
       }),
     }),
+    selfChangePassword: builder.mutation({
+      query: (body) => ({
+        url: `/auth/change-password`,
+        method: "POST",
+        body
+      }),
+    }),
+      changePassword: builder.mutation({
+      query: ({ userId, newPassword, sendEmail }) => ({
+        url: `/users/${userId}/reset-password`,
+        method: "PUT",
+        body: { newPassword, sendEmail },
+      }),
+    }),
 
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useEmailCheckMutation,useLoginMutation } = auth
+export const { useEmailCheckMutation,useLoginMutation,useSelfChangePasswordMutation,useChangePasswordMutation } = auth

@@ -7,8 +7,10 @@ import { useAddRoleMutation } from "../../services/role";
 // ...existing code...
 import { AllRolesRoute, Home } from "../../routes/routepath";
 import PageBreadcrumb from "../../components/breadcrumb";
+import { useNavigate } from "react-router-dom";
 
 const AddRole = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const { data: menuData } = useSiderMenuQuery();
   const [triggerAddRole, { isLoading: adding }] = useAddRoleMutation();
@@ -127,6 +129,7 @@ const AddRole = () => {
 
     await triggerAddRole(payload).unwrap();
     // message.success('Role added successfully');
+    navigate(AllRolesRoute);
     form.resetFields();
     setSelectedPermissions([]);
   };

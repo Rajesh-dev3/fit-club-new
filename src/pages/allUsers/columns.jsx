@@ -1,6 +1,6 @@
 import { Image, Tag, Button, Dropdown, Select } from "antd";
 import { Link } from 'react-router-dom';
-import { EditOutlined, DeleteOutlined, MoreOutlined, EyeOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, MoreOutlined, EyeOutlined, KeyOutlined } from "@ant-design/icons";
 import { UserDetailAttendanceRoute } from "../../routes/routepath";
 
 function statusColor(status) {
@@ -68,8 +68,9 @@ const allColumns = [
   { title: 'Gym Kit', dataIndex: 'gymKit', key: 'gymKit', width: 100 },
   { title: 'Actions', key: 'actions', width: 100, align: 'center', render: (_, record) => {
     const menuItems = [
-      { key: 'edit', label: 'Edit', icon: <EditOutlined />, onClick: () => {} },
-      { key: 'delete', label: 'Delete', icon: <DeleteOutlined />, danger: true, onClick: () => {} },
+      { key: 'edit', label: 'Edit', icon: <EditOutlined />, onClick: () => handleEdit && handleEdit(record) },
+      { key: 'changePassword', label: 'Change Password', icon: <KeyOutlined />, onClick: () => handleChangePassword && handleChangePassword(record) },
+      { key: 'delete', label: 'Delete', icon: <DeleteOutlined />, danger: true, onClick: () => handleDelete && handleDelete(record) },
     ];
     return (
       <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
@@ -79,4 +80,28 @@ const allColumns = [
   } },
 ];
 
+const getUserColumns = (handleEdit, handleDelete, handleChangePassword) => {
+  return allColumns.map(col => {
+    if (col.key === 'actions') {
+      return {
+        ...col,
+        render: (_, record) => {
+          const menuItems = [
+            { key: 'edit', label: 'Edit', icon: <EditOutlined />, onClick: () => handleEdit && handleEdit(record) },
+            { key: 'changePassword', label: 'Change Password', icon: <KeyOutlined />, onClick: () => handleChangePassword && handleChangePassword(record) },
+            { key: 'delete', label: 'Delete', icon: <DeleteOutlined />, danger: true, onClick: () => handleDelete && handleDelete(record) },
+          ];
+          return (
+            <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
+              <Button type="text" icon={<MoreOutlined style={{ fontSize: 20 }} />} />
+            </Dropdown>
+          );
+        }
+      };
+    }
+    return col;
+  });
+};
+
+export { getUserColumns };
 export default allColumns;

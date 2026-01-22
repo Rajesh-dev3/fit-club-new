@@ -45,7 +45,7 @@ console.log(staff,"userInfo")
           <div className="row">
             <span><b>Address:</b> <span className="value">{staff.address || '-'}</span></span>
             <span><b>Branch Name:</b> <span className="value">{(userInfo.branchIds && userInfo.branchIds[0]?.name) || '-'}</span></span>
-            <span><b>Role:</b> <span className="value">{staff.staffTypeId?.name || '-'}</span></span>
+            <span><b>Role:</b> <span className="value">{staff.roleId?.name || '-'}</span></span>
             <span></span>
           </div>
         </div>

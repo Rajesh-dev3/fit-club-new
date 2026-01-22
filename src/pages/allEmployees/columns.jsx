@@ -1,8 +1,8 @@
 import React from 'react';
 import { Image, Tag, Button, Dropdown } from 'antd';
-import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, KeyOutlined } from '@ant-design/icons';
 
-export const getEmployeeColumns = (handleView, handleEdit, handleDelete) => [
+export const getEmployeeColumns = (handleView, handleEdit, handleDelete, handleChangePassword) => [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -94,6 +94,12 @@ export const getEmployeeColumns = (handleView, handleEdit, handleDelete) => [
           label: 'Edit',
           icon: <EditOutlined />,
           onClick: () => handleEdit(record),
+        },
+        {
+          key: 'changePassword',
+          label: 'Change Password',
+          icon: <KeyOutlined />,
+          onClick: () => handleChangePassword(record),
         },
         {
           key: 'delete',
