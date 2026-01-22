@@ -55,7 +55,7 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
       branches: item.branch ? [item.branch] : [],
       branchName: item.branch?.name || '-',
       ownedBy: item.role?.name || '-',
-      status: item.userId?.status || 'inactive',
+      status: item?.status || 'INACTIVE',
     }));
   }, [directorsData]);
 
