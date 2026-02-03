@@ -17,6 +17,7 @@ import { coupons } from '../coupons'
 import { feedbacks } from '../feedbacks'
 import { qrCodes } from '../qrCodes'
 import { departments } from '../departments'
+import { biometricApi } from '../biometric'
 import branchReducer from '../branchSlice'
 
 export const store = configureStore({
@@ -38,6 +39,7 @@ export const store = configureStore({
     [feedbacks.reducerPath]: feedbacks.reducer,
     [qrCodes.reducerPath]: qrCodes.reducer,
     [departments.reducerPath]: departments.reducer,
+    [biometricApi.reducerPath]: biometricApi.reducer,
     branch: branchReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
@@ -59,6 +61,7 @@ export const store = configureStore({
     feedbacks.middleware,
     qrCodes.middleware,
     departments.middleware,
+    biometricApi.middleware,
   ),
 })
 

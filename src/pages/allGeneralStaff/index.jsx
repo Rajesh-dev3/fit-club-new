@@ -1,14 +1,15 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, Input, Dropdown, Image, Tag, Select } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, MoreOutlined, CheckOutlined, EyeInvisibleOutlined, LockOutlined, HomeOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, CheckOutlined, EyeInvisibleOutlined, LockOutlined, HomeOutlined } from "@ant-design/icons";
 import { AddGeneralStaffRoute, GeneralStaffDetailAttendanceRoute, Home } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 import { getGeneralStaffColumns } from "./columns";
-import ChangePasswordModal from "../../components/ChangePasswordModal";
+import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
+import AddButton from "../../components/addButton";
 // ...existing code...
 import "./styles.scss";
 import { useGetGeneralStaffQuery } from "../../services/generalStaff";
@@ -147,14 +148,9 @@ const AllGeneralStaff = () => {
           </div>
 <div className="flex" style={{gap:"10px"}}>
 
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />}
-          className="add-btn"
-          onClick={() => navigate('/add-general-staff')}
-          >
+        <AddButton to={AddGeneralStaffRoute}>
           Add General Staff
-        </Button>
+        </AddButton>
 
         <ColumnVisibility
           columns={allColumns}

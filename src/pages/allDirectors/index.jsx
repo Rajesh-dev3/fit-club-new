@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { Home, EditDirectorRoute } from "../../routes/routepath";
+import { Home, EditDirectorRoute, AddDirectorRoute } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
-import ChangePasswordModal from "../../components/ChangePasswordModal";
+import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
+import AddButton from "../../components/addButton";
 import { getColumns } from './columns';
 import { useGetDirectorsQuery, useUpdateDirectorStatusMutation } from "../../services/director";
 import "./styles.scss"
@@ -126,8 +126,8 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
          item.phoneNumber?.includes(searchText));
       
       const matchesTab = activeTab === "all" || 
-        (activeTab === "active" && item.status === "active") ||
-        (activeTab === "inactive" && item.status !== "active");
+        (activeTab === "active" && item.status?.toLowerCase() === "active") ||
+        (activeTab === "inactive" && item.status?.toLowerCase() !== "active");
       
       return matchesSearch && matchesTab;
     });
@@ -135,8 +135,8 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
 
   // Calculate counts for each tab
   const allCount = directors.length || 0;
-  const activeCount = directors.filter(item => item.status === "active").length || 0;
-  const inactiveCount = directors.filter(item => item.status !== "active").length || 0;
+  const activeCount = directors.filter(item => item.status?.toLowerCase() === "active").length || 0;
+  const inactiveCount = directors.filter(item => item.status?.toLowerCase() !== "active").length || 0;
 
   const tabsData = [
     { key: 'all', label: 'All', count: allCount },
@@ -169,14 +169,9 @@ const { data: directorsData, isLoading } = useGetDirectorsQuery({ page, limit })
           />
         </div>
         <div className="flex" style={{gap:"10px"}}>
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />}
-            className="add-btn"
-            onClick={handleAddDirector}
-          >
+          <AddButton to={AddDirectorRoute}>
             Add Director
-          </Button>
+          </AddButton>
           <ColumnVisibility
             columns={allColumns}
             visibleColumns={visibleColumns}

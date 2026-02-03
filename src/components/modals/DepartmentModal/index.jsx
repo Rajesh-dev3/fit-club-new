@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Modal, Input, Button, Table, Switch } from "antd";
 import "./styles.scss";
-import CommonTable from "../commonTable";
+import CommonTable from "../../commonTable";
 
 import { message } from "antd";
-import { useAddDepartmentMutation, useGetDepartmentsQuery, useToggleDepartmentStatusMutation } from "../../services/departments";
+import { useAddDepartmentMutation, useGetDepartmentsQuery, useToggleDepartmentStatusMutation } from "../../../services/departments";
 
 const DepartmentModal = ({ open, onClose }) => {
   const [deptName, setDeptName] = useState("");

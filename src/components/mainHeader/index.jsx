@@ -39,6 +39,19 @@ const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) =
 
   const userData = getUserData();
   const userName = userData?.name || 'User';
+  const userBranches = userData?.branchIds || [];
+  const userType = userData?.userType;
+  
+  // Determine if branch selector should be disabled
+  // Enable for SUPERADMIN (who can see all branches) or users with multiple branches
+  const shouldDisableBranchSelector = userType !== 'SUPERADMIN' && userBranches.length <= 1;
+  
+  // Auto-select branch if user has only one branch (but not for SUPERADMIN)
+  React.useEffect(() => {
+    if (userType !== 'SUPERADMIN' && userBranches.length === 1 && !selectedBranch) {
+      dispatch(setSelectedBranch(userBranches[0]._id));
+    }
+  }, [userBranches, selectedBranch, dispatch, userType]);
 
   const handleMenuClick = () => {
     if (isMobile) {
@@ -71,7 +84,9 @@ const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) =
     items: [
       {
         key: "1",
-        label: <div className="profile-name">{userName}</div>,
+        label: <div className="profile-name">{userName}
+       <br />
+      <span style={{color:"gray",fontSize:"11px",textTransform:"capitalize"}}>{userType}</span>  </div>,
         disabled: true,
       },
       { type: "divider" },
@@ -144,11 +159,23 @@ const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) =
           onChange={val => dispatch(setSelectedBranch(val))}
           optionFilterProp="children"
           showSearch
+          disabled={shouldDisableBranchSelector}
         >
-          <Select.Option value="all" >All</Select.Option>
-          {branchData?.data?.map(b => (
-            <Select.Option key={b._id} value={b._id}>{b.name}</Select.Option>
-          ))}
+          {(userType === 'SUPERADMIN' || userBranches.length > 1) && (
+            <Select.Option value="all">All Branches</Select.Option>
+          )}
+          {userType === 'SUPERADMIN' 
+            ? branchData?.data?.map(branch => (
+                <Select.Option key={branch._id} value={branch._id}>
+                  {branch.name}
+                </Select.Option>
+              ))
+            : userBranches.map(branch => (
+                <Select.Option key={branch._id} value={branch._id}>
+                  {branch.name}
+                </Select.Option>
+              ))
+          }
         </Select>
       </div>
 

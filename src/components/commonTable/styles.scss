@@ -6,6 +6,11 @@
   // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--muted);
   overflow: hidden;
+  .ant-table-cell-fix-end-shadow-show{
+    &::after{
+      box-shadow: none !important;
+    }
+  }
 .ant-table-expanded-row-fixed::after{
     border-inline-end: none !important;
 }

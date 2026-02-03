@@ -26,6 +26,7 @@ const AddPackage = () => {
     { label: 'Membership', value: 'membership' },
     { label: 'Trial', value: 'trial' },
     { label: 'Membership Transfer', value: 'membership_transfer' },
+    { label: 'Add On Package', value: 'add_on_package' },
   ];
 
   const assessmentOptions = [
@@ -49,6 +50,43 @@ const AddPackage = () => {
         nav(AllPackagesRoute);
       } catch (error) {
         console.error('Failed to add membership transfer package', error);
+      }
+      return;
+    }
+
+    // Add On Package के लिए अलग payload with additional fields
+    if (values.packageType === 'add_on_package') {
+      const payload = {
+        name: values.packageName,
+        pricing: values.price,
+        numberOfDays: values.validDays,
+        type: values.packageType,
+        addonPackageName: values.addonPackageName,
+        addonPackagePrice: values.addonPackagePrice,
+        numberOfSession: values.numberOfSession,
+        hsnSac: values.hsnCode,
+        freezable: values.freezable === 'yes',
+        ...(values.freezable === 'yes' && {
+          freezableDays: values.freezeDays,
+          freezableSlot: values.freezeSlot,
+        }),
+        branchId: values.branch,
+        benefits: values.benefitPoints ? values.benefitPoints.map(bp => ({ type: bp.point })) : [],
+        photos: values.banner ? [values.banner] : [],
+        description: values.description || '',
+        preferredGender: values.preferredGender || 'any',
+        maxMembers: values.maxMembers || 0,
+        upgradeLimit: values.upgradeLimit || 0,
+        renewLimit: values.advanceRenewDays || 0,
+        numberOfAssessment: values.assessment === 'yes' ? values.numberOfAssessments : 0,
+        hasAssessments: values.assessment === 'yes',
+      };
+
+      try {
+        await triggerAddPackage(payload).unwrap();
+        nav(AllPackagesRoute);
+      } catch (error) {
+        console.error('Failed to add add-on package', error);
       }
       return;
     }
@@ -143,8 +181,8 @@ const AddPackage = () => {
               {({ getFieldValue }) => {
                 const packageType = getFieldValue('packageType');
                 
-                // Show Package Name for ALL package types (including membership_transfer)
-                if (packageType === 'membership' || packageType === 'trial' || packageType === 'membership_transfer') {
+                // Show Package Name for ALL package types (including add_on_package)
+                if (packageType === 'membership' || packageType === 'trial' || packageType === 'membership_transfer' || packageType === 'add_on_package') {
                   return (
                     <Form.Item
                       label="Package Name"
@@ -208,6 +246,283 @@ const AddPackage = () => {
                         <Select
                           placeholder="Select branch"
                           options={branchOptions}
+                        />
+                      </Form.Item>
+                    </div>
+                  </>
+                );
+              }
+              
+              // Add On Package Case - Show complete membership form with 3 additional fields at the end
+              if (packageType === 'add_on_package') {
+                return (
+                  <>
+                    {/* Row 2: Price + Assessment (same as membership) */}
+                    <div className="form-row">
+                      <Form.Item
+                        label="Price"
+                        name="price"
+                        rules={[{ required: true, message: 'Please enter price' }]}
+                      >
+                        <InputNumber
+                          placeholder="Enter price"
+                          min={0}
+                          style={{ width: '100%' }}
+                          prefix="₹"
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Assessment"
+                        name="assessment"
+                        rules={[{ required: true, message: 'Please select assessment' }]}
+                      >
+                        <Select
+                          placeholder="Select assessment"
+                          options={assessmentOptions}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {/* Row: Upgrade Limit + Advance Renew Days (from membership form) */}
+                    <div className="form-row">
+                      <Form.Item
+                        label="Upgrade Limit"
+                        name="upgradeLimit"
+                        rules={[{ required: true, message: 'Please enter upgrade limit' }]}
+                      >
+                        <InputNumber
+                          placeholder="Enter upgrade limit"
+                          min={0}
+                          style={{ width: '100%' }}
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Advance Renew Days"
+                        name="advanceRenewDays"
+                        rules={[{ required: true, message: 'Please enter advance renew days' }]}
+                      >
+                        <InputNumber
+                          placeholder="Enter advance renew days"
+                          min={0}
+                          style={{ width: '100%' }}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {/* Freezable Field (from membership form) */}
+                    <div className="form-row-single">
+                      <Form.Item
+                        label="Freezable"
+                        name="freezable"
+                        rules={[{ required: true, message: 'Please select freezable option' }]}
+                        initialValue="no"
+                      >
+                        <Select
+                          placeholder="Select freezable option"
+                          options={[
+                            { label: 'Yes', value: 'yes' },
+                            { label: 'No', value: 'no' },
+                          ]}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {/* Conditional: Freeze Slot + Freeze Days (only when Freezable is Yes) */}
+                    <Form.Item
+                      noStyle
+                      shouldUpdate={(prevValues, currentValues) => prevValues.freezable !== currentValues.freezable}
+                    >
+                      {({ getFieldValue: getInnerFieldValue }) =>
+                        getInnerFieldValue('freezable') === 'yes' ? (
+                          <div className="form-row">
+                            <Form.Item
+                              label="Freeze Slot"
+                              name="freezeSlot"
+                              rules={[{ required: true, message: 'Please enter freeze slot' }]}
+                            >
+                              <InputNumber
+                                placeholder="Enter freeze slot"
+                                min={1}
+                                style={{ width: '100%' }}
+                              />
+                            </Form.Item>
+
+                            <Form.Item
+                              label="Freeze Days"
+                              name="freezeDays"
+                              rules={[{ required: true, message: 'Please enter freeze days' }]}
+                            >
+                              <InputNumber
+                                placeholder="Enter freeze days"
+                                min={1}
+                                style={{ width: '100%' }}
+                              />
+                            </Form.Item>
+                          </div>
+                        ) : null
+                      }
+                    </Form.Item>
+
+                    {/* Conditional: Number of Assessments (only when Assessment is Yes) */}
+                    <Form.Item
+                      noStyle
+                      shouldUpdate={(prevValues, currentValues) => prevValues.assessment !== currentValues.assessment}
+                    >
+                      {({ getFieldValue }) =>
+                        getFieldValue('assessment') === 'yes' ? (
+                          <div className="form-row-single">
+                            <Form.Item
+                              label="Number of Assessments"
+                              name="numberOfAssessments"
+                              rules={[{ required: true, message: 'Please enter number of assessments' }]}
+                            >
+                              <InputNumber
+                                placeholder="Enter number of assessments"
+                                min={1}
+                                style={{ width: '100%' }}
+                              />
+                            </Form.Item>
+                          </div>
+                        ) : null
+                      }
+                    </Form.Item>
+
+                    {/* Number of Valid Days */}
+                    <div className="form-row-single">
+                      <Form.Item
+                        label="Number of Valid Days"
+                        name="validDays"
+                        rules={[{ required: true, message: 'Please enter number of valid days' }]}
+                      >
+                        <InputNumber
+                          placeholder="Enter number of valid days"
+                          min={1}
+                          style={{ width: '100%' }}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {/* Row 3: HSN Code + Branch */}
+                    <div className="form-row">
+                      <Form.Item
+                        label="HSN Code"
+                        name="hsnCode"
+                        rules={[{ required: true, message: 'Please enter HSN code' }]}
+                      >
+                        <Input placeholder="Enter HSN code" />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Branch"
+                        name="branch"
+                        rules={[{ required: true, message: 'Please select branch' }]}
+                      >
+                        <Select
+                          placeholder="Select branch"
+                          options={branchOptions}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {/* Single Row: Banner */}
+                    <div className="form-row-single">
+                      <Form.Item
+                        label="Banner"
+                        name="banner"
+                        rules={[
+                          { 
+                            validator: (_, value) => {
+                              if (!value) {
+                                return Promise.reject('Please upload banner image');
+                              }
+                              return Promise.resolve();
+                            }
+                          }
+                        ]}
+                      >
+                        <ImagePicker form={form} name="banner" />
+                      </Form.Item>
+                    </div>
+
+                    {/* Benefit Points - Multiple */}
+                    <div className="certificates-section">
+                      <h3 style={{ color: 'var(--sider-text)', marginBottom: 16 }}>Benefit Points</h3>
+                      <Form.List name="benefitPoints">
+                        {(fields, { add, remove }) => (
+                          <>
+                            {fields.map(({ key, name, ...restField }) => (
+                              <div key={key} className="certificate-item">
+                                <div className="row">
+                                  <Form.Item
+                                    {...restField}
+                                    name={[name, 'point']}
+                                    label="Benefit Point"
+                                    rules={[{ required: true, message: 'Please enter benefit point' }]}
+                                  >
+                                    <Input placeholder="Enter benefit point" />
+                                  </Form.Item>
+
+                                  <Button
+                                    type="link"
+                                    danger
+                                    icon={<MinusCircleOutlined />}
+                                    onClick={() => remove(name)}
+                                    style={{ marginTop: 30 }}
+                                  >
+                                    Remove
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                            <Form.Item>
+                              <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                Add Benefit Point
+                              </Button>
+                            </Form.Item>
+                          </>
+                        )}
+                      </Form.List>
+                    </div>
+
+                    {/* 3 NEW FIELDS AT THE END FOR ADD ON PACKAGE */}
+                    <div className="form-separator" style={{ margin: '24px 0', borderBottom: '2px solid var(--border-color)' }}></div>
+                    <h3 style={{ color: 'var(--sider-text)', marginBottom: 16 }}>Add-On Package Details</h3>
+                    
+                    <div className="form-row">
+                      <Form.Item
+                        label="Add on package name"
+                        name="addonPackageName"
+                        rules={[{ required: true, message: 'Please enter add-on package name' }]}
+                      >
+                        <Input placeholder="Enter add-on package name" />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Add on package price"
+                        name="addonPackagePrice"
+                        rules={[{ required: true, message: 'Please enter add-on package price' }]}
+                      >
+                        <InputNumber
+                          placeholder="Enter add-on package price"
+                          min={0}
+                          style={{ width: '100%' }}
+                          prefix="₹"
+                        />
+                      </Form.Item>
+                    </div>
+
+                    <div className="form-row-single">
+                      <Form.Item
+                        label="Number of session"
+                        name="numberOfSession"
+                        rules={[{ required: true, message: 'Please enter number of sessions' }]}
+                      >
+                        <InputNumber
+                          placeholder="Enter number of sessions"
+                          min={1}
+                          style={{ width: '100%' }}
                         />
                       </Form.Item>
                     </div>

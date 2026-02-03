@@ -1,14 +1,15 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Input, Dropdown, Image, Tag, Select } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, MoreOutlined, CheckOutlined, EyeInvisibleOutlined, LockOutlined, HomeOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, CheckOutlined, EyeInvisibleOutlined, LockOutlined, HomeOutlined } from "@ant-design/icons";
 import { AddEmployeeRoute, EmployeeDetailAttendanceRoute, Home } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 import PageBreadcrumb from "../../components/breadcrumb";
-import ChangePasswordModal from "../../components/ChangePasswordModal";
+import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
+import AddButton from "../../components/addButton";
 import CommonTable from '../../components/commonTable';
 import "./styles.scss";
 import { useGetEmployeeQuery } from "../../services/employee";
@@ -182,14 +183,9 @@ const AllEmployees = () => {
 <div className="flex" style={{gap:"10px"}}>
 
 
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />}
-          className="add-btn"
-          onClick={() => navigate(AddEmployeeRoute)}
-          >
+        <AddButton to={AddEmployeeRoute}>
           Add Employee
-        </Button>
+        </AddButton>
 
         <ColumnVisibility
           columns={allColumns}

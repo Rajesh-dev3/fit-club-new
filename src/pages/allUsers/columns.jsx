@@ -1,7 +1,7 @@
 import { Image, Tag, Button, Dropdown, Select } from "antd";
 import { Link } from 'react-router-dom';
 import { EditOutlined, DeleteOutlined, MoreOutlined, EyeOutlined, KeyOutlined } from "@ant-design/icons";
-import { UserDetailAttendanceRoute } from "../../routes/routepath";
+import { UserDetailAttendanceRoute, ViewFormRoute } from "../../routes/routepath";
 
 function statusColor(status) {
   switch (status) {
@@ -62,7 +62,11 @@ const allColumns = [
       <Button type="text" icon={<EyeOutlined style={{ fontSize: 20 }} />} />
     </Link>
   ) },
-  { title: 'Membership Form', dataIndex: 'membershipForm', key: 'membershipForm', width: 120 },
+  { title: 'Membership Form', key: 'membershipForm', width: 120, align: 'center', render: (_, record) => (
+    <Link to={`${ViewFormRoute}/${record._id}`}>
+      <Button type="text" icon={<EyeOutlined style={{ fontSize: 20 }} />} />
+    </Link>
+  ) },
   { title: 'Start Date', dataIndex: 'startDate', key: 'startDate', width: 120 },
   { title: 'End Date', dataIndex: 'endDate', key: 'endDate', width: 120 },
   { title: 'Gym Kit', dataIndex: 'gymKit', key: 'gymKit', width: 100 },

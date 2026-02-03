@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Input, Dropdown, Image, Tag, Select, Spin } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, MoreOutlined, CheckOutlined, EyeInvisibleOutlined, LockOutlined, HomeOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, CheckOutlined, EyeInvisibleOutlined, LockOutlined, HomeOutlined } from "@ant-design/icons";
 import { Home, AddPackageRoute } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
+import AddButton from "../../components/addButton";
 import PageBreadcrumb from "../../components/breadcrumb";
 import CommonTable from '../../components/commonTable';
 import "./styles.scss";
@@ -144,14 +145,9 @@ const AllPackages = () => {
       <div className="flex" style={{gap:"10px"}}>
       
       
-              <Button 
-                type="primary" 
-                icon={<PlusOutlined />}
-                className="add-btn"
-                onClick={() => navigate(AddPackageRoute)}
-                >
+              <AddButton to={AddPackageRoute}>
                 Add Package
-              </Button>
+              </AddButton>
       
               <ColumnVisibility
                 columns={allColumns}

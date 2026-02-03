@@ -1,6 +1,8 @@
 const AllFeedbacksRoute = "/all-feedbacks";
 const AddCouponRoute = "/add-coupon"
 const AllCouponsRoute = "/all-coupons"
+const AddBiometricRoute = "/add-biometric"
+const AllBiometricsRoute = "/all-biometrics"
 const Home = "/"
 const AddUserRoute = "/add-user"
 const AddEmployeeRoute = "/add-employee"
@@ -29,6 +31,11 @@ const AddAddOnPackageRoute = "/add-add-on-package"
 
 const EmployeeDetailRoute = "/employee-detail"
 const DirectorAttendanceRoute = "/director-attendance"
+const UserAttendanceRoute = "/user-attendance"
+const EmployeeAttendanceRoute = "/employee-attendance"
+const TrainerAttendanceRoute = "/trainer-attendance"
+const GeneralStaffAttendanceRoute = "/general-staff-attendance"
+const ViewFormRoute = "/view-form"
 const loginRoute = "/login"
 const AllUsersRoute = "/all-users"
 
@@ -87,7 +94,7 @@ export {EditDirectorRoute, EditRoleRoute, Home, AddUserRoute, AddEmployeeRoute,
      AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, 
      AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute,
       AddAddOnSlotRoute, AllAddOnPackagesRoute, AddAddOnPackageRoute, AllUsersRoute,
-       DirectorAttendanceRoute, loginRoute, EmployeeDetailRoute,
+       DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, ViewFormRoute, loginRoute, EmployeeDetailRoute,
         EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute,
          EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, 
          EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute,
@@ -111,5 +118,7 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
   AllCouponsRoute,
   AddCouponRoute,
   AllFeedbacksRoute,
-  userFeedbackRoute
+  userFeedbackRoute,
+  AddBiometricRoute,
+  AllBiometricsRoute
  }

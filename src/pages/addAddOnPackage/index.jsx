@@ -21,9 +21,18 @@ const typeOptions = [
 const AddAddOnPackage = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
+  const [selectedPackageType, setSelectedPackageType] = useState("");
   const { data: branchesData, isLoading: branchesLoading } = useGetBranchesQuery();
 
   const handleUploadChange = ({ fileList }) => setFileList(fileList);
+
+  const handlePackageTypeChange = (value) => {
+    setSelectedPackageType(value);
+    // Reset sessions field when package type changes
+    if (value === "Paid Locker") {
+      form.setFieldsValue({ sessions: undefined });
+    }
+  };
 
   const onFinish = (values) => {
     // Handle form submission
@@ -62,7 +71,11 @@ const AddAddOnPackage = () => {
             label="Package Type"
             rules={[{ required: true, message: "Please select package type" }]}
           >
-            <Select placeholder="Select package type" options={typeOptions} />
+            <Select 
+              placeholder="Select package type" 
+              options={typeOptions}
+              onChange={handlePackageTypeChange}
+            />
           </Form.Item>
           <Form.Item
             name="name"
@@ -144,6 +157,17 @@ const AddAddOnPackage = () => {
             <Input placeholder="Enter benefit headline" />
           </Form.Item>
         </div>
+        {selectedPackageType !== "Paid Locker" && (
+          <div className="row">
+            <Form.Item
+              name="sessions"
+              label="Sessions"
+              rules={[{ required: true, message: "Please enter number of sessions" }]}
+            >
+              <InputNumber min={1} style={{ width: "100%" }} placeholder="Enter number of sessions" />
+            </Form.Item>
+          </div>
+        )}
         <div className="footer-buttons">
           <Button type="primary" htmlType="submit" className="save-btn">
             Submit

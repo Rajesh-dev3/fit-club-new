@@ -1,11 +1,12 @@
 import  { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
-import {  PlusOutlined, HomeOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import { Home, AddAddOnSlotRoute } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
+import AddButton from "../../components/addButton";
 import CommonTable from '../../components/commonTable';
 import "./styles.scss";
 import { getAddOnSlotColumns } from './columns';
@@ -119,14 +120,9 @@ const AllAddOnSlots = () => {
       <div className="flex" style={{gap:"10px"}}>
       
       
-              <Button 
-                type="primary" 
-                icon={<PlusOutlined />}
-                className="add-btn"
-                onClick={() => navigate(AddAddOnSlotRoute)}
-                >
+              <AddButton to={AddAddOnSlotRoute}>
                  Add On Slot
-              </Button>
+              </AddButton>
       
               <ColumnVisibility
                 columns={allColumns}

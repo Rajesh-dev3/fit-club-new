@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Select, Button, Spin } from "antd";
-import { useGetBranchesQuery } from "../../services/branches";
-import { useGenerateQrCodeMutation } from "../../services/qrCodes";
+import { useGetBranchesQuery } from "../../../services/branches";
+import { useGenerateQrCodeMutation } from "../../../services/qrCodes";
 import "./qrModal.scss";
 
 const QRModal = ({ open, onClose }) => {

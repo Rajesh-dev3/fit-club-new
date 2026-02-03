@@ -5,6 +5,7 @@ import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import CommonTable from "../../components/commonTable";
 import ColumnVisibility from "../../components/columnVisibility";
+import AddButton from "../../components/addButton";
 import PageBreadcrumb from "../../components/breadcrumb";
 import CustomPagination from "../../components/pagination";
 import { HomeOutlined } from "@ant-design/icons";
@@ -285,9 +286,9 @@ const AllCoupons = () => {
           />
         </div>
         <div className="flex" style={{ gap: "10px", alignItems: 'center' }}>
-          <Button type="primary" href={AddCouponRoute} style={{ fontWeight: 500 }}>
+          <AddButton to={AddCouponRoute}>
             Add Coupon
-          </Button>
+          </AddButton>
           <ColumnVisibility
             columns={allColumns}
             visibleColumns={visibleColumns}

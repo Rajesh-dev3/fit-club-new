@@ -10,9 +10,11 @@ import {
   createBrowserRouter,
   Navigate,
 } from "react-router-dom";
-import { AddEmployeeRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, EditDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, DirectorAttendanceRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute, DirectorDetailPageRoute, DirectorAttendancePageRoute, DirectorBiometricAccessPageRoute, AddAddOnPackageRoute } from "./routepath";
+import { AddEmployeeRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, EditDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, ViewFormRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute, DirectorDetailPageRoute, DirectorAttendancePageRoute, DirectorBiometricAccessPageRoute, AddAddOnPackageRoute, AddBiometricRoute, AllBiometricsRoute } from "./routepath";
 import AddBranch from "../pages/addBranch";
 import AllBranches from "../pages/allBranches";
+import AddBiometric from "../pages/addBiometric";
+import AllBiometrics from "../pages/allBiometrics";
 import MainLayout from "../common/mainLayout";
 import Dashboard from "../pages/Dashboard";
 import AddUser from "../pages/addUser";
@@ -34,6 +36,11 @@ import AddAddOnSlot from "../pages/addAddOnSlot";
 import Login from "../pages/auth/login";
 import AllUsers from "../pages/allUsers";
 import DirectorAttendance from "../pages/directorAttendance";
+import UserAttendancePage from "../pages/userAttendance";
+import EmployeeAttendancePage from "../pages/employeeAttendance";
+import TrainerAttendancePage from "../pages/trainerAttendance";
+import GeneralStaffAttendancePage from "../pages/generalStaffAttendance";
+import ViewForm from "../pages/viewForm";
 
 import EmployeeDetailPage from "../pages/employeeDetail";
 import EmployeeDetailAttendance from "../components/employeeDetail/attendance";
@@ -102,14 +109,21 @@ export const router = createBrowserRouter([
       { path: `${EditDirectorRoute}/:id`, element:<EditDirector/> },
       { path: AllPackagesRoute, element:<AllPackages/> },
       { path: AllUsersRoute, element:<AllUsers/> },
+      { path: `${ViewFormRoute}/:id`, element:<ViewForm/> },
       { path: AllAddOnPackagesRoute, element: <AllAddOnPackages/> },
       { path: AddAddOnPackageRoute, element: <AddAddOnPackage/> },
       { path: DirectorAttendanceRoute, element:<DirectorAttendance/> },
+      { path: UserAttendanceRoute, element:<UserAttendancePage/> },
+      { path: EmployeeAttendanceRoute, element:<EmployeeAttendancePage/> },
+      { path: TrainerAttendanceRoute, element:<TrainerAttendancePage/> },
+      { path: GeneralStaffAttendanceRoute, element:<GeneralStaffAttendancePage/> },
       { path: AddPackageRoute, element:<AddPackage/> },
       { path: AllAddOnSlotsRoute, element:<AllAddOnSlots/> },
       { path: AddAddOnSlotRoute, element:<AddAddOnSlot/> },
       { path: AddBranchRoute, element: <AddBranch/> },
       { path: AllBranchesRoute, element: <AllBranches /> },
+      { path: AddBiometricRoute, element: <AddBiometric/> },
+      { path: AllBiometricsRoute, element: <AllBiometrics/> },
       { path: `${EditBranchRoute}/:id`, element: <EditBranch />, errorElement: <ErrorBoundary /> },
       {
         path: `${EmployeeDetailRoute}/:id`,

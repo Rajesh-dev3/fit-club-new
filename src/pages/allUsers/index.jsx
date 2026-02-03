@@ -6,7 +6,7 @@ import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
-import ChangePasswordModal from "../../components/ChangePasswordModal";
+import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
 import allColumns, { getUserColumns } from "./columns";
 // ...existing code...
 import "./styles.scss";

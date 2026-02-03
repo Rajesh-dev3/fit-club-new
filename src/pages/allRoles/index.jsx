@@ -7,6 +7,7 @@ import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
+import AddButton from "../../components/addButton";
 // ...existing code...
 import {  AddRoleRoute, EditRoleRoute } from "../../routes/routepath";
 import "./styles.scss";
@@ -215,14 +216,9 @@ const AllRoles = () => {
           </div>
 <div className="flex" style={{ gap: "10px" }}>
 
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />}
-          className="add-btn"
-          onClick={handleAddRole}
-          >
+        <AddButton to={AddRoleRoute}>
           Add Role
-        </Button>
+        </AddButton>
 
         <ColumnVisibility
           columns={allColumns}

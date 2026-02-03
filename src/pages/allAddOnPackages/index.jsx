@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Select } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
+import AddButton from "../../components/addButton";
 import CommonTable from "../../components/commonTable";
 import allColumns from "./columns";
 import "./styles.scss";
@@ -124,14 +125,9 @@ const AllAddOnPackages = () => {
             visibleColumns={visibleColumns}
             onColumnToggle={handleColumnToggle}
           />
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            className="add-btn"
-            onClick={() => navigate(AddAddOnPackageRoute)}
-          >
+          <AddButton to={AddAddOnPackageRoute}>
             Add Add On Package
-          </Button>
+          </AddButton>
         </div>
       </div>
       <div className="packages-table-wrapper">

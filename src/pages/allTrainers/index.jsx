@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button } from "antd";
-import {  PlusOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import { AddTrainerRoute, TrainerDetailAttendanceRoute } from "../../routes/routepath";
 // import { useGetTrainersQuery } from "../../services/trainer";
 import CustomPagination from "../../components/pagination";
 import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
+import AddButton from "../../components/addButton";
 // ...existing code...
 import "./styles.scss";
 import { useGetTrainersQuery } from "../../services/trainer";
@@ -144,14 +145,9 @@ const AllTrainers = () => {
         </div>
 <div className="flex" style={{gap:"10px"}}>
 
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />}
-          className="add-btn"
-          onClick={() => navigate(AddTrainerRoute)}
-          >
+        <AddButton to={AddTrainerRoute}>
           Add Trainer
-        </Button>
+        </AddButton>
 
         <ColumnVisibility
           columns={allColumns}

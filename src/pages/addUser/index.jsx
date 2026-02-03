@@ -557,11 +557,11 @@ const [trigger,{data}] = useAdduserMutation();
                 </Form.Item>
               </Col>
 
-              <Col span={8}>
+              {/* <Col span={8}>
                 <Form.Item name="password" label="Password" rules={[{ min: 6, message: 'Password must be at least 6 characters' }] }>
                   <Input.Password placeholder="Enter password" />
                 </Form.Item>
-              </Col>
+              </Col> */}
 
               <Col span={8}>
                 <Form.Item name="heardFrom" label="How did you hear about FitClub">

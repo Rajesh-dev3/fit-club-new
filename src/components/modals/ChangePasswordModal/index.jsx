@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
 import './styles.scss';
-import { useChangePasswordMutation } from '../../services/auth';
+import { useChangePasswordMutation } from '../../../services/auth';
 
 const ChangePasswordModal = ({ 
   visible, 
