@@ -142,9 +142,12 @@
         }
       }
     }
-
+.ant-select-multiple{
+  height: auto !important;
+  padding-block: 10px;
+}
     .ant-select {
-      height: 48px !important;
+      height: 48px;
       
       .ant-select-selector {
         height: 48px !important;

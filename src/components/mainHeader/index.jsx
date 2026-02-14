@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoMenu } from "react-icons/io5";
 import { FiMoon, FiSun } from "react-icons/fi";
 import { Select, Avatar, Dropdown, Spin, Modal, Form, Input, Button, message } from "antd";
@@ -23,22 +23,42 @@ const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) =
   // Password modal state
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordForm] = Form.useForm();
+  const [userData, setUserData] = useState(null);
+  const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
 
-  // Get user data from localStorage
-  const getUserData = () => {
-    try {
-      const userString = localStorage.getItem('user');
-      if (userString) {
-        return JSON.parse(userString);
+  // Get user data from localStorage with proper state management
+  useEffect(() => {
+    const loadUserData = () => {
+      try {
+        const userString = localStorage.getItem('user');
+        if (userString) {
+          const parsedData = JSON.parse(userString);
+          setUserData(parsedData);
+        } else {
+          setUserData(null);
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        setUserData(null);
+      } finally {
+        setIsUserDataLoaded(true);
       }
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-    }
-    return null;
-  };
+    };
 
-  const userData = getUserData();
-  const userName = userData?.name || 'User';
+    loadUserData();
+    
+    // Listen for storage changes (in case user data is updated elsewhere)
+    const handleStorageChange = (e) => {
+      if (e.key === 'user') {
+        loadUserData();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const userName = userData?.name || 'Loading...';
   const userBranches = userData?.branchIds || [];
   const userType = userData?.userType;
   
@@ -48,10 +68,10 @@ const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) =
   
   // Auto-select branch if user has only one branch (but not for SUPERADMIN)
   React.useEffect(() => {
-    if (userType !== 'SUPERADMIN' && userBranches.length === 1 && !selectedBranch) {
+    if (isUserDataLoaded && userType !== 'SUPERADMIN' && userBranches.length === 1 && !selectedBranch) {
       dispatch(setSelectedBranch(userBranches[0]._id));
     }
-  }, [userBranches, selectedBranch, dispatch, userType]);
+  }, [userBranches, selectedBranch, dispatch, userType, isUserDataLoaded]);
 
   const handleMenuClick = () => {
     if (isMobile) {
@@ -84,9 +104,9 @@ const MainHeader = ({ collapsed, setCollapsed, isMobile, toggleMobileDrawer }) =
     items: [
       {
         key: "1",
-        label: <div className="profile-name">{userName}
+        label: <div className="profile-name">{isUserDataLoaded ? userName : 'Loading...'}
        <br />
-      <span style={{color:"gray",fontSize:"11px",textTransform:"capitalize"}}>{userType}</span>  </div>,
+      <span style={{color:"gray",fontSize:"11px",textTransform:"capitalize"}}>{isUserDataLoaded ? userType : 'Loading...'}</span>  </div>,
         disabled: true,
       },
       { type: "divider" },

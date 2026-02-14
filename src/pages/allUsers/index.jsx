@@ -154,14 +154,15 @@ const AllUsers = () => {
     return data;
   }, [usersData, activeTab, remainingDays, searchText]);
 
-  // Tabs data with count (replace with real counts if available)
+  // Tabs data with count from API statusCounts
   const tabsData = [
-    { key: 'all', label: 'All', count: filteredData?.length || 0 },
-    { key: 'active', label: 'Active', count: filteredData?.filter(u => u.status === 'active').length || 0 },
-    { key: 'pending', label: 'Pending', count: filteredData?.filter(u => u.status === 'pending').length || 0 },
-    { key: 'inactive', label: 'Inactive', count: filteredData?.filter(u => u.status === 'inactive').length || 0 },
-    { key: 'freezed', label: 'Freezed', count: filteredData?.filter(u => u.status === 'freezed').length || 0 },
-    { key: 'block', label: 'Block', count: filteredData?.filter(u => u.status === 'block').length || 0 },
+    { key: 'all', label: 'All', count: data?.statusCounts?.all || 0 },
+    { key: 'active', label: 'Active', count: data?.statusCounts?.active || 0 },
+    { key: 'pending', label: 'Pending', count: data?.statusCounts?.pending || 0 },
+    { key: 'inactive', label: 'Inactive', count: data?.statusCounts?.inactive || 0 },
+    { key: 'freezed', label: 'Freezed', count: data?.statusCounts?.freezed || 0 },
+    { key: 'blocked', label: 'Block', count: data?.statusCounts?.blocked || 0 },
+    { key: 'advance', label: 'Advance', count: data?.statusCounts?.advance || 0 },
   ];
 
   const columns = columnsWithHandlers.filter(col => visibleColumns[col.key]);

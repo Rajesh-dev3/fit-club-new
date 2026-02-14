@@ -60,6 +60,18 @@ export const biometricApi = createApi({
       }),
       invalidatesTags: ['Biometric'],
     }),
+    getBranchResources: builder.query({
+      query: (branchIds) => {
+        if (Array.isArray(branchIds) && branchIds.length > 0) {
+          const branchIdString = branchIds.join(',');
+          return `/branch-resources?branchIds=${branchIdString}`;
+        } else if (branchIds) {
+          return `/branch-resources?branchIds=${branchIds}`;
+        }
+        return '/branch-resources';
+      },
+      providesTags: ['Biometric'],
+    }),
   }),
 });
 
@@ -71,4 +83,5 @@ export const {
   useUpdateBiometricLimitedMutation,
   useDeleteBiometricMutation,
   useUpdateBiometricStatusMutation,
+  useGetBranchResourcesQuery,
 } = biometricApi;

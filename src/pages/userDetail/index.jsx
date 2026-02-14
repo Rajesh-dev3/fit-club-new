@@ -29,6 +29,33 @@ const UserDetailPage = () => {
   const member = userData.member || {};
   const memberShip = userData.memberShip || {};
 
+  // Create dynamic menu items based on user status
+  const getMenuItems = () => {
+    const baseMenuItems = [
+      { id: 'attendance', label: 'Attendance', path: 'attendance' },
+      { id: 'membership', label: 'Membership', path: 'membership' },
+      { id: 'addonPackage', label: 'AddOn Package', path: 'addon-package' },
+      { id: 'assessment', label: 'Assessment', path: 'assessment' },
+      { id: 'refundHistory', label: 'Refund History', path: 'refund-history' },
+      { id: 'parkingHistory', label: 'Parking History', path: 'parking-history' },
+      { id: 'dietsPlan', label: 'Diets Plan', path: 'diets-plan' },
+      { id: 'biometricAccess', label: 'Biometric Access', path: 'biometric-access' },
+      { id: 'feedback', label: 'Feedback', path: 'user-feedback' },
+    ];
+
+    // Add "Buy Plan" option if user status is pending
+    if (userData?.status === 'pending') {
+      baseMenuItems.splice(1, 0, { id: 'buyPlan', label: 'Buy Plan', path: 'buy-plan' });
+    }
+    if (userData?.status === 'active') {
+      baseMenuItems.splice(1, 0, { id: 'buyMorePlan', label: 'Buy More Plan', path: 'buy-plan' });
+    }
+
+    return baseMenuItems;
+  };
+
+  const menuItems = getMenuItems();
+
  
 
   const [expanded, setExpanded] = useState(false);
@@ -58,6 +85,17 @@ const UserDetailPage = () => {
       return;
     }
 
+    // Check for buy-plan route specifically
+    if (currentSegment === 'buy-plan') {
+      // Set appropriate tab based on user status
+      if (userData?.status === 'active') {
+        setCurrentTab('buyMorePlan');
+      } else {
+        setCurrentTab('buyPlan');
+      }
+      return;
+    }
+
     // Find matching menu item
     const matchedItem = menuItems.find(item => {
       const itemLastSegment = getLastPathSegment(item.path);
@@ -70,7 +108,7 @@ const UserDetailPage = () => {
       // If no match found, default to first tab
       setCurrentTab(menuItems[0].id);
     }
-  }, [location.pathname]);
+  }, [location.pathname, menuItems]); // Add menuItems to dependency array
 
   // tabItems for mobile (using path as key)
   const tabItems = menuItems.map(item => ({

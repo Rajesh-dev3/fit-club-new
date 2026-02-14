@@ -29,6 +29,14 @@ const EditBranchRoute = "/edit-branch"
 const AllAddOnPackagesRoute = "/all-add-on-packages"
 const AddAddOnPackageRoute = "/add-add-on-package"
 
+const AllInventoryRoute = "/all-inventory"
+const AddInventoryRoute = "/add-inventory"
+
+// Invoice Management Routes
+const AllInvoiceRoute = "/all-invoice"
+const AddInvoiceRoute = "/add-invoice"
+const PartialInvoiceRoute = "/partial-invoice"
+
 const EmployeeDetailRoute = "/employee-detail"
 const DirectorAttendanceRoute = "/director-attendance"
 const UserAttendanceRoute = "/user-attendance"
@@ -119,6 +127,11 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
   AddCouponRoute,
   AllFeedbacksRoute,
   userFeedbackRoute,
+  AllInventoryRoute,
+  AddInventoryRoute,
   AddBiometricRoute,
-  AllBiometricsRoute
+  AllBiometricsRoute,
+  AllInvoiceRoute,
+  AddInvoiceRoute,
+  PartialInvoiceRoute
  }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Button, Dropdown } from 'antd';
+import { Tag, Button, Dropdown, Tooltip } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons';
 
 export const getPackageColumns = (handleView, handleEdit, handleDelete) => [
@@ -12,10 +12,38 @@ export const getPackageColumns = (handleView, handleEdit, handleDelete) => [
   },
   {
     title: 'Branch Name',
-    dataIndex: ['branchId', 'name'],
     key: 'branchName',
     width: 150,
-    render: (branchName) => branchName || '-',
+    render: (_, record) => {
+      // Handle multiple branches (branchIds array)
+      if (record.branchIds && Array.isArray(record.branchIds) && record.branchIds.length > 0) {
+        if (record.branchIds.length === 1) {
+          // Single branch in array
+          return record.branchIds[0]?.name || '-';
+        } else {
+          // Multiple branches - show in tooltip
+          const branchNames = record.branchIds.map(branch => branch?.name).filter(Boolean);
+          const displayText = `${branchNames[0]} (+${branchNames.length - 1} more)`;
+          const tooltipContent = (
+            <div>
+              {branchNames.map((name, index) => (
+                <div key={index}>{name}</div>
+              ))}
+            </div>
+          );
+          return (
+            <Tooltip title={tooltipContent} placement="topLeft">
+              <span style={{ cursor: 'pointer' }}>{displayText}</span>
+            </Tooltip>
+          );
+        }
+      }
+      // Handle single branch (legacy branchId object)
+      else if (record.branchId) {
+        return record.branchId?.name || '-';
+      }
+      return '-';
+    },
   },
   {
     title: 'Package Name',

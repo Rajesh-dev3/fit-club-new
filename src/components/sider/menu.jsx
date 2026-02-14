@@ -16,9 +16,10 @@ import {
   WalletOutlined,
   MessageOutlined,
   SmileOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { AddEmployeeRoute, AddGeneralStaffRoute, AddRoleRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AllRolesRoute, AllTrainersRoute, AllDirectorsRoute, Home, AllUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, AllPackagesRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, AllBranchesRoute, AddBranchRoute, AllCouponsRoute, AddCouponRoute, AllFeedbacksRoute, AddBiometricRoute, AllBiometricsRoute } from '../../routes/routepath';
+import { AddEmployeeRoute, AddGeneralStaffRoute, AddRoleRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AllRolesRoute, AllTrainersRoute, AllDirectorsRoute, Home, AllUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, AllPackagesRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, AllBranchesRoute, AddBranchRoute, AllCouponsRoute, AddCouponRoute, AllFeedbacksRoute, AddBiometricRoute, AllBiometricsRoute, AllInventoryRoute, AddInventoryRoute } from '../../routes/routepath';
 
 const items = [
   {
@@ -154,7 +155,7 @@ const items = [
     icon: <CreditCardOutlined />,
     children: [
       { key: '15-1', label: 'All Invoice' },
-      { key: '15-2', label: 'All Invoice' },
+      // { key: '15-2', label: 'All Invoice' },
       { key: '15-3', label: 'Add Invoice' },
       { key: '15-4', label: 'Partial Invoice' },
       { key: '15-5', label: 'Credit Notes' },
@@ -162,15 +163,15 @@ const items = [
       { key: '15-7', label: 'Activity Log' },
     ],
   },
-  // {
-  //   key: '16',
-  //   label: 'Coupon',
-  //   icon: <GiftOutlined />,
-  //   children: [
-  //     { key: '16-1', label: <Link to={AllCouponsRoute}>All Coupons</Link> },
-  //     { key: '16-3', label: 'Activity Log' },
-  //   ],
-  // },
+  {
+    key: '16',
+    label: 'Coupon',
+    icon: <GiftOutlined />,
+    children: [
+      { key: '16-1', label: <Link to={AllCouponsRoute}>All Coupons</Link> },
+      { key: '16-3', label: 'Activity Log' },
+    ],
+  },
   // {
   //   key: '17',
   //   label: 'Banner',
@@ -207,6 +208,14 @@ const items = [
   //     { key: '20-1', label: 'All Transaction' },
   //   ],
   // },
+  {
+    key: '22',
+    label: 'Inventory Management',
+    icon: <AppstoreOutlined />,
+    children: [
+      { key: '22-1', label: <Link to={AllInventoryRoute}>All Inventory</Link> },
+    ],
+  },
   {
     key: '21',
     label: 'Feedback',

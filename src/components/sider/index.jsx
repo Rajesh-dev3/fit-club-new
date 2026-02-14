@@ -14,6 +14,9 @@ import {
   AllTrainersRoute,
   AllUsersRoute,
   AddUserRoute,
+  AllInvoiceRoute,
+  AddInvoiceRoute,
+  PartialInvoiceRoute,
 } from "../../routes/routepath";
 import { items as MASTER_MENU } from "./menu"; // 👈 STATIC MENU
 import "./sider.scss";
@@ -29,6 +32,10 @@ const routeMap = {
   "8-3": AllTrainersRoute,
   "9-1": AllUsersRoute,
   "9-2": AddUserRoute,
+  "15-1": AllInvoiceRoute,
+  "15-2": AllInvoiceRoute, // Duplicate in menu, mapping to same route
+  "15-3": AddInvoiceRoute,
+  "15-4": PartialInvoiceRoute,
 };
 
 const MENU_CACHE_KEY = "siderMenuData";
@@ -97,10 +104,55 @@ const SiderComponent = ({ collapsed }) => {
 
   const rawMenu = cachedMenu || siderData?.menu || [];
 
+  /* ================= ENSURE INVOICE MANAGEMENT IS ALWAYS INCLUDED ================= */
+  const enhancedRawMenu = useMemo(() => {
+    if (rawMenu.length === 0) {
+      // If no backend menu, return static menu structure with Invoice Management
+      return [
+        { key: "1" },
+        { key: "2" },
+        { key: "3" },
+        { key: "4", children: [{ key: "4-1" }] },
+        { key: "8", children: [{ key: "8-1" }, { key: "8-2" }, { key: "8-3" }] },
+        { key: "9", children: [{ key: "9-1" }, { key: "9-2" }] },
+        { 
+          key: "15", 
+          children: [
+            { key: "15-1" },
+            { key: "15-2" },
+            { key: "15-3" },
+            { key: "15-4" }
+          ]
+        }
+      ];
+    }
+    
+    // Check if Invoice Management exists in backend menu
+    const hasInvoiceManagement = rawMenu.find(item => item.key === "15");
+    
+    if (!hasInvoiceManagement) {
+      // Add Invoice Management if not present
+      return [
+        ...rawMenu,
+        { 
+          key: "15", 
+          children: [
+            { key: "15-1" },
+            { key: "15-2" },
+            { key: "15-3" },
+            { key: "15-4" }
+          ]
+        }
+      ];
+    }
+    
+    return rawMenu;
+  }, [rawMenu]);
+
   /* ================= MATCH BACKEND + STATIC MENU ================= */
   const menuData = useMemo(() => {
-    return matchMenus(rawMenu, MASTER_MENU);
-  }, [rawMenu]);
+    return matchMenus(enhancedRawMenu, MASTER_MENU);
+  }, [enhancedRawMenu]);
 
   /* ================= SYNC ACTIVE MENU ================= */
   useEffect(() => {

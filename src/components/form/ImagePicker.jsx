@@ -174,10 +174,10 @@ const ImagePicker = ({ form, name = 'photo', aspectRatio = 1, initialImageUrl })
         setPreview(imageUrl);
         setStoredImageUrl(imageUrl);
         form.setFieldsValue({ [name]: imageUrl });
-        message.success('Image uploaded successfully');
+        // message.success('Image uploaded successfully');
       }
     } catch (err) {
-      console.error('Image processing/upload failed', err);
+      // console.error('Image processing/upload failed', err);
       message.error('Image upload failed');
       setPreview(null);
     } finally {

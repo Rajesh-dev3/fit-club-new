@@ -1,3 +1,4 @@
+@use "../../styles/breakpoints.scss" as *;
 .fitclub-registration-form {
   max-width: 550px;
   margin: auto;
@@ -83,6 +84,10 @@ p{
     gap: 16px;
     justify-content: space-between;
     margin-bottom: 12px;
+    @include mobile{
+        flex-direction: column;
+        gap: 8px;
+    }
     .age{
         display: flex;
         .label{
@@ -123,6 +128,10 @@ p{
     gap: 16px;
     justify-content: space-between;
     margin-bottom: 12px;
+      @include mobile{
+        flex-direction: column;
+        gap: 8px;
+    }
     .marital-status{
         display: flex;
         .label{

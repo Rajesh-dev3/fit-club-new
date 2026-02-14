@@ -56,6 +56,14 @@
       &.count-block {
         background: #fa541c;
       }
+      
+      &.count-blocked {
+        background: #fa541c;
+      }
+      
+      &.count-advance {
+        background: #722ed1;
+      }
       // Coupon status bar custom count backgrounds
 &.count-all {
   background: #bdbdbd !important;

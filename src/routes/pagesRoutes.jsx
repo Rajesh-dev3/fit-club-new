@@ -10,7 +10,7 @@ import {
   createBrowserRouter,
   Navigate,
 } from "react-router-dom";
-import { AddEmployeeRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, EditDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, ViewFormRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute, DirectorDetailPageRoute, DirectorAttendancePageRoute, DirectorBiometricAccessPageRoute, AddAddOnPackageRoute, AddBiometricRoute, AllBiometricsRoute } from "./routepath";
+import { AddEmployeeRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, EditDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, ViewFormRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute, DirectorDetailPageRoute, DirectorAttendancePageRoute, DirectorBiometricAccessPageRoute, AddAddOnPackageRoute, AddBiometricRoute, AllBiometricsRoute, AllInventoryRoute, AddInventoryRoute, AllInvoiceRoute, AddInvoiceRoute, PartialInvoiceRoute } from "./routepath";
 import AddBranch from "../pages/addBranch";
 import AllBranches from "../pages/allBranches";
 import AddBiometric from "../pages/addBiometric";
@@ -79,6 +79,7 @@ import DietsPlan from "../components/userDetail/dietsPlan";
 import UserParkingHistory from "../components/userDetail/parkingHistory";
 import UserBiometricAccess from "../components/userDetail/biometricAccess";
 import AddUserBiometricAccess from "../components/userDetail/biometricAccess/AddUserBiometricAccess";
+import BuyPlan from "../components/userDetail/buyPlan";
 import {ErrorBoundary} from "../components/errorBoundery";
 import EditBranch from "../pages/editBranch";
 import FreezabilityForm from "../components/userDetail/membership/FreezabilityForm";
@@ -88,6 +89,11 @@ import DirectorDetailPage from "../pages/directorDetail";
 import DirectorDetailAttendance from "../components/directorDetail/attendance";
 import DirectorDetailBiometricAccess from "../components/directorDetail/biometricAccess";
 import UserFeedback from "../components/userDetail/userFeedback";
+import AllInventory from "../pages/allInventory";
+import AddInventory from "../pages/addInventory";
+import AllInvoice from "../pages/allInvoice";
+import AddInvoice from "../pages/addInvoice";
+import PartialInvoice from "../pages/partialInvoice";
 
 export const router = createBrowserRouter([
   {
@@ -171,6 +177,7 @@ export const router = createBrowserRouter([
           errorElement: <ErrorBoundary />,  // Add error boundary
         children: [
           { path: UserDetailAttendanceRoute.slice(1), element: <UserAttendance /> },
+          { path: "buy-plan", element: <BuyPlan /> },
           { path: UserDetailMembershipRoute.slice(1), element: <UserMembership /> },
           { path: UserDetailMembershipFreezabilityRoute.slice(1), element: <FreezabilityForm /> },
           { path: UserDetailMembershipDaysRoute.slice(1), element: <DaysForm /> },
@@ -266,7 +273,12 @@ export const router = createBrowserRouter([
       { path: AllCouponsRoute, element: <AllCoupons /> },
       { path: AddCouponRoute, element: <AddCoupon /> },
       { path: AllFeedbacksRoute, element: <AllFeedbacks /> },
-   { path: `${EditRoleRoute}/:id`, element: <EditRole /> },
+      { path: AllInventoryRoute, element: <AllInventory /> },
+      { path: AddInventoryRoute, element: <AddInventory /> },
+      { path: AllInvoiceRoute, element: <AllInvoice /> },
+      { path: AddInvoiceRoute, element: <AddInvoice /> },
+      { path: PartialInvoiceRoute, element: <PartialInvoice /> },
+      { path: `${EditRoleRoute}/:id`, element: <EditRole /> },
 
     ]
     

@@ -56,7 +56,7 @@ textarea::placeholder,
 color: var(--sider-text) !important;
 }
 .ant-input-number {
-  height: 48px !important;
+  height: 48px;
   background-color: transparent !important;
   &:hover , &:focus{
     border-color: var(--muted) !important;

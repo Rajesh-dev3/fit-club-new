@@ -31,7 +31,17 @@ const dummyTrainers = [
 ];
 
 const allColumns = [
-  { title: 'Name', dataIndex: 'name', key: 'name', width: 150 },
+  { 
+    title: 'Name', 
+    dataIndex: 'name', 
+    key: 'name', 
+    width: 150,
+    render: (name, record) => (
+      <Link to={`/user-detail/${record._id}/${UserDetailAttendanceRoute}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+        {name}
+      </Link>
+    )
+  },
   { title: 'Branch', dataIndex: 'branch', key: 'branch', width: 120 },
   { title: 'Phone Number', dataIndex: 'phoneNumber', key: 'phoneNumber', width: 130 },
   { title: 'Assessment Ratio', dataIndex: 'assessmentRatio', key: 'assessmentRatio', width: 120 },

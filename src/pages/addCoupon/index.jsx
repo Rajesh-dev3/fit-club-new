@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, Input, Select, Button, InputNumber, message } from "antd";
-import { HomeOutlined } from "@ant-design/icons";
+import { HomeOutlined, PercentageOutlined, DollarOutlined } from "@ant-design/icons";
 import { useGetBranchesQuery } from "../../services/branches";
 import { useAddCouponMutation } from "../../services/coupons";
 import { useGetEmployeeQuery } from "../../services/employee";
@@ -26,6 +26,7 @@ const AddCoupon = () => {
 
   const [addCoupon] = useAddCouponMutation();
   const [couponType, setCouponType] = React.useState();
+  const [discountType, setDiscountType] = React.useState();
 
   const onFinish = async (values) => {
     let payload;
@@ -105,12 +106,42 @@ const AddCoupon = () => {
           </Form.Item>
         </div>
         <div className="row">
+          <Form.Item
+            name="discountType"
+            label="Discount Type"
+            rules={[{ required: true, message: "Please select discount type" }]}
+          >
+            <Select 
+              placeholder="Select discount type" 
+              options={discountTypeOptions}
+              onChange={setDiscountType}
+            />
+          </Form.Item>
             <Form.Item
               name="couponValue"
               label="Coupon Value"
               rules={[{ required: true, message: "Please enter coupon value" }]}
             >
-              <InputNumber min={0} style={{ width: "100%" }} placeholder="Enter coupon value" />
+              {discountType === 'percentage' ? (
+                <InputNumber 
+                  min={0} 
+                  max={100}
+                  style={{ width: "100%" }} 
+                  placeholder="Enter percentage value"
+                  formatter={value => `${value}%`}
+                  parser={value => value.replace('%', '')}
+                  prefix={<PercentageOutlined />}
+                />
+              ) : (
+                <InputNumber 
+                  min={0} 
+                  style={{ width: "100%" }} 
+                  placeholder="Enter absolute value"
+                  formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={value => value.replace(/₹\s?|(,*)/g, '')}
+                  prefix={<DollarOutlined />}
+                />
+              )}
             </Form.Item>
           {couponType === "single_use" ? (
             <Form.Item
@@ -145,14 +176,6 @@ const AddCoupon = () => {
             // style={{ flex: 1, marginRight: 8 }}
           >
             <Input placeholder="Enter remark" />
-          </Form.Item>
-          <Form.Item
-            name="discountType"
-            label="Discount Type"
-            rules={[{ required: true, message: "Please select discount type" }]}
-            style={{ flex: 1 }}
-          >
-            <Select placeholder="Select discount type" options={discountTypeOptions} />
           </Form.Item>
         </div>
         <div className="footer-buttons">

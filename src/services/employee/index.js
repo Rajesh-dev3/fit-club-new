@@ -30,10 +30,17 @@ export const employee = createApi({
       }),
       providesTags: ['Employee'],
     }),
+    getEmployeeByCustomer: builder.query({
+      query: (id) => ({
+        url: `/employees/by-customer?userId=${id}`,
+        method: "GET",
+      }),
+      providesTags: ['Employee'],
+    }),
   
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useAddEmployeeMutation,useGetEmployeeQuery,useGetEmployeeDetailQuery } = employee
+export const { useAddEmployeeMutation,useGetEmployeeQuery,useGetEmployeeDetailQuery,useGetEmployeeByCustomerQuery } = employee
