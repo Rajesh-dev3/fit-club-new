@@ -173,6 +173,7 @@
       .payment-group {
         // margin-bottom: 24px;
         padding: 16px;
+        padding-block: 0;
         background: var(--transparent);
         border: 1px solid var(--muted-light);
         border-radius: 6px;
@@ -231,12 +232,57 @@
           }
         }
       }
+
+      // Remaining Balance Display
+      .remaining-balance {
+        padding: 0px 16px;
+        border-top: 1px solid var(--muted-light);
+        display: flex;
+        justify-content: flex-start;
+
+        .balance-text {
+          font-size: 16px;
+          
+          &.remaining {
+            color: var(--warning, #ff6b35);
+          }
+
+          &.complete {
+            color: var(--success, #52c41a);
+          }
+        }
+      }
     }
 
     .ant-form-item-label > label {
       font-weight: 500;
       color: var(--sider-text);
       font-size: 14px;
+    }
+
+    // Date Selection Section styling
+    .date-selection-section {
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--muted);
+
+      .row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 22px;
+        margin-bottom: 0;
+
+        .ant-form-item {
+          margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+      }
     }
 
     .footer-buttons {
@@ -305,6 +351,30 @@
       &.full-width {
         flex-direction: column;
         gap: 4px;
+      }
+
+      &.remaining-amount {
+        color: var(--warning, #ff6b35);
+        font-weight: 600;
+        border-top: 1px solid var(--muted-light);
+        padding-top: 8px;
+        margin-top: 8px;
+
+        span {
+          color: var(--warning, #ff6b35);
+        }
+      }
+
+      &.complete-amount {
+        color: var(--success, #52c41a);
+        font-weight: 600;
+        border-top: 1px solid var(--muted-light);
+        padding-top: 8px;
+        margin-top: 8px;
+
+        span {
+          color: var(--success, #52c41a);
+        }
       }
 
       span {

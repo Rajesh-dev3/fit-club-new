@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select, DatePicker, Button, Card, InputNumber, Input, message } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useGetPlansQuery } from '../../../services/package';
 import { useGetBranchesQuery } from '../../../services/branches';
@@ -16,6 +16,7 @@ const { Option } = Select;
 
 const BuyPlan = () => {
   const { userData } = useOutletContext();
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -165,10 +166,18 @@ const BuyPlan = () => {
     calculatePaymentAmounts();
   }, [selectedPackage, discountAmount, gstClaim, paymentModes.length]);
 
-  // Recalculate amounts when package, discount, or GST changes
-  useEffect(() => {
-    calculatePaymentAmounts();
-  }, [selectedPackage, discountAmount, gstClaim, paymentModes.length]);
+  // Handle start date change and calculate end date
+  const handleStartDateChange = (date) => {
+    if (date && selectedPackage) {
+      const startDate = dayjs(date);
+      const packageDuration = selectedPackage.duration || 365; // Default 1 year if no duration
+      const endDate = startDate.add(packageDuration, 'days');
+      
+      form.setFieldsValue({
+        endDate: endDate
+      });
+    }
+  };
 
   // Handle coupon selection
   const handleCouponChange = (couponId) => {
@@ -290,12 +299,19 @@ const BuyPlan = () => {
       // Call the invoice API
       const result = await addInvoice(payload).unwrap();
       
+      message.success('Invoice created successfully!');
+      
       form.resetFields();
       setSelectedPackage(null);
       setSelectedCoupon(null);
       setPaymentMode('');
       setGstClaim(false);
       setDiscountAmount(0);
+      
+      // Navigate to membership tab
+      navigate(`/users/${userData._id}`, { 
+        state: { activeTab: 'membership' } 
+      });
       
     } catch (error) {
     } finally {
@@ -715,9 +731,16 @@ const BuyPlan = () => {
               )}
             </div>
           ))}
+          
+          {/* Remaining Balance Display */}
+          {selectedPackage && (
+            <div className="remaining-balance">
+              <span className={`balance-text ${remainingAmount > 0 ? 'remaining' : 'complete'}`}>
+                <strong>Remaining Balance: ₹{remainingAmount.toFixed(2)}</strong>
+              </span>
+            </div>
+          )}
         </div>
-
-     
 
 
 
@@ -738,10 +761,16 @@ const BuyPlan = () => {
               <span>₹{selectedCoupon ? (selectedPackage.pricing - discountAmount).toFixed(2) : selectedPackage.pricing}</span>
             </div>
             {/* {gstClaim && ( */}
-              <div className="summary-row">
-                <span><strong>GST ({gstPercentage}%):</strong></span>
-                <span>₹{(((selectedPackage.pricing - discountAmount) * gstPercentage) / 100).toFixed(2)}</span>
-              </div>
+              <>
+                <div className="summary-row">
+                  <span><strong>SGST (2.5%):</strong></span>
+                  <span>₹{(((selectedPackage.pricing - discountAmount) * 2.5) / 100).toFixed(2)}</span>
+                </div>
+                <div className="summary-row">
+                  <span><strong>CGST (2.5%):</strong></span>
+                  <span>₹{(((selectedPackage.pricing - discountAmount) * 2.5) / 100).toFixed(2)}</span>
+                </div>
+              </>
             {/* )} */}
             <div className="summary-row">
               <span><strong>Final Total:</strong></span>
@@ -750,12 +779,52 @@ const BuyPlan = () => {
                 (gstClaim ? ((selectedPackage.pricing - discountAmount) * gstPercentage) / 100 : 0)
               ).toFixed(2)}</span>
             </div>
+            <div className="summary-row">
+              <span><strong>Total Paid:</strong></span>
+              <span>₹{totalPaidAmount.toFixed(2)}</span>
+            </div>
+            <div className={`summary-row ${remainingAmount > 0 ? 'remaining-amount' : 'complete-amount'}`}>
+              <span><strong>Remaining Balance:</strong></span>
+              <span>₹{remainingAmount.toFixed(2)}</span>
+            </div>
             {selectedPackage.description && (
               <div className="summary-row full-width">
                 <span><strong>Description:</strong> {selectedPackage.description}</span>
               </div>
             )}
           </Card>
+        )}
+
+        {/* Start Date and End Date Section */}
+        {selectedPackage && (
+          <div className="date-selection-section">
+            <div className="row">
+              <Form.Item
+                name="startDate"
+                label="Start Date"
+                rules={[{ required: true, message: 'Please select start date' }]}
+              >
+                <DatePicker
+                  style={{ width: '100%', height: '46px' }}
+                  placeholder="Select start date"
+                  format="DD-MM-YYYY"
+                  onChange={handleStartDateChange}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="endDate"
+                label="End Date"
+              >
+                <DatePicker
+                  style={{ width: '100%', height: '46px' }}
+                  placeholder="Auto-calculated end date"
+                  format="DD-MM-YYYY"
+                  disabled
+                />
+              </Form.Item>
+            </div>
+          </div>
         )}
 
         <div className="footer-buttons">

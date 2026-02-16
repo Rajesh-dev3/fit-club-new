@@ -48,7 +48,7 @@ const UserDetailPage = () => {
       baseMenuItems.splice(1, 0, { id: 'buyPlan', label: 'Buy Plan', path: 'buy-plan' });
     }
     if (userData?.status === 'active') {
-      baseMenuItems.splice(1, 0, { id: 'buyMorePlan', label: 'Buy More Plan', path: 'buy-plan' });
+      baseMenuItems.splice(1, 0, { id: 'buyMorePlan', label: 'Addvance Renew', path: 'buy-plan' });
     }
 
     return baseMenuItems;
