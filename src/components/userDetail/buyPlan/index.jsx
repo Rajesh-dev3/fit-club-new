@@ -309,9 +309,9 @@ const BuyPlan = () => {
       setDiscountAmount(0);
       
       // Navigate to membership tab
-      navigate(`/users/${userData._id}`, { 
-        state: { activeTab: 'membership' } 
-      });
+      // navigate(`/users/${userData._id}`, { 
+      //   state: { activeTab: 'membership' } 
+      // });
       
     } catch (error) {
     } finally {
