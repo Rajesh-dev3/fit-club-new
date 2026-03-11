@@ -120,6 +120,9 @@ const AllUsers = () => {
         startDate: member.joiningDate ? new Date(member.joiningDate).toLocaleDateString() : '-',
         endDate: member.expiryDate ? new Date(member.expiryDate).toLocaleDateString() : '-',
         gymKit: '-',
+        // Pass planGymKit and deliveredSummary for gym kit functionality
+        planGymKit: user.planGymKit,
+        deliveredSummary: user.deliveredSummary,
       };
     });
   }, [data]);

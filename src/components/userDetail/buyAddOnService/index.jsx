@@ -3,47 +3,44 @@ import { Form, Select, DatePicker, Button, Card, InputNumber, Input, message } f
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useGetPlansQuery } from '../../../services/package';
-import { useGetBranchesQuery } from '../../../services/branches';
 import { useGetAllCouponQuery } from '../../../services/coupons';
-import { useGetEmployeeByCustomerQuery, useGetEmployeeQuery } from '../../../services/employee';
-import { useAddInvoiceMutation } from '../../../services/invoice';
-import DateRangeSelector from '../../dateRange/DateRangeSelector';
-import ImagePicker from '../../../components/form/ImagePicker';
+import { useGetEmployeeByCustomerQuery } from '../../../services/employee';
+import ImagePicker from '../../form/ImagePicker';
 import './styles.scss';
 
 const { Option } = Select;
 
-const BuyPlan = () => {
+const typeOptions = [
+  { label: "Personal Training", value: "Personal Training" },
+  { label: "Pilates", value: "Pilates" },
+  { label: "Therapy", value: "Therapy" },
+  { label: "EMS", value: "EMS" },
+  { label: "Paid Locker", value: "Paid Locker" },
+  { label: "MMA", value: "MMA" },
+];
+
+const BuyAddOnService = () => {
   const { userData } = useOutletContext();
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [selectedPackage, setSelectedPackage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gstClaim, setGstClaim] = useState(false);
   const gstPercentage = 5; // Fixed GST 5%
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [paymentModes, setPaymentModes] = useState([{ id: 1, mode: '', amount: '' }]);
-  const [paymentMode, setPaymentMode] = useState(''); // Keep for backward compatibility
+  const [paymentMode, setPaymentMode] = useState('');
   const [totalPaidAmount, setTotalPaidAmount] = useState(0);
   const [remainingAmount, setRemainingAmount] = useState(0);
+  const [planPrice, setPlanPrice] = useState(0);
 
   // API hooks
-  const { data: packagesData, isLoading: plansLoading } = useGetPlansQuery();
-  const { data: branchesData, isLoading: branchesLoading } = useGetBranchesQuery();
   const { data: couponsData, isLoading: couponsLoading } = useGetAllCouponQuery({});
   const { data: employeesData, isLoading: employeesLoading } = useGetEmployeeByCustomerQuery(userData?._id, {
-    skip: !userData?._id // Skip the query if userData._id is not available
+    skip: !userData?._id
   });
-  
-  // Invoice mutation
-  const [addInvoice, { isLoading: addingInvoice }] = useAddInvoiceMutation();
- 
 
   // Extract data arrays from API responses
-  const packages = packagesData?.data || [];
-  const branches = branchesData?.data || [];
   const coupons = couponsData?.data || [];
 
   // Calculate totals with discount and GST
@@ -67,25 +64,17 @@ const BuyPlan = () => {
       totalOrderValue: totalAmount,
     });
   };
- 
 
-  // Handle package selection
-  const handlePackageChange = (packageId) => {
-    const pkg = packages.find(p => p._id === packageId);
-    setSelectedPackage(pkg);
-    if (pkg) {
-      calculateTotals(pkg.pricing, selectedCoupon, gstClaim, gstPercentage);
-      form.setFieldsValue({
-        planPrice: pkg.pricing,
-      });
-    }
+  // Handle plan price change
+  const handlePlanPriceChange = (value) => {
+    setPlanPrice(value || 0);
+    calculateTotals(value || 0, selectedCoupon, gstClaim, gstPercentage);
   };
 
-  // Handle payment mode change (updated for multiple payments)
+  // Handle payment mode change
   const handlePaymentModeChange = (mode, paymentId) => {
     setPaymentMode(mode);
     
-    // Update specific payment mode in the array
     setPaymentModes(prev => 
       prev.map(payment => 
         payment.id === paymentId 
@@ -94,7 +83,6 @@ const BuyPlan = () => {
       )
     );
     
-    // If cash is selected, set employee from localStorage for this specific payment
     if (mode === 'cash') {
       try {
         const loggedInUser = JSON.parse(localStorage.getItem('user')) || {};
@@ -121,15 +109,12 @@ const BuyPlan = () => {
     
     setTotalPaidAmount(total);
     
-    if (selectedPackage) {
-      const finalAmount = selectedPackage.pricing - discountAmount + (gstClaim ? ((selectedPackage.pricing - discountAmount) * gstPercentage) / 100 : 0);
-      setRemainingAmount(Math.max(0, finalAmount - total));
-    }
+    const finalAmount = planPrice - discountAmount + (gstClaim ? ((planPrice - discountAmount) * gstPercentage) / 100 : 0);
+    setRemainingAmount(Math.max(0, finalAmount - total));
   };
 
   // Handle payment amount change
   const handlePaymentAmountChange = (amount, paymentId) => {
-    // Update the amount in state
     setPaymentModes(prev => 
       prev.map(payment => 
         payment.id === paymentId 
@@ -138,7 +123,6 @@ const BuyPlan = () => {
       )
     );
     
-    // Recalculate totals after a small delay to ensure form value is updated
     setTimeout(() => {
       calculatePaymentAmounts();
     }, 100);
@@ -154,37 +138,23 @@ const BuyPlan = () => {
   const removePaymentMode = (paymentId) => {
     if (paymentModes.length > 1) {
       setPaymentModes(prev => prev.filter(payment => payment.id !== paymentId));
-      // Recalculate after removing payment mode
       setTimeout(() => {
         calculatePaymentAmounts();
       }, 100);
     }
   };
 
-  // Recalculate amounts when package, discount, or GST changes
+  // Recalculate amounts when planPrice, discount, or GST changes
   useEffect(() => {
     calculatePaymentAmounts();
-  }, [selectedPackage, discountAmount, gstClaim, paymentModes.length]);
-
-  // Handle start date change and calculate end date
-  const handleStartDateChange = (date) => {
-    if (date && selectedPackage) {
-      const startDate = dayjs(date);
-      const packageDuration = selectedPackage.duration || 365; // Default 1 year if no duration
-      const endDate = startDate.add(packageDuration, 'days');
-      
-      form.setFieldsValue({
-        endDate: endDate
-      });
-    }
-  };
+  }, [planPrice, discountAmount, gstClaim, paymentModes.length]);
 
   // Handle coupon selection
   const handleCouponChange = (couponId) => {
     const coupon = coupons.find(c => c._id === couponId);
     setSelectedCoupon(coupon);
-    if (selectedPackage) {
-      calculateTotals(selectedPackage.pricing, coupon, gstClaim, gstPercentage);
+    if (planPrice) {
+      calculateTotals(planPrice, coupon, gstClaim, gstPercentage);
     }
   };
 
@@ -192,8 +162,8 @@ const BuyPlan = () => {
   const handleGstClaimChange = (value) => {
     const isGstClaim = value === 'yes';
     setGstClaim(isGstClaim);
-    if (selectedPackage) {
-      calculateTotals(selectedPackage.pricing, selectedCoupon, isGstClaim, gstPercentage);
+    if (planPrice) {
+      calculateTotals(planPrice, selectedCoupon, isGstClaim, gstPercentage);
     }
   };
 
@@ -201,20 +171,15 @@ const BuyPlan = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Calculate dates
       const startDate = values.paymentDate ? dayjs(values.paymentDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
-      const expiryDate = selectedPackage?.duration 
-        ? dayjs(startDate).add(selectedPackage.duration, 'days').format('YYYY-MM-DD')
-        : dayjs(startDate).add(365, 'days').format('YYYY-MM-DD'); // Default 1 year
 
       // Calculate amounts
-      const planPrice = selectedPackage?.pricing || 0;
       const discountAmt = discountAmount;
       const afterDiscountAmount = planPrice - discountAmt;
       const gstAmount = gstClaim ? (afterDiscountAmount * gstPercentage) / 100 : 0;
       const totalAmount = afterDiscountAmount + gstAmount;
 
-      // Create payment terms array based on selected payment mode
+      // Create payment terms array
       const paymentTerms = [];
       
       if (paymentMode === 'cash' && values.cashEmployee) {
@@ -264,9 +229,7 @@ const BuyPlan = () => {
       // Create the payload
       const payload = {
         userId: userData._id,
-        planId: selectedPackage?._id,
-        startDate: startDate,
-        expiryDate: expiryDate,
+        packageType: values.packageType,
         planPrice: planPrice,
         couponId: selectedCoupon?._id || null,
         discountAmount: discountAmt,
@@ -280,43 +243,32 @@ const BuyPlan = () => {
         paymentType: values.paymentType || 'full',
         paymentDate: startDate,
         paymentTerm: paymentTerms,
-        coachId: null, // Can be added if coach selection is implemented
-        lockerNumber: values.lockerNumber || null,
-        employeeId: values.salesPerson,
-        details: selectedPackage?.items ? selectedPackage.items.map(item => ({
-          itemName: item.name,
-          quantity: item.quantity || 1,
-          planId: selectedPackage._id
-        })) : []
+        employeeId: values.salesPerson
       };
 
+      console.log('Add-On Service Payload:', payload);
       
-      // Call the invoice API
-      const result = await addInvoice(payload).unwrap();
-      
-      message.success('Invoice created successfully!');
+      message.success('Add-On Service purchased successfully!');
       
       form.resetFields();
-      setSelectedPackage(null);
       setSelectedCoupon(null);
       setPaymentMode('');
       setGstClaim(false);
       setDiscountAmount(0);
-      
-      // Navigate to membership tab
-      // navigate(`/users/${userData._id}`, { 
-      //   state: { activeTab: 'membership' } 
-      // });
+      setPlanPrice(0);
       
     } catch (error) {
+      message.error('Failed to purchase add-on service');
+      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
   };
+
   return (
-    <div className="buy-plan-container">
+    <div className="buy-addon-service-container">
       <div className="form-header">
-        <h2>Purchase Membership Plan</h2>
+        <h2>Purchase Add-On Service</h2>
       </div>
       <Form
         form={form}
@@ -324,14 +276,14 @@ const BuyPlan = () => {
         onFinish={onFinish}
         className="custom-form"
       >
-        <div className="row">
+        <div className="row row-three-columns">
           <Form.Item
             name="invoiceDate"
             label="Invoice Date"
             initialValue={dayjs()}
           >
             <DatePicker
-              style={{ width: '100%',height: '46px' }}
+              style={{ width: '100%', height: '46px' }}
               disabled
               placeholder="Invoice date"
               format="DD-MM-YYYY"
@@ -345,12 +297,26 @@ const BuyPlan = () => {
             rules={[{ required: true, message: 'Please select payment date' }]}
           >
             <DatePicker
-              style={{ width: '100%',height: '46px' }}
+              style={{ width: '100%', height: '46px' }}
               placeholder="Select payment date"
               format="DD-MM-YYYY"
             />
           </Form.Item>
 
+          <Form.Item
+            name="mobileNo"
+            label="Mobile No."
+            initialValue={userData?.phoneNumber}
+          >
+            <Input
+              style={{ width: '100%', height: '46px' }}
+              placeholder="Mobile number"
+              disabled
+            />
+          </Form.Item>
+        </div>
+
+        <div className="row">
           <Form.Item
             name="salesPerson"
             label="Sales Person"
@@ -367,7 +333,7 @@ const BuyPlan = () => {
               {employeesData?.data?.length > 0 ? (
                 employeesData?.data?.map(employee => (
                   <Option key={employee._id} value={employee._id}>
-                    {employee?.name || employee?.name || 'Unknown'} - {employee.employeeId || 'No ID'}
+                    {employee?.name || 'Unknown'} - {employee.employeeId || 'No ID'}
                   </Option>
                 ))
               ) : (
@@ -379,22 +345,87 @@ const BuyPlan = () => {
 
         <div className="row">
           <Form.Item
-            name="planSelect"
-            label="Plan Select"
-            rules={[{ required: true, message: 'Please select a plan' }]}
+            name="customerName"
+            label="Customer Name"
+            initialValue={userData?.name}
+          >
+            <Input
+              style={{ width: '100%', height: '46px' }}
+              placeholder="Customer name"
+              disabled
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="age"
+            label="Age"
+            initialValue={userData?.member?.age}
+          >
+            <Input
+              style={{ width: '100%', height: '46px' }}
+              placeholder="Age"
+              disabled
+            />
+          </Form.Item>
+        </div>
+
+        <div className="row">
+          <Form.Item
+            name="gender"
+            label="Gender"
+            initialValue={userData?.member?.gender}
           >
             <Select
-              placeholder="Choose plan"
-              loading={plansLoading}
-              onChange={handlePackageChange}
-              showSearch
-              filterOption={(input, option) =>
-                option.children.toLowerCase().includes(input.toLowerCase())
-              }
+              placeholder="Gender"
+              disabled
+              style={{ height: '46px' }}
             >
-              {packages?.map(pkg => (
-                <Option key={pkg._id} value={pkg._id}>
-                  {pkg.name} - ₹{pkg.pricing}
+              <Option value="male">Male</Option>
+              <Option value="female">Female</Option>
+              <Option value="other">Other</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="stateName"
+            label="State Name"
+            initialValue={userData?.member?.state}
+          >
+            <Select
+              placeholder="State"
+              disabled
+              style={{ height: '46px' }}
+            >
+              <Option value={userData?.member?.state}>{userData?.member?.state}</Option>
+            </Select>
+          </Form.Item>
+        </div>
+
+        <div className="row">
+          <Form.Item
+            name="billingAddress"
+            label="Billing Address"
+            initialValue={userData?.member?.address}
+          >
+            <Input.TextArea
+              style={{ width: '100%' }}
+              placeholder="Billing address"
+              rows={4}
+              disabled
+            />
+          </Form.Item>
+        </div>
+
+        <div className="row">
+          <Form.Item
+            name="packageType"
+            label="Package Type"
+            rules={[{ required: true, message: 'Please select package type' }]}
+          >
+            <Select placeholder="Select package type">
+              {typeOptions.map(option => (
+                <Option key={option.value} value={option.value}>
+                  {option.label}
                 </Option>
               ))}
             </Select>
@@ -414,18 +445,87 @@ const BuyPlan = () => {
 
         <div className="row">
           <Form.Item
+            name="gstPercentage"
+            label="GST Percentage"
+            initialValue="5"
+          >
+            <Select placeholder="Select GST percentage" disabled>
+              <Option value="5">5%</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
             name="planPrice"
             label="Plan Price"
+            rules={[{ required: true, message: 'Please enter plan price' }]}
+          >
+            <InputNumber
+              style={{ width: '100%' }}
+              formatter={value => `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={value => value.replace(/₹\s?|(,*)/g, '')}
+              placeholder="Enter plan price"
+              onChange={handlePlanPriceChange}
+              min={0}
+            />
+          </Form.Item>
+        </div>
+
+        <div className="row">
+          <Form.Item
+            name="gstClaim"
+            label="GST Claim"
+            rules={[{ required: true, message: 'Please select GST claim option' }]}
+          >
+            <Select 
+              placeholder="Select GST claim"
+              onChange={handleGstClaimChange}
+            >
+              <Option value="yes">Yes</Option>
+              <Option value="no">No</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="totalOrderValue"
+            label="Total Order Value"
           >
             <InputNumber
               style={{ width: '100%' }}
               formatter={value => `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
               parser={value => value.replace(/₹\s?|(,*)/g, '')}
               disabled
-              placeholder="Auto-filled from plan"
+              placeholder="Total amount"
             />
           </Form.Item>
+        </div>
 
+        {gstClaim && (
+          <div className="row">
+            <Form.Item
+              name="gstNumber"
+              label="GST Number"
+              rules={[
+                { required: true, message: 'Please enter GST number' },
+                { pattern: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, message: 'Please enter valid GST number' }
+              ]}
+            >
+              <Input placeholder="Enter GST number" style={{ height: '46px' }} />
+            </Form.Item>
+
+            <Form.Item
+              name="registeredCompanyName"
+              label="Registered Company Name"
+              rules={[
+                { required: true, message: 'Please enter registered company name' },
+                { min: 2, message: 'Company name must be at least 2 characters' }
+              ]}
+            >
+              <Input placeholder="Enter registered company name" style={{ height: '46px' }} />
+            </Form.Item>
+          </div>
+        )}
+
+        <div className="row">
           <Form.Item
             name="couponSelect"
             label="Coupon Select"
@@ -448,64 +548,20 @@ const BuyPlan = () => {
               ))}
             </Select>
           </Form.Item>
+
+          <Form.Item
+            name="afterDiscount"
+            label="After Discount"
+          >
+            <InputNumber
+              style={{ width: '100%' }}
+              formatter={value => `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={value => value.replace(/₹\s?|(,*)/g, '')}
+              disabled
+              placeholder="Price after coupon discount"
+            />
+          </Form.Item>
         </div>
-
-        {selectedPackage && (
-          <div className="row">
-            <Form.Item
-              name="afterDiscount"
-              label="After Discount"
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                formatter={value => `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                parser={value => value.replace(/₹\s?|(,*)/g, '')}
-                disabled
-                placeholder="Price after coupon discount"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="gstClaim"
-              label="GST Claim"
-              rules={[{ required: true, message: 'Please select GST claim option' }]}
-            >
-              <Select 
-                placeholder="Select GST claim"
-                onChange={handleGstClaimChange}
-              >
-                <Option value="yes">Yes</Option>
-                <Option value="no">No</Option>
-              </Select>
-            </Form.Item>
-          </div>
-        )}
-
-        {gstClaim && (
-          <div className="row">
-            <Form.Item
-              name="gstNumber"
-              label="GST Number"
-              rules={[
-                { required: true, message: 'Please enter GST number' },
-                { pattern: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, message: 'Please enter valid GST number' }
-              ]}
-            >
-              <Input placeholder="Enter GST number" />
-            </Form.Item>
-
-            <Form.Item
-              name="registeredCompanyName"
-              label="Registered Company Name"
-              rules={[
-                { required: true, message: 'Please enter registered company name' },
-                { min: 2, message: 'Company name must be at least 2 characters' }
-              ]}
-            >
-              <Input placeholder="Enter registered company name" />
-            </Form.Item>
-          </div>
-        )}
 
         {/* Multiple Payment Modes Section */}
         <div className="payment-modes-section">
@@ -538,8 +594,8 @@ const BuyPlan = () => {
                     { required: true, message: 'Please enter amount' },
                     {
                       validator: (_, value) => {
-                        if (selectedPackage && value) {
-                          const finalAmount = selectedPackage.pricing - discountAmount + (gstClaim ? ((selectedPackage.pricing - discountAmount) * gstPercentage) / 100 : 0);
+                        if (planPrice && value) {
+                          const finalAmount = planPrice - discountAmount + (gstClaim ? ((planPrice - discountAmount) * gstPercentage) / 100 : 0);
                           if (totalPaidAmount > finalAmount) {
                             return Promise.reject(new Error(`Total payment (₹${totalPaidAmount}) exceeds package amount (₹${finalAmount.toFixed(2)})`));
                           }
@@ -728,7 +784,7 @@ const BuyPlan = () => {
           ))}
           
           {/* Remaining Balance Display */}
-          {selectedPackage && (
+          {planPrice > 0 && (
             <div className="remaining-balance">
               <span className={`balance-text ${remainingAmount > 0 ? 'remaining' : 'complete'}`}>
                 <strong>Remaining Balance: ₹{remainingAmount.toFixed(2)}</strong>
@@ -737,13 +793,11 @@ const BuyPlan = () => {
           )}
         </div>
 
-
-
-        {selectedPackage && (
+        {planPrice > 0 && (
           <Card className="package-summary" size="small" title="Order Summary">
             <div className="summary-row">
-              <span><strong>Package:</strong> {selectedPackage.name}</span>
-              <span><strong>Plan Price:</strong> ₹{selectedPackage.pricing}</span>
+              <span><strong>Plan Price:</strong></span>
+              <span>₹{planPrice}</span>
             </div>
             {selectedCoupon && (
               <div className="summary-row">
@@ -753,25 +807,23 @@ const BuyPlan = () => {
             )}
             <div className="summary-row">
               <span><strong>Price After Discount:</strong></span>
-              <span>₹{selectedCoupon ? (selectedPackage.pricing - discountAmount).toFixed(2) : selectedPackage.pricing}</span>
+              <span>₹{(planPrice - discountAmount).toFixed(2)}</span>
             </div>
-            {/* {gstClaim && ( */}
-              <>
-                <div className="summary-row">
-                  <span><strong>SGST (2.5%):</strong></span>
-                  <span>₹{(((selectedPackage.pricing - discountAmount) * 2.5) / 100).toFixed(2)}</span>
-                </div>
-                <div className="summary-row">
-                  <span><strong>CGST (2.5%):</strong></span>
-                  <span>₹{(((selectedPackage.pricing - discountAmount) * 2.5) / 100).toFixed(2)}</span>
-                </div>
-              </>
-            {/* )} */}
+            <>
+              <div className="summary-row">
+                <span><strong>SGST (2.5%):</strong></span>
+                <span>₹{(((planPrice - discountAmount) * 2.5) / 100).toFixed(2)}</span>
+              </div>
+              <div className="summary-row">
+                <span><strong>CGST (2.5%):</strong></span>
+                <span>₹{(((planPrice - discountAmount) * 2.5) / 100).toFixed(2)}</span>
+              </div>
+            </>
             <div className="summary-row">
               <span><strong>Final Total:</strong></span>
               <span>₹{(
-                (selectedPackage.pricing - discountAmount) + 
-                (gstClaim ? ((selectedPackage.pricing - discountAmount) * gstPercentage) / 100 : 0)
+                (planPrice - discountAmount) + 
+                (gstClaim ? ((planPrice - discountAmount) * gstPercentage) / 100 : 0)
               ).toFixed(2)}</span>
             </div>
             <div className="summary-row">
@@ -782,55 +834,18 @@ const BuyPlan = () => {
               <span><strong>Remaining Balance:</strong></span>
               <span>₹{remainingAmount.toFixed(2)}</span>
             </div>
-            {selectedPackage.description && (
-              <div className="summary-row full-width">
-                <span><strong>Description:</strong> {selectedPackage.description}</span>
-              </div>
-            )}
           </Card>
-        )}
-
-        {/* Start Date and End Date Section */}
-        {selectedPackage && (
-          <div className="date-selection-section">
-            <div className="row">
-              <Form.Item
-                name="startDate"
-                label="Start Date"
-                rules={[{ required: true, message: 'Please select start date' }]}
-              >
-                <DatePicker
-                  style={{ width: '100%', height: '46px' }}
-                  placeholder="Select start date"
-                  format="DD-MM-YYYY"
-                  onChange={handleStartDateChange}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="endDate"
-                label="End Date"
-              >
-                <DatePicker
-                  style={{ width: '100%', height: '46px' }}
-                  placeholder="Auto-calculated end date"
-                  format="DD-MM-YYYY"
-                  disabled
-                />
-              </Form.Item>
-            </div>
-          </div>
         )}
 
         <div className="footer-buttons">
           <Button
             type="primary"
             htmlType="submit"
-            loading={loading || addingInvoice}
+            loading={loading}
             className="save-btn"
-            disabled={!selectedPackage}
+            disabled={!planPrice || planPrice === 0}
           >
-            Purchase Plan
+            Purchase Add-On Service
           </Button>
         </div>
       </Form>
@@ -838,4 +853,4 @@ const BuyPlan = () => {
   );
 };
 
-export default BuyPlan;
+export default BuyAddOnService;

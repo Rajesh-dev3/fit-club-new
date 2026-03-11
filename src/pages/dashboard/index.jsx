@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
 import Bargraph from '../../components/Graphs/BarGraph';
 import LineGraph from '../../components/Graphs/LineGraph';
 import PieChartGraph from '../../components/Graphs/PieChart';
@@ -10,9 +11,17 @@ import "./styles.scss";
 const firstSectionGraphs = [{ comp: <LineGraph /> }, { comp: <RadialBarGraph /> }];
 
 function Dashboard() {
+  const [selectedRange, setSelectedRange] = useState('0');
+  
+  // Get current month in YYYY-MM format
+  const currentMonth = new Date().toISOString().slice(0, 7); // "2026-02"
+  
   // Fetch real API data
   const { data: salesTodayData, isLoading: salesTodayLoading, error: salesTodayError } = useGetSalesTodayQuery();
-  const { data: salesMonthlyData, isLoading: salesMonthlyLoading } = useGetSalesMonthlyQuery();
+  const { data: salesMonthlyData, isLoading: salesMonthlyLoading } = useGetSalesMonthlyQuery({ 
+    month: currentMonth,
+    range: selectedRange
+  });
 
   // Transform today's sales data to match chart format
   const transformTodayData = (apiData) => {
@@ -97,17 +106,19 @@ function Dashboard() {
             <HierarchicalChart
               title="Sales Revenue"
               amount={monthlyData.totalSales.toLocaleString('en-IN')}
-              period="This Month"
+              period={selectedRange}
               data={monthlyData.employees}
               type="sales"
+              onPeriodChange={(value) => setSelectedRange(value)}
             />
             
             <HierarchicalChart
               title="Trainers Revenue"
               amount={monthlyData.totalTrainers.toLocaleString('en-IN')}
-              period="This Month"
+              period={selectedRange}
               data={monthlyData.trainers}
               type="trainers"
+              onPeriodChange={(value) => setSelectedRange(value)}
             />
           </div>
         </div>

@@ -55,7 +55,7 @@ const items = [
     icon: <SolutionOutlined />,
     children: [
       { key: '5-1', label: <Link to={AllBiometricsRoute}>All Biometrics</Link> },
-      { key: '5-2', label: <Link to={AddBiometricRoute}>Add Biometric</Link> },
+      // { key: '5-2', label: <Link to={AddBiometricRoute}>Add Biometric</Link> },
     ],
   },
   // {

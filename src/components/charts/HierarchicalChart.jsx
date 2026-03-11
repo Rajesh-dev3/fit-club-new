@@ -1,4 +1,5 @@
 import React from 'react';
+import { Select } from 'antd';
 import './HierarchicalChart.scss';
 
 const HierarchicalChart = ({ 
@@ -6,7 +7,8 @@ const HierarchicalChart = ({
   amount, 
   period = '', 
   data = [],
-  type = 'sales' // 'sales' or 'trainers'
+  type = 'sales', // 'sales' or 'trainers'
+  onPeriodChange
 }) => {
   const chartData = Array.isArray(data) ? data : [];
   
@@ -34,13 +36,25 @@ const HierarchicalChart = ({
       <div className="chart-header">
         <div className="chart-title">
           <h3>{title}</h3>
-          <span className="chart-amount">₹{amount}</span>
         </div>
         {period && (
           <div className="chart-period">
-            <span>{period}</span>
+            <Select
+              defaultValue={period}
+              style={{ width: 150 }}
+              onChange={onPeriodChange}
+              options={[
+                { value: 'all', label: 'All Time' },
+                { value: '6', label: 'Last 6 Months' },
+                { value: '3', label: 'Last 3 Months' },
+                { value: '1', label: 'Last Month' },
+                { value: '0', label: 'This Month' },
+              ]}
+            />
           </div>
         )}
+          <span className="chart-amount">₹{amount}</span>
+
       </div>
 
       <div className="chart-content">

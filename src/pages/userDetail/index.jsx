@@ -35,6 +35,7 @@ const UserDetailPage = () => {
       { id: 'attendance', label: 'Attendance', path: 'attendance' },
       { id: 'membership', label: 'Membership', path: 'membership' },
       { id: 'addonPackage', label: 'AddOn Package', path: 'addon-package' },
+      { id: 'buyAddOnService', label: 'Buy Add On Service', path: 'buy-addon-service' },
       { id: 'assessment', label: 'Assessment', path: 'assessment' },
       { id: 'refundHistory', label: 'Refund History', path: 'refund-history' },
       { id: 'parkingHistory', label: 'Parking History', path: 'parking-history' },

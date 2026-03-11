@@ -4,29 +4,31 @@
   border-radius: 12px;
   padding: 20px;
   box-shadow: var(--boxShadow);
-  // height: 400px; // Fixed height for chart container
   display: flex;
   flex-direction: column;
 
   .chart-header {
     margin-bottom: 20px;
-
+display: flex;
+justify-content: space-between;
+width: 100%;
     .chart-title {
       display: flex;
       justify-content: space-between;
       align-items: center;
 
-      h3 {
-        margin: 0;
-        font-size: 16px;
-        color: var(--sider-text);
-      }
+    }
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--sider-text);
+    }
 
-      .chart-amount {
-        font-size: 24px;
-        font-weight: bold;
-        color: var(--sider-text);
-      }
+    .chart-amount {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--sider-text);
+      align-content: center;
     }
 
     .chart-period {

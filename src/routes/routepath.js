@@ -35,7 +35,9 @@ const AddInventoryRoute = "/add-inventory"
 // Invoice Management Routes
 const AllInvoiceRoute = "/all-invoice"
 const AddInvoiceRoute = "/add-invoice"
+const EditInvoiceRoute = "/edit-invoice"
 const PartialInvoiceRoute = "/partial-invoice"
+const InvoiceDetailRoute = "/invoice-detail"
 
 const EmployeeDetailRoute = "/employee-detail"
 const DirectorAttendanceRoute = "/director-attendance"
@@ -133,5 +135,7 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
   AllBiometricsRoute,
   AllInvoiceRoute,
   AddInvoiceRoute,
-  PartialInvoiceRoute
+  EditInvoiceRoute,
+  PartialInvoiceRoute,
+  InvoiceDetailRoute
  }

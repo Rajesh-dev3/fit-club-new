@@ -1,6 +1,8 @@
 import React from 'react';
 import { Dropdown, Button, Tag } from 'antd';
 import { MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import { InvoiceDetailRoute } from '../../routes/routepath';
 
 export const getPartialInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   {
@@ -9,6 +11,14 @@ export const getPartialInvoicesColumns = (handleEdit, handleDelete, handleView) 
     key: 'invoiceNumber',
     width: 120,
     fixed: 'left',
+    render: (invoiceNumber, record) => (
+      <Link 
+        to={`${InvoiceDetailRoute}/${record._id}`}
+        style={{ color: '#1890ff', textDecoration: 'none' }}
+      >
+        {invoiceNumber}
+      </Link>
+    ),
   },
   {
     title: 'Invoice Date',

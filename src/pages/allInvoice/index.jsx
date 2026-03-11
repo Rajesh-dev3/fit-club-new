@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { HomeOutlined, EyeOutlined } from '@ant-design/icons';
+import  { useState, useMemo } from 'react';
+import { HomeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { Modal, message, Select } from 'antd';
 
@@ -70,9 +70,11 @@ const AllInvoice = () => {
         Object.values(item).some(val =>
           String(val).toLowerCase().includes(searchText.toLowerCase())
         ) ||
-        // Also search in nested customer and branch data
-        (item.customerId?.name && String(item.customerId.name).toLowerCase().includes(searchText.toLowerCase())) ||
+        // Also search in nested user, branch, and plan data
+        (item.userId?.name && String(item.userId.name).toLowerCase().includes(searchText.toLowerCase())) ||
+        (item.userId?.phoneNumber && String(item.userId.phoneNumber).toLowerCase().includes(searchText.toLowerCase())) ||
         (item.branchId?.name && String(item.branchId.name).toLowerCase().includes(searchText.toLowerCase())) ||
+        (item.planId?.name && String(item.planId.name).toLowerCase().includes(searchText.toLowerCase())) ||
         (item.invoiceNumber && String(item.invoiceNumber).toLowerCase().includes(searchText.toLowerCase()))
       );
     }
@@ -80,8 +82,8 @@ const AllInvoice = () => {
     // Apply date range filter
     if (dateRange && dateRange.startDate && dateRange.endDate) {
       result = result.filter(item => {
-        if (!item.issueDate) return false;
-        const invoiceDate = new Date(item.issueDate);
+        if (!item.invoiceDate) return false;
+        const invoiceDate = new Date(item.invoiceDate);
         const startDate = new Date(dateRange.startDate);
         const endDate = new Date(dateRange.endDate);
         
@@ -197,11 +199,7 @@ const AllInvoice = () => {
         />
       </div>
 
-      {error && (
-        <div className="error-state">
-          <p>Error loading invoices: {error.message || 'Something went wrong'}</p>
-        </div>
-      )}
+     
     </div>
   );
 };

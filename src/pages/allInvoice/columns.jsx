@@ -1,6 +1,8 @@
 import React from 'react';
 import { Dropdown, Button, Tag } from 'antd';
 import { MoreOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { Link, useNavigate } from 'react-router-dom';
+import { InvoiceDetailRoute, EditInvoiceRoute } from '../../routes/routepath';
 
 export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   {
@@ -8,16 +10,27 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
     dataIndex: 'invoiceNumber',
     key: 'invoiceNumber',
     width: 120,
+    render: (invoiceNumber, record) => (
+      <Link 
+        to={`${InvoiceDetailRoute}/${record._id}`}
+        style={{ color: '#1890ff', textDecoration: 'none' }}
+      >
+        {invoiceNumber}
+      </Link>
+    ),
     // fixed: 'left',
   },
   {
     title: 'Invoice Date',
     dataIndex: 'invoiceDate',
     key: 'invoiceDate',
-    width: 110,
+    width: 160,
     render: (date) => {
       if (!date) return '-';
-      return new Date(date).toLocaleDateString('en-IN');
+      const d = new Date(date);
+      const dateStr = d.toLocaleDateString('en-IN');
+      const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      return `${dateStr} ${timeStr}`;
     },
   },
   {
@@ -39,24 +52,28 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Name',
-    dataIndex: ['customerId', 'name'],
+    dataIndex: ['userId', 'name'],
     key: 'customerName',
     width: 150,
-    render: (_, record) => record.customerId?.name || record.customerName || '-',
+    render: (_, record) => record.userId?.name || record.customerName || '-',
   },
   {
     title: 'Mobile No.',
-    dataIndex: ['customerId', 'mobile'],
+    dataIndex: ['userId', 'phoneNumber'],
     key: 'customerMobile',
     width: 120,
-    render: (_, record) => record.customerId?.mobile || record.customerMobile || '-',
+    render: (_, record) => record.userId?.phoneNumber || record.customerNumber || '-',
   },
   {
     title: 'Service Type',
-    dataIndex: 'serviceType',
+    dataIndex: ['membershipId', 'type'],
     key: 'serviceType',
     width: 120,
-    render: (serviceType) => serviceType || '-',
+    render: (_, record) => {
+      const type = record.membershipId?.type || record.serviceType;
+      if (!type) return '-';
+      return type.charAt(0).toUpperCase() + type.slice(1);
+    },
   },
   {
     title: 'Trainer Name',
@@ -67,10 +84,10 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Sales Person',
-    dataIndex: ['salesPersonId', 'name'],
+    dataIndex: ['employeeId', 'name'],
     key: 'salesPersonName',
     width: 130,
-    render: (_, record) => record.salesPersonId?.name || record.salesPersonName || '-',
+    render: (_, record) => record.employeeId?.name || record.salesPersonName || '-',
   },
   {
     title: 'Invoice Status',
@@ -98,10 +115,10 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Package Name',
-    dataIndex: ['packageId', 'name'],
+    dataIndex: ['planId', 'name'],
     key: 'packageName',
     width: 150,
-    render: (_, record) => record.packageId?.name || record.packageName || '-',
+    render: (_, record) => record.planId?.name || record.packageName || '-',
   },
   {
     title: 'Start Date',
@@ -132,7 +149,7 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Package Price(₹)',
-    dataIndex: 'packagePrice',
+    dataIndex: 'planPrice',
     key: 'packagePrice',
     width: 130,
     render: (price) => price ? `₹${price.toLocaleString()}` : '₹0',
@@ -146,7 +163,7 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Discount',
-    dataIndex: 'discount',
+    dataIndex: 'discountAmount',
     key: 'discount',
     width: 100,
     render: (discount) => {
@@ -156,24 +173,24 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Taxable amount(₹)',
-    dataIndex: 'taxableAmount',
+    dataIndex: 'afterDiscount',
     key: 'taxableAmount',
     width: 140,
     render: (amount) => amount ? `₹${amount.toLocaleString()}` : '₹0',
   },
   {
     title: 'CGST',
-    dataIndex: 'cgst',
+    dataIndex: 'gstAmount',
     key: 'cgst',
     width: 100,
-    render: (cgst) => cgst ? `₹${cgst.toLocaleString()}` : '₹0',
+    render: (gstAmount) => gstAmount ? `₹${(gstAmount / 2).toLocaleString()}` : '₹0',
   },
   {
     title: 'SGST',
-    dataIndex: 'sgst',
+    dataIndex: 'gstAmount',
     key: 'sgst',
     width: 100,
-    render: (sgst) => sgst ? `₹${sgst.toLocaleString()}` : '₹0',
+    render: (gstAmount) => gstAmount ? `₹${(gstAmount / 2).toLocaleString()}` : '₹0',
   },
   {
     title: 'Invoice Amount(₹)',
@@ -191,27 +208,31 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Payment Mode',
-    dataIndex: 'paymentMode',
+    dataIndex: 'paymentType',
     key: 'paymentMode',
     width: 120,
-    render: (mode) => mode || '-',
+    render: (mode) => mode === 'fullPayment' ? 'Full Payment' : (mode || '-'),
   },
   {
-    title: 'View',
+    title: 'Receipt',
     key: 'view',
     width: 80,
     render: (_, record) => (
-      <Button 
-        type="text" 
-        icon={<EyeOutlined />} 
-        size="small"
-        onClick={() => handleView && handleView(record)}
-        style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center' 
-        }}
-      />
+      <Link 
+        to={`${InvoiceDetailRoute}/${record._id}`}
+        style={{ color: '#1890ff', textDecoration: 'none' }}
+      >
+        <Button 
+          type="text" 
+          icon={<EyeOutlined />} 
+          size="small"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center' 
+          }}
+        />
+      </Link>
     ),
   },
   {
@@ -224,12 +245,14 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
         {
           key: 'edit',
           label: (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Link 
+              to={`${EditInvoiceRoute}/${record._id}`}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'inherit', textDecoration: 'none' }}
+            >
               <EditOutlined />
               Edit
-            </span>
+            </Link>
           ),
-          onClick: () => handleEdit(record),
         },
         {
           key: 'delete',

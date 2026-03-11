@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Select, DatePicker, Button, Card, InputNumber, Input, message } from 'antd';
+import { Form, Select, DatePicker, Button, Card, InputNumber, Input, message, Spin } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext, useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useGetPlansQuery } from '../../../services/package';
-import { useGetBranchesQuery } from '../../../services/branches';
-import { useGetAllCouponQuery } from '../../../services/coupons';
-import { useGetEmployeeByCustomerQuery, useGetEmployeeQuery } from '../../../services/employee';
-import { useAddInvoiceMutation } from '../../../services/invoice';
-import DateRangeSelector from '../../dateRange/DateRangeSelector';
-import ImagePicker from '../../../components/form/ImagePicker';
+import { useGetPlansQuery } from '../../services/package';
+import { useGetBranchesQuery } from '../../services/branches';
+import { useGetAllCouponQuery } from '../../services/coupons';
+import { useGetEmployeeByCustomerQuery, useGetEmployeeQuery } from '../../services/employee';
+import { useGetInvoiceByIdQuery, useUpdateInvoiceMutation } from '../../services/invoice';
+import { AllInvoiceRoute } from '../../routes/routepath';
+import ImagePicker from '../../components/form/ImagePicker';
 import './styles.scss';
 
 const { Option } = Select;
 
-const BuyPlan = () => {
-  const { userData } = useOutletContext();
+const EditInvoice = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [form] = Form.useForm();
+  const [userData, setUserData] = useState(null);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gstClaim, setGstClaim] = useState(false);
@@ -30,6 +31,7 @@ const BuyPlan = () => {
   const [remainingAmount, setRemainingAmount] = useState(0);
 
   // API hooks
+  const { data: invoiceData, isLoading: invoiceLoading, error: invoiceError } = useGetInvoiceByIdQuery(id);
   const { data: packagesData, isLoading: plansLoading } = useGetPlansQuery();
   const { data: branchesData, isLoading: branchesLoading } = useGetBranchesQuery();
   const { data: couponsData, isLoading: couponsLoading } = useGetAllCouponQuery({});
@@ -38,7 +40,7 @@ const BuyPlan = () => {
   });
   
   // Invoice mutation
-  const [addInvoice, { isLoading: addingInvoice }] = useAddInvoiceMutation();
+  const [updateInvoice, { isLoading: updatingInvoice }] = useUpdateInvoiceMutation();
  
 
   // Extract data arrays from API responses
@@ -166,6 +168,72 @@ const BuyPlan = () => {
     calculatePaymentAmounts();
   }, [selectedPackage, discountAmount, gstClaim, paymentModes.length]);
 
+  // Load invoice data when available
+  useEffect(() => {
+    if (invoiceData?.data) {
+      const invoice = invoiceData.data;
+      
+      // Set user data from invoice
+      if (invoice.userId) {
+        setUserData(invoice.userId);
+      }
+      
+      // Set selected package
+      if (invoice.planId) {
+        setSelectedPackage(invoice.planId);
+      }
+      
+      // Set GST claim
+      if (invoice.gstClaim !== undefined) {
+        setGstClaim(invoice.gstClaim);
+      }
+      
+      // Set selected coupon
+      if (invoice.couponId) {
+        setSelectedCoupon(invoice.couponId);
+        setDiscountAmount(invoice.discountAmount || 0);
+      }
+      
+      // Populate form fields
+      form.setFieldsValue({
+        // User and Branch
+        userId: invoice.userId?._id,
+        branchId: invoice.branchId?._id,
+        
+        // Plan Details
+        planId: invoice.planId?._id,
+        planPrice: invoice.planPrice,
+        
+        // Dates
+        startDate: invoice.startDate ? dayjs(invoice.startDate) : null,
+        expiryDate: invoice.expiryDate ? dayjs(invoice.expiryDate) : null,
+        invoiceDate: invoice.invoiceDate ? dayjs(invoice.invoiceDate) : null,
+        paymentDate: invoice.startDate ? dayjs(invoice.startDate) : null,
+        
+        // Discount and Coupon
+        couponId: invoice.couponId?._id,
+        discountAmount: invoice.discountAmount,
+        afterDiscount: invoice.afterDiscount,
+        
+        // GST Details
+        gstClaim: invoice.gstClaim ? 'yes' : 'no',
+        gstNumber: invoice.gstNumber,
+        registeredCompanyName: invoice.registeredCompanyName,
+        
+        // Totals
+        totalOrderValue: invoice.totalAmount,
+        
+        // Payment Details
+        paymentType: invoice.paymentType === 'fullPayment' ? 'full' : 'partial',
+        salesPerson: invoice.employeeId,
+        
+        // Membership Details
+        lockerNumber: invoice.userMemberships?.[0]?.lockerNumber,
+        coachId: invoice.userMemberships?.[0]?.coachId,
+      });
+    }
+  }, [invoiceData, form]);
+
   // Handle start date change and calculate end date
   const handleStartDateChange = (date) => {
     if (date && selectedPackage) {
@@ -222,20 +290,23 @@ const BuyPlan = () => {
           modeOfPayment: 'cash',
           amount: totalAmount,
           receivedBy: values.cashEmployee,
-          receipt: []
+          receipt: [],
+          paymentDate: startDate
         });
       } else if (paymentMode === 'upi' && values.upiScreenshot) {
         paymentTerms.push({
           modeOfPayment: 'upi',
           amount: totalAmount,
           receipt: [values.upiScreenshot],
-          referenceId: values.upiReferenceId || ''
+          referenceId: values.upiReferenceId || '',
+          paymentDate: startDate
         });
       } else if (paymentMode === 'card' && values.cardScreenshot) {
         paymentTerms.push({
           modeOfPayment: 'card',
           amount: totalAmount,
-          receipt: [values.cardScreenshot]
+          receipt: [values.cardScreenshot],
+          paymentDate: startDate
         });
       } else if (paymentMode === 'cheque' && values.chequeNumber && values.bankName) {
         paymentTerms.push({
@@ -243,7 +314,8 @@ const BuyPlan = () => {
           amount: totalAmount,
           chequeNumber: values.chequeNumber,
           bankName: values.bankName,
-          receipt: []
+          receipt: [],
+          paymentDate: startDate
         });
       } else if (paymentMode === 'bank_transfer' && values.holderName && values.bankName && values.receiptName) {
         paymentTerms.push({
@@ -251,19 +323,22 @@ const BuyPlan = () => {
           amount: totalAmount,
           bankHolderName: values.holderName,
           bankName: values.bankName,
-          receiptNumber: values.receiptName
+          receiptNumber: values.receiptName,
+          paymentDate: startDate
         });
       } else if (paymentMode === 'credit_note' && values.creditNoteAmount && values.creditNoteUpload) {
         paymentTerms.push({
           modeOfPayment: 'creditnote',
           amount: values.creditNoteAmount,
-          receipt: [values.creditNoteUpload]
+          receipt: [values.creditNoteUpload],
+          paymentDate: startDate
         });
       }
 
       // Create the payload
       const payload = {
-        userId: userData._id,
+        id: id, // Invoice ID for update
+        userId: userData?._id || invoiceData?.data?.userId?._id,
         planId: selectedPackage?._id,
         startDate: startDate,
         expiryDate: expiryDate,
@@ -278,7 +353,6 @@ const BuyPlan = () => {
         registeredCompanyName: values.registeredCompanyName || null,
         totalInvoiceAmount: totalAmount,
         paymentType: values.paymentType || 'full',
-        paymentDate: startDate,
         paymentTerm: paymentTerms,
         coachId: null, // Can be added if coach selection is implemented
         lockerNumber: values.lockerNumber || null,
@@ -291,33 +365,76 @@ const BuyPlan = () => {
       };
 
       
-      // Call the invoice API
-      const result = await addInvoice(payload).unwrap();
+      // Call the invoice update API
+      const result = await updateInvoice(payload).unwrap();
       
-      message.success('Invoice created successfully!');
+      message.success('Invoice updated successfully!');
       
-      form.resetFields();
-      setSelectedPackage(null);
-      setSelectedCoupon(null);
-      setPaymentMode('');
-      setGstClaim(false);
-      setDiscountAmount(0);
-      
-      // Navigate to membership tab
-      // navigate(`/users/${userData._id}`, { 
-      //   state: { activeTab: 'membership' } 
-      // });
+      // Navigate back to all invoices
+      navigate(AllInvoiceRoute);
       
     } catch (error) {
+      message.error('Failed to update invoice. Please try again.');
+      console.error('Update invoice error:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  // Show loading state
+  if (invoiceLoading) {
+    return (
+      <div className="buy-plan-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Spin size="large" tip="Loading invoice..." />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (invoiceError) {
+    return (
+      <div className="buy-plan-container" style={{ padding: '40px', textAlign: 'center' }}>
+        <p style={{ color: 'red', fontSize: '16px' }}>Failed to load invoice. Please try again.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="buy-plan-container">
       <div className="form-header">
-        <h2>Purchase Membership Plan</h2>
+        <h2>Edit Invoice</h2>
       </div>
+
+      {/* User Information Display */}
+      {userData && (
+        <Card 
+          style={{ 
+            marginBottom: '24px', 
+            background: 'var(--hover-bg)',
+            border: '1px solid var(--muted)'
+          }}
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <div>
+              <strong>Customer Name:</strong>
+              <div>{userData.name}</div>
+            </div>
+            <div>
+              <strong>Email:</strong>
+              <div>{userData.email}</div>
+            </div>
+            <div>
+              <strong>Phone Number:</strong>
+              <div>{userData.phoneNumber}</div>
+            </div>
+            <div>
+              <strong>Status:</strong>
+              <div style={{ textTransform: 'capitalize' }}>{userData.status}</div>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <Form
         form={form}
         layout="vertical"
@@ -379,7 +496,7 @@ const BuyPlan = () => {
 
         <div className="row">
           <Form.Item
-            name="planSelect"
+            name="planId"
             label="Plan Select"
             rules={[{ required: true, message: 'Please select a plan' }]}
           >
@@ -826,11 +943,11 @@ const BuyPlan = () => {
           <Button
             type="primary"
             htmlType="submit"
-            loading={loading || addingInvoice}
+            loading={loading || updatingInvoice}
             className="save-btn"
             disabled={!selectedPackage}
           >
-            Purchase Plan
+            Update Invoice
           </Button>
         </div>
       </Form>
@@ -838,4 +955,7 @@ const BuyPlan = () => {
   );
 };
 
-export default BuyPlan;
+export default EditInvoice;
+
+
+

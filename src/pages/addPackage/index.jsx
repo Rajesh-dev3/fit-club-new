@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Form, Input, Select, Button, InputNumber, Checkbox, Row, Col, Space } from "antd";
 import { HomeOutlined, PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import "./styles.scss";
@@ -32,6 +32,16 @@ const AddPackage = () => {
     skip: !selectedBranches || selectedBranches.length === 0
   });
 
+  // Clear inventory and biometric selections when branches are cleared
+  useEffect(() => {
+    if (!selectedBranches || selectedBranches.length === 0) {
+      form.setFieldsValue({
+        selectedInventory: undefined,
+        biometricMachine: undefined
+      });
+    }
+  }, [selectedBranches, form]);
+
   const branchOptions = useMemo(() => {
     if (!branchesData || !Array.isArray(branchesData.data)) return [];
     return branchesData.data.map((b) => ({
@@ -58,6 +68,8 @@ const AddPackage = () => {
   ];
 
   const inventoryOptions = useMemo(() => {
+    // If no branches selected, return empty array
+    if (!selectedBranches || selectedBranches.length === 0) return [];
     if (!inventoryData?.success || !Array.isArray(inventoryData.data)) return [];
     
     const allInventory = [];
@@ -73,9 +85,11 @@ const AddPackage = () => {
       }
     });
     return allInventory;
-  }, [inventoryData]);
+  }, [inventoryData, selectedBranches]);
 
   const biometricMachineOptions = useMemo(() => {
+    // If no branches selected, return empty array
+    if (!selectedBranches || selectedBranches.length === 0) return [];
     if (!biometricData?.success || !Array.isArray(biometricData.data?.machines)) return [];
     
     const allMachines = [];
@@ -91,45 +105,29 @@ const AddPackage = () => {
       }
     });
     return allMachines;
-  }, [biometricData]);
+  }, [biometricData, selectedBranches]);
 
   // Custom component for inventory selection with quantities
   const InventorySelectionWithQuantity = ({ value, onChange }) => {
     const [localSelection, setLocalSelection] = useState(value || {});
-    const [quantityErrors, setQuantityErrors] = useState({});
 
     const handleItemCheck = (itemId, checked) => {
       const newSelection = { ...localSelection };
-      const newErrors = { ...quantityErrors };
       
       if (checked) {
         newSelection[itemId] = { selected: true, quantity: 1 };
       } else {
         delete newSelection[itemId];
-        delete newErrors[itemId]; // Clear error when unchecking
       }
       
       setLocalSelection(newSelection);
-      setQuantityErrors(newErrors);
       onChange?.(newSelection);
     };
 
     const handleQuantityChange = (itemId, quantity) => {
       if (localSelection[itemId]) {
-        // Get the max available quantity for this item
-        const maxQuantity = inventoryData?.data?.find(item => item._id === itemId)?.quantity || 1;
-        
-        const newErrors = { ...quantityErrors };
-        
-        // Check if user tried to enter more than available
-        if (quantity > maxQuantity) {
-          newErrors[itemId] = `Maximum ${maxQuantity} available`;
-        } else {
-          delete newErrors[itemId];
-        }
-        
-        // Ensure quantity doesn't exceed available stock
-        const validQuantity = Math.min(Math.max(quantity || 1, 1), maxQuantity);
+        // Allow any quantity - no stock restriction
+        const validQuantity = Math.max(quantity || 1, 1);
         
         const newSelection = {
           ...localSelection,
@@ -137,7 +135,6 @@ const AddPackage = () => {
         };
         
         setLocalSelection(newSelection);
-        setQuantityErrors(newErrors);
         onChange?.(newSelection);
       }
     };
@@ -156,7 +153,6 @@ const AddPackage = () => {
         {inventoryOptions.map((option) => {
           const isSelected = localSelection[option.value]?.selected || false;
           const quantity = localSelection[option.value]?.quantity || 1;
-          const hasError = quantityErrors[option.value];
           
           return (
             <Row key={option.value} align="middle" style={{ marginBottom: '12px' }}>
@@ -180,20 +176,9 @@ const AddPackage = () => {
                       size="small"
                       style={{ 
                         width: '80px', 
-                        height: '30px',
-                        borderColor: hasError ? '#ff4d4f' : undefined
+                        height: '30px'
                       }}
-                      status={hasError ? 'error' : undefined}
                     />
-                    {hasError && (
-                      <span style={{ 
-                        fontSize: '12px', 
-                        color: '#ff4d4f',
-                        whiteSpace: 'nowrap'
-                      }}>
-                        {hasError}
-                      </span>
-                    )}
                   </Space>
                 </Col>
               )}

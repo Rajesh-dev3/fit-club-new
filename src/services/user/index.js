@@ -44,6 +44,14 @@ export const user = createApi({
         method: "GET",
       }),
     }),
+    assignGymKit: builder.mutation({
+      query: ({ userId, products }) => ({
+        url: `/users/${userId}/assign-gym-kit`,
+        method: "POST",
+        body: { products },
+      }),
+      invalidatesTags: ["user"]
+    }),
   
    
   }),
@@ -51,4 +59,4 @@ export const user = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useUserDetailDataQuery,useAdduserMutation, useGetAttachUserListQuery,useGetAllUserQuery } = user
+export const { useUserDetailDataQuery,useAdduserMutation, useGetAttachUserListQuery,useGetAllUserQuery, useAssignGymKitMutation } = user
