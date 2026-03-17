@@ -11,7 +11,6 @@ import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
 import { getAddOnsUserColumns } from "./columns";
 // ...existing code...
 import "./styles.scss";
-import { useGetAllUserQuery } from "../../services/user";
 import CommonTable from "../../components/commonTable";
 
 
@@ -91,8 +90,9 @@ const AllAddOnsUsers = () => {
   // Get columns with handlers
   const columnsWithHandlers = getAddOnsUserColumns(handleEdit, handleDelete, handleChangePassword, navigate);
   
-  // Use the actual API hook for all users
-  const { data, isLoading } = useGetAllUserQuery({ page, limit });
+  // Empty data states - API to be implemented
+  const data = null;
+  const isLoading = false;
 
   // Map API data to table rows (updated for add-ons users)
   const usersData = useMemo(() => {
