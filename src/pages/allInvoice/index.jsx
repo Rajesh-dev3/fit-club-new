@@ -9,6 +9,7 @@ import AddButton from '../../components/addButton';
 import CommonTable from '../../components/commonTable';
 import SearchBar from '../../components/searchBar';
 import ColumnVisibility from '../../components/columnVisibility';
+import CustomPagination from '../../components/pagination';
 import DateRangeSelector from '../../components/dateRange/DateRangeSelector';
 import { useGetInvoicesQuery, useDeleteInvoiceMutation } from '../../services/invoice';
 import { getInvoicesColumns } from './columns';
@@ -17,7 +18,9 @@ import './styles.scss';
 
 const AllInvoice = () => {
   const navigate = useNavigate();
-  const { data: invoicesData, isLoading, error } = useGetInvoicesQuery();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const { data: invoicesData, isLoading, error } = useGetInvoicesQuery({ page, limit });
   const [deleteInvoice] = useDeleteInvoiceMutation();
   const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState(null);
@@ -199,6 +202,16 @@ const AllInvoice = () => {
         />
       </div>
 
+      <CustomPagination
+        current={page}
+        pageSize={limit}
+        total={invoicesData?.pagination?.total || 0}
+        onPageChange={(newPage) => setPage(newPage)}
+        onPageSizeChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+      />
      
     </div>
   );

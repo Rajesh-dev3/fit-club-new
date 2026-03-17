@@ -91,10 +91,11 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Invoice Status',
-    dataIndex: 'status',
+    dataIndex: 'invoiceTypeLabel',
     key: 'status',
     width: 120,
-    render: (status) => {
+    render: (invoiceTypeLabel, record) => {
+      const status = invoiceTypeLabel || record.status;
       const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
           case 'paid': return 'green';
@@ -102,6 +103,10 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
           case 'overdue': return 'red';
           case 'cancelled': return 'default';
           case 'partial': return 'blue';
+          case 'complete': return 'green';
+          case 'new client': return 'cyan';
+          case 'upgrade': return 'purple';
+          case 'balance clear': return 'green';
           default: return 'blue';
         }
       };
