@@ -65,7 +65,7 @@ const EditRole = () => {
       
       form.setFieldsValue({
         name: role?.name || "",
-        description: role?.description || "",
+        level: role?.level || null,
       });
       
       // Extract permission keys from the API response
@@ -246,8 +246,17 @@ const EditRole = () => {
           <Form.Item label="Role Name" name="name" rules={[{ required: true, message: "Please enter role name" }]}> 
             <Input placeholder="Role Name" /> 
           </Form.Item>
-          <Form.Item label="Description" name="description"> 
-            <Input placeholder="Description" /> 
+          <Form.Item label="Level" name="level">
+            <Select placeholder="Select Level" options={[
+              { label: 'Level 1', value: 1 },
+              { label: 'Level 2', value: 2 },
+              { label: 'Level 3', value: 3 },
+              { label: 'Level 4', value: 4 },
+              { label: 'Level 5', value: 5 },
+              { label: 'Level 6', value: 6 },
+              { label: 'Level 7', value: 7 },
+              { label: 'Level 8', value: 8 },
+            ]} />
           </Form.Item>
         </div>
         

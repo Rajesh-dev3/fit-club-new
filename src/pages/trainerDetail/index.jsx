@@ -47,13 +47,16 @@ const TrainerDetailPage = () => {
           <div className="row">
             <span><b>Name:</b> <span className="value">{userInfo.name || '-'}</span></span>
             <span><b>Mobile No.:</b> <span className="value">{userInfo.phoneNumber || '-'}</span></span>
-            <span><b>Trainer Id:</b> <span className="value">{trainer.trainerId || trainer.id || '-'}</span></span>
-            <span><b>Biometric Id:</b> <span className="value">{userInfo.biometricId || '-'}</span></span>
+            <span><b>Expertise:</b> <span className="value">{Array.isArray(trainer.specialization) && trainer.specialization.length > 0 ? trainer.specialization.join(', ') : '-'}</span></span>
           </div>
           <div className="row">
-            <span><b>Address:</b> <span className="value">{trainer.address || '-'}</span></span>
-            <span><b>Branch Name:</b> <span className="value">{(userInfo.branchIds && userInfo.branchIds[0]?.name) || '-'}</span></span>
-            <span><b>Role:</b> <span className="value">{trainer.roleId?.name || '-'}</span></span>
+            <span><b>Biometric Id:</b> <span className="value">{userInfo.biometricId || '-'}</span></span>
+            <span><b>Experience:</b> <span className="value">{trainer.experience ? `${trainer.experience} ${trainer.experience === 1 ? 'Year' : 'Years'}` : '-'}</span></span>
+            <span><b>Branch Name:</b> <span className="value">{Array.isArray(userInfo.branchIds) && userInfo.branchIds.length > 0 ? userInfo.branchIds.map(b => b.name).join(', ') : '-'}</span></span>
+          </div>
+          <div className="row">
+            <span><b>Branch Id:</b> <span className="value">{Array.isArray(userInfo.branchIds) && userInfo.branchIds.length > 0 ? userInfo.branchIds.map(b => b.branchId).join(', ') : '-'}</span></span>
+            <span></span>
             <span></span>
           </div>
         </div>

@@ -47,9 +47,9 @@ const AddTrainer = () => {
       email: values.trainerEmail,
       phoneNumber: values.coachPhoneNumber,
       experience: values.yearsOfExperience,
-      trainerType: values.type || [],
+      specialization: values.type || [],
       roleId: values.role || null,
-      branchIds: values.branchId,
+      branchIds: [values.branchId],
       photo: values.photo,
       employeeType: 'coach',
       userType: 'coach',
@@ -69,6 +69,7 @@ const AddTrainer = () => {
     });
 
     try {
+      console.log('Payload for adding trainer:', payload);
       await triggerAddTrainer(payload).unwrap();
       nav(AllTrainersRoute);
       // message.success('Trainer added successfully');
@@ -123,9 +124,9 @@ const AddTrainer = () => {
             <Select placeholder="Select branch" options={branchOptions} showSearch optionFilterProp="label" allowClear />
           </Form.Item>
 
-          <Form.Item label="Role" name="role">
+          {/* <Form.Item label="Role" name="role">
             <Select placeholder="Select" showSearch optionFilterProp="children" options={rolesOptions} />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item label="Upload Photo" name="photo">
             <ImagePicker form={form} name="photo" />

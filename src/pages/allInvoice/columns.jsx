@@ -87,7 +87,7 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
     dataIndex: ['employeeId', 'name'],
     key: 'salesPersonName',
     width: 130,
-    render: (_, record) => record.employeeId?.name || record.salesPersonName || '-',
+    render: (_, record) => record.employeeId?.user?.name || record.employeeId?.name || record.salesPersonId?.name || record.salesPerson?.name || '-',
   },
   {
     title: 'Invoice Status',

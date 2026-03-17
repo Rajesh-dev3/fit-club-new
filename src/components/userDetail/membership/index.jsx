@@ -3,6 +3,7 @@ import { Button } from 'antd';
 import MembershipCard from '../../card/memberShipCard';
 import FreezabilityForm from './FreezabilityForm';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useGetUserMembershipQuery } from '../../../services/membership';
 import './styles.scss';
 import { UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute, UserDetailRoute } from '../../../routes/routepath';
 
@@ -11,6 +12,8 @@ const UserMembership = () => {
   const { id } = useParams();
   const location = useLocation();
   const isFreezability = location.pathname.endsWith('/freezability');
+  
+  const { data: membershipData, isLoading } = useGetUserMembershipQuery(id);
 
   const handleFreezabilityClick = () => {
     navigate(`${UserDetailRoute}/${id}${UserDetailMembershipFreezabilityRoute}`);
@@ -28,7 +31,7 @@ const UserMembership = () => {
             <Button className="themed-btn" onClick={handleFreezabilityClick}>Freezability</Button>
             <Button className="themed-btn" onClick={handleDaysClick}>Days</Button>
           </div>
-          <MembershipCard/>
+          <MembershipCard membershipData={membershipData} isLoading={isLoading} />
   
     </div>
   );

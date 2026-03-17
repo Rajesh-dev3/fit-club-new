@@ -11,7 +11,7 @@ import { useUserDetailDataQuery } from '../../services/user';
 const menuItems = [
   { id: 'attendance', label: 'Attendance', path: 'attendance' },
   { id: 'membership', label: 'Membership', path: 'membership' },
-  { id: 'addonPackage', label: 'AddOn Package', path: 'addon-package' },
+  // { id: 'addonPackage', label: 'AddOn Package', path: 'addon-package' },
   { id: 'assessment', label: 'Assessment', path: 'assessment' },
   { id: 'refundHistory', label: 'Refund History', path: 'refund-history' },
   { id: 'parkingHistory', label: 'Parking History', path: 'parking-history' },
@@ -34,8 +34,8 @@ const UserDetailPage = () => {
     const baseMenuItems = [
       { id: 'attendance', label: 'Attendance', path: 'attendance' },
       { id: 'membership', label: 'Membership', path: 'membership' },
-      { id: 'addonPackage', label: 'AddOn Package', path: 'addon-package' },
-      { id: 'buyAddOnService', label: 'Buy Add On Service', path: 'buy-addon-service' },
+      { id: 'buyMembership', label: 'Add invoice', path: 'buy-membership' },
+      { id: 'addOnService', label: 'Add On Service', path: 'addon-service' },
       { id: 'assessment', label: 'Assessment', path: 'assessment' },
       { id: 'refundHistory', label: 'Refund History', path: 'refund-history' },
       { id: 'parkingHistory', label: 'Parking History', path: 'parking-history' },
@@ -43,14 +43,6 @@ const UserDetailPage = () => {
       { id: 'biometricAccess', label: 'Biometric Access', path: 'biometric-access' },
       { id: 'feedback', label: 'Feedback', path: 'user-feedback' },
     ];
-
-    // Add "Buy Plan" option if user status is pending
-    if (userData?.status === 'pending') {
-      baseMenuItems.splice(1, 0, { id: 'buyPlan', label: 'Buy Plan', path: 'buy-plan' });
-    }
-    if (userData?.status === 'active') {
-      baseMenuItems.splice(1, 0, { id: 'buyMorePlan', label: 'Addvance Renew', path: 'buy-plan' });
-    }
 
     return baseMenuItems;
   };
@@ -87,13 +79,8 @@ const UserDetailPage = () => {
     }
 
     // Check for buy-plan route specifically
-    if (currentSegment === 'buy-plan') {
-      // Set appropriate tab based on user status
-      if (userData?.status === 'active') {
-        setCurrentTab('buyMorePlan');
-      } else {
-        setCurrentTab('buyPlan');
-      }
+    if (currentSegment === 'buy-plan' || currentSegment === 'buy-membership') {
+      setCurrentTab('buyMembership');
       return;
     }
 

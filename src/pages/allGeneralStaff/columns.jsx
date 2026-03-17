@@ -1,8 +1,9 @@
 import React from 'react';
-import { Image, Tag, Button, Dropdown } from 'antd';
+import { Image, Tag, Button, Dropdown, Switch, Spin } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, CheckOutlined, MoreOutlined, LockOutlined } from '@ant-design/icons';
+import { EditGeneralStaffRoute } from '../../routes/routepath';
 
-export const getGeneralStaffColumns = (handleView, handleVerify, handleEdit, handleDelete, handleChangePassword) => [
+export const getGeneralStaffColumns = (handleView, handleVerify, handleEdit, handleDelete, handleChangePassword, navigate, handleStatusToggle, statusLoading) => [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -50,13 +51,23 @@ export const getGeneralStaffColumns = (handleView, handleVerify, handleEdit, han
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
-    width: 100,
+    width: 120,
     align: 'center',
-    render: (status) => (
-      <Tag color={status === 'active' ? 'green' : 'red'}>
-        {status === 'active' ? 'ACTIVE' : 'INACTIVE'}
-      </Tag>
-    ),
+    render: (status, record) => {
+      const isLoading = statusLoading === record._id;
+      return (
+        <Spin spinning={isLoading} size="small">
+          <Switch
+            checked={status === 'active'}
+            onChange={(checked) => handleStatusToggle(record._id, checked)}
+            checkedChildren="On"
+            unCheckedChildren="Off"
+            disabled={isLoading}
+            size='small'
+          />
+        </Spin>
+      );
+    },
   },
   {
     title: 'View',
@@ -94,7 +105,7 @@ export const getGeneralStaffColumns = (handleView, handleVerify, handleEdit, han
           key: 'edit',
           label: 'Edit',
           icon: <EditOutlined />,
-          onClick: () => handleEdit(record),
+          onClick: () => navigate(`${EditGeneralStaffRoute}/${record._id}`),
         },
         {
           key: 'delete',

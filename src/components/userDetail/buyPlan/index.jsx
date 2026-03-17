@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select, DatePicker, Button, Card, InputNumber, Input, message } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext, useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useGetPlansQuery } from '../../../services/package';
 import { useGetBranchesQuery } from '../../../services/branches';
 import { useGetAllCouponQuery } from '../../../services/coupons';
 import { useGetEmployeeByCustomerQuery, useGetEmployeeQuery } from '../../../services/employee';
 import { useAddInvoiceMutation } from '../../../services/invoice';
+import { useUserDetailDataQuery } from '../../../services/user';
 import DateRangeSelector from '../../dateRange/DateRangeSelector';
 import ImagePicker from '../../../components/form/ImagePicker';
 import './styles.scss';
@@ -17,6 +18,8 @@ const { Option } = Select;
 const BuyPlan = () => {
   const { userData } = useOutletContext();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { refetch: refetchUserData } = useUserDetailDataQuery(id);
   const [form] = Form.useForm();
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -28,6 +31,7 @@ const BuyPlan = () => {
   const [paymentMode, setPaymentMode] = useState(''); // Keep for backward compatibility
   const [totalPaidAmount, setTotalPaidAmount] = useState(0);
   const [remainingAmount, setRemainingAmount] = useState(0);
+  const [paymentType, setPaymentType] = useState(''); // Track payment type
 
   // API hooks
   const { data: packagesData, isLoading: plansLoading } = useGetPlansQuery();
@@ -58,13 +62,13 @@ const BuyPlan = () => {
     }
     
     const priceAfterDiscount = Math.max(0, basePrice - discountAmt);
-    const gstAmount = isGstClaim ? (priceAfterDiscount * gstPercent) / 100 : 0;
-    const totalAmount = priceAfterDiscount + gstAmount;
+    // Note: GST will be calculated on paid amount, not on after discount amount
+    // This is handled in calculatePaymentAmounts function
     
     setDiscountAmount(discountAmt);
     form.setFieldsValue({
       afterDiscount: priceAfterDiscount,
-      totalOrderValue: totalAmount,
+      totalOrderValue: priceAfterDiscount, // Without GST for now
     });
   };
  
@@ -122,8 +126,17 @@ const BuyPlan = () => {
     setTotalPaidAmount(total);
     
     if (selectedPackage) {
-      const finalAmount = selectedPackage.pricing - discountAmount + (gstClaim ? ((selectedPackage.pricing - discountAmount) * gstPercentage) / 100 : 0);
-      setRemainingAmount(Math.max(0, finalAmount - total));
+      const afterDiscountAmount = selectedPackage.pricing - discountAmount;
+      
+      // User paid amount includes GST, extract base amount
+      // Base Amount = Total / 1.05
+      const baseAmount = total / 1.05;
+      
+      // Remaining balance = After Discount - Total Paid (full amount user paid)
+      // Company bears the GST, so we use the full paid amount
+      const remainingAmount = Math.max(0, afterDiscountAmount - total);
+      
+      setRemainingAmount(remainingAmount);
     }
   };
 
@@ -170,7 +183,7 @@ const BuyPlan = () => {
   const handleStartDateChange = (date) => {
     if (date && selectedPackage) {
       const startDate = dayjs(date);
-      const packageDuration = selectedPackage.duration || 365; // Default 1 year if no duration
+      const packageDuration = selectedPackage.numberOfDays || 365; // Use numberOfDays from API
       const endDate = startDate.add(packageDuration, 'days');
       
       form.setFieldsValue({
@@ -202,64 +215,100 @@ const BuyPlan = () => {
     setLoading(true);
     try {
       // Calculate dates
-      const startDate = values.paymentDate ? dayjs(values.paymentDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
-      const expiryDate = selectedPackage?.duration 
-        ? dayjs(startDate).add(selectedPackage.duration, 'days').format('YYYY-MM-DD')
-        : dayjs(startDate).add(365, 'days').format('YYYY-MM-DD'); // Default 1 year
+      const startDate = values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
+      const expiryDate = values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : 
+        (selectedPackage?.numberOfDays 
+          ? dayjs(startDate).add(selectedPackage.numberOfDays, 'days').format('YYYY-MM-DD')
+          : dayjs(startDate).add(365, 'days').format('YYYY-MM-DD')); // Default 1 year
+      const paymentDate = values.paymentDate ? dayjs(values.paymentDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
 
-      // Calculate amounts
+      // Calculate amounts - Paid amount includes GST
       const planPrice = selectedPackage?.pricing || 0;
       const discountAmt = discountAmount;
       const afterDiscountAmount = planPrice - discountAmt;
-      const gstAmount = gstClaim ? (afterDiscountAmount * gstPercentage) / 100 : 0;
-      const totalAmount = afterDiscountAmount + gstAmount;
+      // Extract base amount from paid amount (which includes GST)
+      const baseAmount = totalPaidAmount / 1.05;
+      const gstOnPaidAmount = totalPaidAmount - baseAmount;
+      const totalAmount = totalPaidAmount; // Already includes GST
 
-      // Create payment terms array based on selected payment mode
+      // Create payment terms array based on multiple payment modes
       const paymentTerms = [];
       
-      if (paymentMode === 'cash' && values.cashEmployee) {
-        paymentTerms.push({
-          modeOfPayment: 'cash',
-          amount: totalAmount,
-          receivedBy: values.cashEmployee,
-          receipt: []
-        });
-      } else if (paymentMode === 'upi' && values.upiScreenshot) {
-        paymentTerms.push({
-          modeOfPayment: 'upi',
-          amount: totalAmount,
-          receipt: [values.upiScreenshot],
-          referenceId: values.upiReferenceId || ''
-        });
-      } else if (paymentMode === 'card' && values.cardScreenshot) {
-        paymentTerms.push({
-          modeOfPayment: 'card',
-          amount: totalAmount,
-          receipt: [values.cardScreenshot]
-        });
-      } else if (paymentMode === 'cheque' && values.chequeNumber && values.bankName) {
-        paymentTerms.push({
-          modeOfPayment: 'cheque',
-          amount: totalAmount,
-          chequeNumber: values.chequeNumber,
-          bankName: values.bankName,
-          receipt: []
-        });
-      } else if (paymentMode === 'bank_transfer' && values.holderName && values.bankName && values.receiptName) {
-        paymentTerms.push({
-          modeOfPayment: 'netbanking',
-          amount: totalAmount,
-          bankHolderName: values.holderName,
-          bankName: values.bankName,
-          receiptNumber: values.receiptName
-        });
-      } else if (paymentMode === 'credit_note' && values.creditNoteAmount && values.creditNoteUpload) {
-        paymentTerms.push({
-          modeOfPayment: 'creditnote',
-          amount: values.creditNoteAmount,
-          receipt: [values.creditNoteUpload]
-        });
-      }
+      // Loop through all payment modes and create payment terms
+      paymentModes.forEach(payment => {
+        const mode = form.getFieldValue(`paymentMode_${payment.id}`);
+        const amount = form.getFieldValue(`paymentAmount_${payment.id}`) || 0;
+        
+        if (!mode || amount === 0) return; // Skip if mode not selected or amount is 0
+        
+        if (mode === 'cash') {
+          const cashEmployee = form.getFieldValue(`cashEmployee_${payment.id}`);
+          if (cashEmployee) {
+            paymentTerms.push({
+              modeOfPayment: 'cash',
+              amount: amount,
+              receivedBy: cashEmployee,
+              receipt: []
+            });
+          }
+        } else if (mode === 'upi') {
+          const upiScreenshot = form.getFieldValue(`upiScreenshot_${payment.id}`);
+          const upiReferenceId = form.getFieldValue(`upiReferenceId_${payment.id}`);
+          if (upiScreenshot) {
+            paymentTerms.push({
+              modeOfPayment: 'upi',
+              amount: amount,
+              receipt: [upiScreenshot],
+              referenceId: upiReferenceId || ''
+            });
+          }
+        } else if (mode === 'card') {
+          const cardScreenshot = form.getFieldValue(`cardScreenshot_${payment.id}`);
+          if (cardScreenshot) {
+            paymentTerms.push({
+              modeOfPayment: 'card',
+              amount: amount,
+              receipt: [cardScreenshot]
+            });
+          }
+        } else if (mode === 'cheque') {
+          const chequeNumber = form.getFieldValue(`chequeNumber_${payment.id}`);
+          const bankName = form.getFieldValue(`bankName_${payment.id}`);
+          if (chequeNumber && bankName) {
+            paymentTerms.push({
+              modeOfPayment: 'cheque',
+              amount: amount,
+              chequeNumber: chequeNumber,
+              bankName: bankName,
+              receipt: []
+            });
+          }
+        } else if (mode === 'bank_transfer') {
+          const holderName = form.getFieldValue(`holderName_${payment.id}`);
+          const accountNumber = form.getFieldValue(`accountNumber_${payment.id}`);
+          const ifscCode = form.getFieldValue(`ifscCode_${payment.id}`);
+          const transferScreenshot = form.getFieldValue(`transferScreenshot_${payment.id}`);
+          if (holderName && accountNumber && ifscCode) {
+            paymentTerms.push({
+              modeOfPayment: 'netbanking',
+              amount: amount,
+              bankHolderName: holderName,
+              accountNumber: accountNumber,
+              ifscCode: ifscCode,
+              receipt: transferScreenshot ? [transferScreenshot] : []
+            });
+          }
+        } else if (mode === 'credit_note') {
+          const creditNoteUpload = form.getFieldValue(`creditNoteUpload_${payment.id}`);
+          if (creditNoteUpload) {
+            paymentTerms.push({
+              modeOfPayment: 'creditnote',
+              amount: amount,
+              receipt: [creditNoteUpload]
+            });
+          }
+        }
+      });
 
       // Create the payload
       const payload = {
@@ -273,16 +322,18 @@ const BuyPlan = () => {
         afterDiscount: afterDiscountAmount,
         gstClaim: gstClaim,
         gstPercentage: gstPercentage,
-        gstAmount: gstAmount,
+        gstAmount: gstOnPaidAmount,
         gstNumber: values.gstNumber || null,
         registeredCompanyName: values.registeredCompanyName || null,
         totalInvoiceAmount: totalAmount,
+        dueAmount: paymentType === 'partial' ? remainingAmount : 0,
         paymentType: values.paymentType || 'full',
-        paymentDate: startDate,
+        paymentDate: paymentDate,
         paymentTerm: paymentTerms,
+        invoiceType: userData?.hasMembership ? 'renew' : 'new_client',
         coachId: null, // Can be added if coach selection is implemented
         lockerNumber: values.lockerNumber || null,
-        employeeId: values.salesPerson,
+        salesPersonId: values.salesPerson,
         details: selectedPackage?.items ? selectedPackage.items.map(item => ({
           itemName: item.name,
           quantity: item.quantity || 1,
@@ -290,11 +341,14 @@ const BuyPlan = () => {
         })) : []
       };
 
-      
+      // console.log('Invoice Payload:', payload);
       // Call the invoice API
       const result = await addInvoice(payload).unwrap();
       
-      message.success('Invoice created successfully!');
+      // message.success('Invoice created successfully!');
+      
+      // Refetch user data
+      await refetchUserData();
       
       form.resetFields();
       setSelectedPackage(null);
@@ -304,9 +358,7 @@ const BuyPlan = () => {
       setDiscountAmount(0);
       
       // Navigate to membership tab
-      // navigate(`/users/${userData._id}`, { 
-      //   state: { activeTab: 'membership' } 
-      // });
+      navigate(`/user-detail/${id}/membership`);
       
     } catch (error) {
     } finally {
@@ -405,7 +457,10 @@ const BuyPlan = () => {
             label="Payment Type"
             rules={[{ required: true, message: 'Please select payment type' }]}
           >
-            <Select placeholder="Select payment type">
+            <Select 
+              placeholder="Select payment type"
+              onChange={(value) => setPaymentType(value)}
+            >
               <Option value="fullPayment">Full Payment</Option>
               <Option value="partial">Partial Payment</Option>
             </Select>
@@ -539,9 +594,23 @@ const BuyPlan = () => {
                     {
                       validator: (_, value) => {
                         if (selectedPackage && value) {
-                          const finalAmount = selectedPackage.pricing - discountAmount + (gstClaim ? ((selectedPackage.pricing - discountAmount) * gstPercentage) / 100 : 0);
-                          if (totalPaidAmount > finalAmount) {
-                            return Promise.reject(new Error(`Total payment (₹${totalPaidAmount}) exceeds package amount (₹${finalAmount.toFixed(2)})`));
+                          // After discount amount is the maximum allowed
+                          const afterDiscountAmount = selectedPackage.pricing - discountAmount;
+                          
+                          // Recalculate total paid amount from form values
+                          const formValues = form.getFieldsValue();
+                          let calculatedTotal = 0;
+                          paymentModes.forEach(pm => {
+                            const amt = formValues[`paymentAmount_${pm.id}`] || 0;
+                            calculatedTotal += Number(amt);
+                          });
+                          
+                          // Amount entered includes GST, extract base amount
+                          const baseAmount = calculatedTotal / 1.05;
+                          
+                          // Allow a small tolerance for rounding (0.5 rupees)
+                          if (baseAmount > afterDiscountAmount + 0.5) {
+                            return Promise.reject(new Error(`Base amount (₹${baseAmount.toFixed(2)}) exceeds after discount amount (₹${afterDiscountAmount.toFixed(2)})`));
                           }
                         }
                         return Promise.resolve();
@@ -727,8 +796,8 @@ const BuyPlan = () => {
             </div>
           ))}
           
-          {/* Remaining Balance Display */}
-          {selectedPackage && (
+          {/* Remaining Balance Display - Only show for partial payment */}
+          {selectedPackage && paymentType === 'fullPayment' && (
             <div className="remaining-balance">
               <span className={`balance-text ${remainingAmount > 0 ? 'remaining' : 'complete'}`}>
                 <strong>Remaining Balance: ₹{remainingAmount.toFixed(2)}</strong>
@@ -755,33 +824,33 @@ const BuyPlan = () => {
               <span><strong>Price After Discount:</strong></span>
               <span>₹{selectedCoupon ? (selectedPackage.pricing - discountAmount).toFixed(2) : selectedPackage.pricing}</span>
             </div>
-            {/* {gstClaim && ( */}
+            {/* GST Breakdown - Amount includes GST */}
+            {totalPaidAmount > 0 && (
               <>
                 <div className="summary-row">
+                  <span><strong>Base Amount (without GST):</strong></span>
+                  <span>₹{(totalPaidAmount / 1.05).toFixed(2)}</span>
+                </div>
+                <div className="summary-row">
                   <span><strong>SGST (2.5%):</strong></span>
-                  <span>₹{(((selectedPackage.pricing - discountAmount) * 2.5) / 100).toFixed(2)}</span>
+                  <span>₹{((totalPaidAmount / 1.05) * 0.025).toFixed(2)}</span>
                 </div>
                 <div className="summary-row">
                   <span><strong>CGST (2.5%):</strong></span>
-                  <span>₹{(((selectedPackage.pricing - discountAmount) * 2.5) / 100).toFixed(2)}</span>
+                  <span>₹{((totalPaidAmount / 1.05) * 0.025).toFixed(2)}</span>
+                </div>
+                <div className="summary-row">
+                  <span><strong>Total Paid (with GST):</strong></span>
+                  <span>₹{totalPaidAmount.toFixed(2)}</span>
                 </div>
               </>
-            {/* )} */}
-            <div className="summary-row">
-              <span><strong>Final Total:</strong></span>
-              <span>₹{(
-                (selectedPackage.pricing - discountAmount) + 
-                (gstClaim ? ((selectedPackage.pricing - discountAmount) * gstPercentage) / 100 : 0)
-              ).toFixed(2)}</span>
-            </div>
-            <div className="summary-row">
-              <span><strong>Total Paid:</strong></span>
-              <span>₹{totalPaidAmount.toFixed(2)}</span>
-            </div>
-            <div className={`summary-row ${remainingAmount > 0 ? 'remaining-amount' : 'complete-amount'}`}>
-              <span><strong>Remaining Balance:</strong></span>
-              <span>₹{remainingAmount.toFixed(2)}</span>
-            </div>
+            )}
+            {paymentType === 'fullPayment' && (
+              <div className={`summary-row ${remainingAmount > 0 ? 'remaining-amount' : 'complete-amount'}`}>
+                <span><strong>Remaining Balance:</strong></span>
+                <span>₹{remainingAmount.toFixed(2)}</span>
+              </div>
+            )}
             {selectedPackage.description && (
               <div className="summary-row full-width">
                 <span><strong>Description:</strong> {selectedPackage.description}</span>

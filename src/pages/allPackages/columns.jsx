@@ -1,8 +1,9 @@
 import React from 'react';
 import { Tag, Button, Dropdown, Tooltip } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons';
+import { EditPackageRoute } from '../../routes/routepath';
 
-export const getPackageColumns = (handleView, handleEdit, handleDelete) => [
+export const getPackageColumns = (handleDelete, navigate) => [
   {
     title: 'Package Type',
     dataIndex: 'type',
@@ -100,7 +101,7 @@ export const getPackageColumns = (handleView, handleEdit, handleDelete) => [
           key: 'edit',
           label: 'Edit',
           icon: <EditOutlined />,
-          onClick: () => handleEdit(record),
+          onClick: () => navigate(`${EditPackageRoute}/${record._id}`),
         },
         {
           key: 'delete',

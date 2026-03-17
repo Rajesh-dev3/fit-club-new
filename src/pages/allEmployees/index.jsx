@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Dropdown, Image, Tag, Select } from "antd";
+import { Button, Input, Dropdown, Image, Tag, Select, message } from "antd";
 import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, CheckOutlined, EyeInvisibleOutlined, LockOutlined, HomeOutlined } from "@ant-design/icons";
 import { AddEmployeeRoute, EmployeeDetailAttendanceRoute, Home } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
@@ -12,17 +12,19 @@ import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
 import AddButton from "../../components/addButton";
 import CommonTable from '../../components/commonTable';
 import "./styles.scss";
-import { useGetEmployeeQuery } from "../../services/employee";
+import { useGetEmployeeQuery, useUpdateEmployeeStatusMutation } from "../../services/employee";
 import { getEmployeeColumns } from './columns';
 
 const AllEmployees = () => {
   const {data} = useGetEmployeeQuery()
+  const [updateEmployeeStatus] = useUpdateEmployeeStatusMutation();
 
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [searchText, setSearchText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [statusLoading, setStatusLoading] = useState(null);
   const [designationFilter, setDesignationFilter] = useState("all");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -43,7 +45,7 @@ const AllEmployees = () => {
   const isLoading = false;
 
   const handleView = (record) => {
-    navigate(`/employee-detail/${record.id}/${EmployeeDetailAttendanceRoute}`);
+    navigate(`/employee-detail/${record._id}/${EmployeeDetailAttendanceRoute}`);
   };
 
   const handleEdit = (record) => {
@@ -60,7 +62,22 @@ const AllEmployees = () => {
     setSelectedEmployee(record);
     setShowPasswordModal(true);
   };
-  const allColumns = getEmployeeColumns(handleView, handleEdit, handleDelete, handleChangePassword);
+  
+  const handleStatusToggle = async (record, checked) => {
+    setStatusLoading(record._id);
+    try {
+      const newStatus = checked ? 'ACTIVE' : 'INACTIVE';
+      await updateEmployeeStatus({ id: record._id, status: newStatus }).unwrap();
+      // message.success(`Employee status updated to ${newStatus}`);
+    } catch (error) {
+      // message.error('Failed to update employee status');
+      console.error('Error updating employee status:', error);
+    } finally {
+      setStatusLoading(null);
+    }
+  };
+  
+  const allColumns = getEmployeeColumns(handleView, handleEdit, handleDelete, handleChangePassword, navigate, handleStatusToggle, statusLoading);
    
  
 

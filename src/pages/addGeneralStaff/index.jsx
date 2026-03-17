@@ -101,7 +101,18 @@ const AddGeneralStaff = () => {
           </Form.Item>
 
           <Form.Item label="Select Role" name="role">
-            <Select placeholder="Select Role" showSearch optionFilterProp="children" options={rolesOptions} />
+            <Select placeholder="Select Role" showSearch optionFilterProp="children" options={[
+              { label: 'Housekeeping', value: 'Housekeeping' },
+              { label: 'Management', value: 'Management' },
+              { label: 'Care Taker', value: 'Care Taker' },
+              { label: 'Spotter', value: 'Spotter' },
+              { label: 'Guard', value: 'Guard' },
+              { label: 'Friends & Family', value: 'Friends & Family' },
+              { label: 'Electrician', value: 'Electrician' },
+              { label: 'Social Media', value: 'Social Media' },
+              { label: 'Sdafsd', value: 'Sdafsd' },
+              { label: 'Cafe', value: 'Cafe' },
+            ]} />
           </Form.Item>
         </div>
 

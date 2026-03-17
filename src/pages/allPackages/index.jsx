@@ -38,22 +38,12 @@ const AllPackages = () => {
   const packagesData = data?.data || [];
   const packages = Array.isArray(packagesData) ? packagesData : packagesData?.packages || [];
 
-  const handleView = (record) => {
-    // navigate(`/package-detail/${record.id}`);
-    console.log('View', record);
-  };
-
-  const handleEdit = (record) => {
-    // Navigate to edit page or open modal
-    console.log('Edit', record);
-  };
-
   const handleDelete = (record) => {
     // Delete logic
     console.log('Delete', record);
   };
 
-  const allColumns = getPackageColumns(handleView, handleEdit, handleDelete);
+  const allColumns = getPackageColumns(handleDelete, navigate);
 
   const filteredData = useMemo(() => {
     if (!packages || packages.length === 0) return [];

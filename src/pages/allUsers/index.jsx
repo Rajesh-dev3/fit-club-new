@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Table, Button, Dropdown, Tag, Select, Image } from "antd";
+import { useNavigate } from "react-router-dom";
 import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, HomeOutlined } from "@ant-design/icons";
 import { Home } from "../../routes/routepath";
 import CustomPagination from "../../components/pagination";
@@ -80,6 +81,8 @@ const AllUsers = () => {
     // TODO: Show confirmation modal and call delete API
   };
 
+  const navigate = useNavigate();
+
   const handleChangePassword = (record) => {
     console.log('Change password for user:', record);
     setSelectedUser(record);
@@ -92,7 +95,7 @@ const AllUsers = () => {
   };
 
   // Get columns with handlers
-  const columnsWithHandlers = getUserColumns(handleEdit, handleDelete, handleChangePassword);
+  const columnsWithHandlers = getUserColumns(handleEdit, handleDelete, handleChangePassword, navigate);
   
   // Use the actual API hook for all users
   const { data, isLoading } = useGetAllUserQuery({ page, limit });
@@ -102,6 +105,7 @@ const AllUsers = () => {
     if (!data?.users) return [];
     return data.users.map((user) => {
       const member = user.member || {};
+      const currentMembership = user.currentMembership || {};
       return {
         _id: user?._id,
         name: user.name,
@@ -109,16 +113,16 @@ const AllUsers = () => {
         phoneNumber: user.phoneNumber,
         assessmentRatio: '-',
         salesPerson: '-',
-        planName: member.membershipType || '-',
+        planName: currentMembership.planName || 'N/A',
         planPrice: '-',
         profile: member.photo,
         gender: member.gender || '-',
         status: user.status,
         invoiceStatus: '-',
-        remainingDays: member.expiryDate && member.joiningDate ? Math.max(0, Math.ceil((new Date(member.expiryDate) - new Date()) / (1000 * 60 * 60 * 24))) : '-',
+        remainingDays: currentMembership.expiryDate && currentMembership.startDate ? Math.max(0, Math.ceil((new Date(currentMembership.expiryDate) - new Date()) / (1000 * 60 * 60 * 24))) : '-',
         membershipForm: '-',
-        startDate: member.joiningDate ? new Date(member.joiningDate).toLocaleDateString() : '-',
-        endDate: member.expiryDate ? new Date(member.expiryDate).toLocaleDateString() : '-',
+        startDate: currentMembership.startDate ? new Date(currentMembership.startDate).toLocaleDateString() : '-',
+        endDate: currentMembership.expiryDate ? new Date(currentMembership.expiryDate).toLocaleDateString() : '-',
         gymKit: '-',
         // Pass planGymKit and deliveredSummary for gym kit functionality
         planGymKit: user.planGymKit,
@@ -174,14 +178,6 @@ const AllUsers = () => {
     setVisibleColumns(prev => ({ ...prev, [columnKey]: !prev[columnKey] }));
   };
 
-  // Pagination
-  const paginatedData = useMemo(() => {
-    if (!filteredData) return [];
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    return filteredData.slice(startIndex, endIndex);
-  }, [filteredData, page, limit]);
-
   return (
     <div className="all-users-page">
     
@@ -216,7 +212,7 @@ const AllUsers = () => {
       <div className="users-table-wrapper">
         <CommonTable
           columns={columns}
-          dataSource={paginatedData || []}
+          dataSource={filteredData || []}
           loading={isLoading}
           pagination={false}
           rowKey={(record) => record._id || record.id}
@@ -226,7 +222,7 @@ const AllUsers = () => {
       <CustomPagination
         current={page}
         pageSize={limit}
-        total={filteredData?.length || 0}
+        total={data?.total || 0}
         onPageChange={(newPage) => setPage(newPage)}
         onPageSizeChange={(newLimit) => {
           setLimit(newLimit);

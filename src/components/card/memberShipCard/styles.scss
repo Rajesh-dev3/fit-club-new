@@ -1,16 +1,32 @@
+.membership-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 10px;
+}
+
 .membership-card {
-  width: 340px;
-  border: 2px solid var(--accent);
+  width: 320px;
+  border: 1px solid var(--accent);
   border-radius: 18px;
   background: var(--card-bg);
   position: relative;
   overflow: hidden;
+  // min-height: 180px;
+  
   &:hover{
     transition: all 0.3s ease-in-out;
     cursor: pointer;
- box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
- transform: scale3d(1.01, 1.01, 1.01);
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    transform: scale3d(1.01, 1.01, 1.01);
+  }
 
+  &.collapsed {
+    height: fit-content;
+  }
+
+  &.expanded {
+    height: auto;
   }
 }
 
@@ -31,6 +47,66 @@
   span {
     color: var(--white);
     font-size: 18px;
+  }
+}
+
+/* Header - Collapsed View */
+.card-header-collapsed {
+  padding: 15px 11px 12px;
+  text-align: center;
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .logo {
+      max-width: 50%;
+      margin-bottom: 6px;
+    }
+
+    .branch-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sider-text);
+      margin: 0;
+      text-align: right;
+      width: 100%;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--accent);
+
+    .plan-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--sider-text);
+      margin: 0;
+    }
+
+    .view-btn {
+      background: #E8F4FF;
+      color: #1890ff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #d6ebff;
+      }
+    }
   }
 }
 
@@ -58,7 +134,8 @@
 
 /* Body */
 .card-body {
-  padding: 20px;
+  padding: 16px 10px 20px;
+  animation: slideDown 0.3s ease-in-out;
 
   .plan-title {
     font-size: 28px;
@@ -69,28 +146,61 @@
   }
 
   .info {
+    display: grid;
+    // gap: 10px;
+    
     p {
-      font-size: 18px;
-      margin: 6px 0;
+      font-size: 13px;
+      margin: 0;
       color: var(--sider-text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      
       strong {
         color: var(--sider-text);
-        font-weight: 700;
+        font-weight: 600;
+        min-width: 140px;
+      }
+      
+      span {
+        text-align: right;
+        flex: 1;
+        color: #999;
+      }
+
+      &:last-child {
+        border-bottom: none;
       }
     }
   }
 
   .freeze {
-    margin-top: 24px;
+    margin-top: 20px;
+    // padding-top: 16px;
+    border-top: 1px solid var(--accent);
     text-align: center;
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     color: var(--sider-text);
 
     .arrow {
       display: block;
-      font-size: 26px;
+      font-size: 20px;
       margin-top: 4px;
     }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
   }
 }

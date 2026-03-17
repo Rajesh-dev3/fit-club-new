@@ -1,0 +1,273 @@
+import React, { useMemo, useEffect } from "react";
+import { Form, Input, Select, Button, message, Spin } from "antd";
+import { DeleteOutlined, HomeOutlined } from "@ant-design/icons";
+import ImagePicker from "../../components/form/ImagePicker";
+import "./styles.scss";
+import { useGetRolesQuery } from "../../services/role";
+import { useGetGeneralStaffDetailQuery, useUpdateGeneralStaffMutation } from "../../services/generalStaff";
+import { useGetBranchesQuery } from "../../services/branches";
+import PageBreadcrumb from "../../components/breadcrumb";
+import { Home, AllGeneralStaffRoute } from "../../routes/routepath";
+import { useNavigate, useParams } from "react-router-dom";
+
+const EditGeneralStaff = () => {
+  const [form] = Form.useForm();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { data: rolesData } = useGetRolesQuery();
+  const { data: branchesData } = useGetBranchesQuery();
+  const { data: staffData, isLoading: isLoadingStaff, error: staffError } = useGetGeneralStaffDetailQuery(id);
+  const [updateGeneralStaff, { isLoading: updating }] = useUpdateGeneralStaffMutation();
+
+  const rolesOptions = useMemo(() => {
+    if (rolesData && Array.isArray(rolesData.data) && rolesData.data.length) {
+      return rolesData.data.map((r) => ({ label: r.name, value: r._id }));
+    }
+    return [];
+  }, [rolesData]);
+
+  const branchOptions = useMemo(() => {
+    if (!branchesData || !Array.isArray(branchesData.data)) return [];
+    return branchesData.data.map((b) => ({
+      label: `${b.name}${b.branchArea ? ` — ${b.branchArea}` : ''}`,
+      value: b.branchId ?? b._id,
+    }));
+  }, [branchesData]);
+
+  // Populate form with staff data
+  useEffect(() => {
+    if (staffData && staffData.data) {
+      const data = staffData.data;
+      const user = data.user;
+      
+      form.setFieldsValue({
+        name: user.name,
+        phone: user.phoneNumber,
+        role: data.department,
+        address: data.address,
+        idType: data.idType,
+        idNumber: data.idNumber,
+        passportNumber: data.passportNumber,
+        nationality: data.nationality,
+        idFront: data.idFront,
+        idBack: data.idBack,
+        branchId: user.branchIds ? user.branchIds.map(b => b.branchId || b._id) : [],
+        photo: data.photo,
+      });
+    }
+  }, [staffData, form]);
+
+  const handleUpdateGeneralStaff = async (values) => {
+    const payload = {
+      name: values.name,
+      phoneNumber: values.phone,
+      department: values.role || null,
+      employeeType: 'general-staff',
+      address: values.address,
+      idType: values.idType,
+      idNumber: values.idNumber,
+      idFront: values.idFront,
+      idBack: values.idBack,
+      branchIds: values.branchId,
+      photo: values.photo,
+    };
+
+    if (values.passportNumber) payload.passportNumber = values.passportNumber;
+    if (values.nationality) payload.nationality = values.nationality;
+
+    Object.keys(payload).forEach((k) => {
+      if (payload[k] === undefined || payload[k] === null || payload[k] === '') delete payload[k];
+    });
+
+    try {
+      const res = await updateGeneralStaff({ id, body: payload }).unwrap();
+      if (res && res.success) {
+        message.success('General Staff updated successfully');
+        navigate(AllGeneralStaffRoute);
+      }
+    } catch (err) {
+      console.error('Update general staff failed', err);
+      message.error('Failed to update general staff');
+    }
+  };
+
+  if (isLoadingStaff) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px' }}>
+        <Spin size="large" />
+        <p>Loading staff data...</p>
+      </div>
+    );
+  }
+
+  if (staffError) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px' }}>
+        <p style={{ color: 'red' }}>Error loading staff data. Please try again.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="general-staff-page">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <h2 style={{ margin: 0 }}>Edit General Staff</h2>
+
+        <PageBreadcrumb
+          items={[
+            { label: <HomeOutlined />, to: Home, icon: null },
+            { label: "EMPLOYEE MANAGEMENT", to: Home, icon: null },
+            { label: "Edit General Staff" },
+          ]}
+        />
+      </div>
+
+      <Form form={form} layout="vertical" className="general-staff-form" onFinish={handleUpdateGeneralStaff}>
+        <div className="row">
+          <Form.Item label="Staff Name" name="name">
+            <Input placeholder="Staff Name" />
+          </Form.Item>
+
+          <Form.Item label="Phone No." name="phone">
+            <Input placeholder="Phone No." />
+          </Form.Item>
+
+          <Form.Item label="Address" name="address">
+            <Input placeholder="Address" />
+          </Form.Item>
+
+          <Form.Item label="Select Role" name="role">
+            <Select placeholder="Select Role" showSearch optionFilterProp="children" options={[
+              { label: 'Housekeeping', value: 'Housekeeping' },
+              { label: 'Management', value: 'Management' },
+              { label: 'Care Taker', value: 'Care Taker' },
+              { label: 'Spotter', value: 'Spotter' },
+              { label: 'Guard', value: 'Guard' },
+              { label: 'Friends & Family', value: 'Friends & Family' },
+              { label: 'Electrician', value: 'Electrician' },
+              { label: 'Social Media', value: 'Social Media' },
+              { label: 'Sdafsd', value: 'Sdafsd' },
+              { label: 'Cafe', value: 'Cafe' },
+            ]} />
+          </Form.Item>
+        </div>
+
+        <div className="row">
+          <Form.Item label="Upload Your Photo" name="photo">
+            <ImagePicker form={form} name="photo" />
+          </Form.Item>
+
+          <Form.Item name="idType" label="ID Type">
+            <Select placeholder="Select ID Type" options={[
+              { label: 'Aadhar Card', value: 'aadhar' },
+              { label: 'Passport', value: 'passport' },
+              { label: 'Driving Licence', value: 'driving_license' },
+              { label: 'PAN Card', value: 'pan' },
+            ]} />
+          </Form.Item>
+
+          <Form.Item noStyle shouldUpdate={(prev, cur) => prev.idType !== cur.idType}>
+            {({ getFieldValue }) => {
+              const idType = getFieldValue('idType');
+              if (!idType) return null;
+
+              const idField = (() => {
+                if (idType === 'passport') {
+                  return (
+                    <>
+                      <Form.Item name="passportNumber" label="Passport Number" rules={[{ required: true, message: 'Please enter passport number' }]}> 
+                        <Input placeholder="Enter passport number" />
+                      </Form.Item>
+
+                      <Form.Item name="nationality" label="Nationality" rules={[{ required: true, message: 'Please enter nationality' }]}> 
+                        <Input placeholder="Enter nationality" />
+                      </Form.Item>
+                    </>
+                  );
+                }
+
+                if (idType === 'aadhar') {
+                  return (
+                    <Form.Item name="idNumber" label="Aadhar Number" rules={[{ required: true, message: 'Please enter Aadhar number' }]}> 
+                      <Input placeholder="Enter Aadhar number" />
+                    </Form.Item>
+                  );
+                }
+
+                if (idType === 'driving_license') {
+                  return (
+                    <Form.Item name="idNumber" label="Driving Licence Number" rules={[{ required: true, message: 'Please enter driving licence number' }]}> 
+                      <Input placeholder="Enter driving licence number" />
+                    </Form.Item>
+                  );
+                }
+
+                if (idType === 'pan') {
+                  return (
+                    <Form.Item name="idNumber" label="PAN Number" rules={[{ required: true, message: 'Please enter PAN number' }]}> 
+                      <Input placeholder="Enter PAN number" />
+                    </Form.Item>
+                  );
+                }
+
+                return (
+                  <Form.Item name="idNumber" label="ID Number">
+                    <Input placeholder="Enter ID number" />
+                  </Form.Item>
+                );
+              })();
+
+              return (
+                <>
+                  {idField}
+                  <div className="row id-images-row">
+                    <Form.Item name="idFront" label="ID Front">
+                      <ImagePicker form={form} name="idFront" />
+                    </Form.Item>
+
+                    <Form.Item name="idBack" label="ID Back">
+                      <ImagePicker form={form} name="idBack" />
+                    </Form.Item>
+                  </div>
+                </>
+              );
+            }}
+          </Form.Item>
+        </div>
+
+        <div className="branch-row">
+          <Form.Item label="Select Branch(es)" name="branchId" className="branch-select">
+            <Select
+              mode="multiple"
+              placeholder="Select Branch(es)"
+              showSearch
+              optionFilterProp="label"
+              allowClear
+              options={branchOptions}
+            />
+          </Form.Item>
+        </div>
+
+        <div className="footer-buttons">
+          <Button className="delete-btn" onClick={() => form.resetFields()}>
+            <DeleteOutlined /> RESET
+          </Button>
+
+          <Button className="save-btn" type="primary" htmlType="submit" loading={updating}>
+            UPDATE
+          </Button>
+        </div>
+      </Form>
+    </div>
+  );
+};
+
+export default EditGeneralStaff;

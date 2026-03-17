@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { Home as HomePath } from "../../routes/routepath";
+import { Link, useNavigate } from "react-router-dom";
+import { Home as HomePath, AllUsersRoute } from "../../routes/routepath";
 import { HomeOutlined } from "@ant-design/icons";
 import countryStateList from "../../data/countryStateList.json";
 import {
@@ -35,6 +35,7 @@ const defaultValues = {};
 
 const AddUser = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [tokens, setTokens] = useState({});
   const [form] = Form.useForm();
   const [imageUplaoder,{data:imageUplaodResponse}]= useImageUploadMutation()
@@ -50,6 +51,7 @@ const [trigger,{data}] = useAdduserMutation();
       return "IN";
     }
   });
+  // console.log(form,"form")
 
   // attach users will be loaded from the API
   const { data: attachUsersData } = useGetAttachUserListQuery();
@@ -140,45 +142,86 @@ const [trigger,{data}] = useAdduserMutation();
       name: values.name,
       email: values.email,
       phoneNumber: values.phoneNumber,
+      // status: "ACTIVE",
+      branchIds: values.branchId ? [values.branchId] : [],
+      
+      dob: values.dob ? values.dob.format('YYYY-MM-DD') : null,
+      age: values.age || null,
+      gender: values.gender,
+      address: values.address,
+      stateName: values.stateName,
+      zipCode: values.zipCode || null,
+      nationality: values.nationality,
+      maritalStatus: values.maritalStatus,
+      anniversaryDate: values.anniversaryDate ? values.anniversaryDate.format('YYYY-MM-DD') : null,
       countryCode: values.countryCode || selectedCountry,
       alternativePhoneNumber: values.alternativePhoneNumber,
-      address: values.address,
-      age: values.age,
-      // Send age directly in the `dob` field (as requested) instead of the date string
-      dob: values.age != null ? values.age : (values.dob ? values.dob.toISOString() : null),
-      idNumber: values.idNumber,
+      
       photo: values.photo,
-      gender: values.gender,
-      work: values.work || values.designation || null,
-      stateName: values.stateName,
-      designation: values.designation,
-      emergencyCall: values.emergencyCall,
-      emergencyName: values.emergencyName,
-      hearAbout: values.heardFrom || values.hearAbout,
-      referred: values.referredBy || values.referred,
       height: values.height,
       weight: values.weight,
+      bmi: values.bmiNote || null,
       bmiMeasurement: values.bmiMeasurement,
-      branchId: values.branchId,
       medicalHistory: values.medicalHistory,
-      maritalStatus: values.maritalStatus,
-      // send anniversary as duration in years (like age)
-      anniversaryDate: values.anniversaryDate ? dayjs().diff(values.anniversaryDate, 'year') : null,
+      
       idType: values.idType,
-      nationality: values.nationality,
+      idNumber: values.idNumber,
+      idFront: values.idFront,
+      idBack: values.idBack,
+      
+      emergencyContactName: values.emergencyName,
+      emergencyContactNumber: values.emergencyCall,
+      
+      work: values.work || values.designation || null,
+      companyName: values.companyName,
+      
+      hearAbout: values.heardFrom || values.hearAbout,
+      referred: values.referredBy || values.referred,
+      canTransfer: false,
+      delivered: "Undelivered",
+      
+      assessmentStatus: "pending",
+      
+      assignedTrainer: null,
+      healthInfo: {
+        bloodGroup: values.bloodGroup || null,
+        medicalConditions: values.medicalHistory ? [values.medicalHistory] : [],
+        allergies: [],
+        emergencyContact: {
+          name: values.emergencyName || null,
+          relation: values.emergencyRelation || null,
+          phoneNumber: values.emergencyCall || null,
+        }
+      },
+      fitnessGoals: {
+        primary: values.fitnessGoalPrimary || null,
+        targetWeight: values.targetWeight || null,
+        notes: values.fitnessNotes || null,
+      },
+      
       userType: values.userType || 'user',
       password: values.password,
       attachedToPhoneNumber: values.attachedToPhoneNumber || null,
     };
 
+    // Remove null/undefined values
+    Object.keys(payload).forEach((key) => {
+      if (payload[key] === null || payload[key] === undefined || payload[key] === '') {
+        delete payload[key];
+      }
+    });
+
+    console.log('Add user payload:', payload);
+
     try {
       const res = await trigger(payload).unwrap();
       console.log('Add user response:', res);
-      message.success('User added successfully');
+      // message.success('User added successfully');
       form.resetFields();
+      navigate(AllUsersRoute);
     } catch (err) {
       console.error('Add user failed', err);
-      message.error('Failed to add user');
+      // message.error('Failed to add user');
     }
   };
 

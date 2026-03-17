@@ -1,7 +1,7 @@
 import { Image, Tag, Button, Dropdown, Select, Modal, Form, InputNumber, DatePicker, Input } from "antd";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { EditOutlined, DeleteOutlined, MoreOutlined, EyeOutlined, KeyOutlined } from "@ant-design/icons";
-import { UserDetailAttendanceRoute, ViewFormRoute } from "../../routes/routepath";
+import { UserDetailAttendanceRoute, ViewFormRoute, EditUserRoute } from "../../routes/routepath";
 import { useState } from 'react';
 import React from 'react';
 import { useAssignGymKitMutation } from "../../services/user";
@@ -366,7 +366,7 @@ const getallColumns = () => [
     width: 150,
     render: (value) => (
       <Select
-        placeholder="Select Trainer"
+        placeholder="Select sales person"
         options={dummyTrainers}
         style={{ width: '100%' }}
         value={value && dummyTrainers.some(t => t.value === value) ? value : undefined}
@@ -394,9 +394,14 @@ const getallColumns = () => [
   { title: 'Start Date', dataIndex: 'startDate', key: 'startDate', width: 120 },
   { title: 'End Date', dataIndex: 'endDate', key: 'endDate', width: 120 },
   { title: 'Gym Kit', key: 'gymKit', width: 200, render: (_, record) => <GymKitSelect record={record} /> },
-  { title: 'Actions', key: 'actions', width: 100, align: 'center', render: (_, record) => {
+  { title: 'Actions', key: 'actions', width: 100, align: 'center', render: (_, record, navigate) => {
     const menuItems = [
-      { key: 'edit', label: 'Edit', icon: <EditOutlined />, onClick: () => handleEdit && handleEdit(record) },
+      { 
+        key: 'edit', 
+        label: 'Edit', 
+        icon: <EditOutlined />,
+        onClick: () => navigate && navigate(`${EditUserRoute}/${record._id}`)
+      },
       { key: 'changePassword', label: 'Change Password', icon: <KeyOutlined />, onClick: () => handleChangePassword && handleChangePassword(record) },
       { key: 'delete', label: 'Delete', icon: <DeleteOutlined />, danger: true, onClick: () => handleDelete && handleDelete(record) },
     ];
@@ -408,7 +413,7 @@ const getallColumns = () => [
   } },
 ];
 
-const getUserColumns = (handleEdit, handleDelete, handleChangePassword) => {
+const getUserColumns = (handleEdit, handleDelete, handleChangePassword, navigate) => {
   const allColumns = getallColumns();
   return allColumns.map(col => {
     if (col.key === 'actions') {
@@ -416,7 +421,12 @@ const getUserColumns = (handleEdit, handleDelete, handleChangePassword) => {
         ...col,
         render: (_, record) => {
           const menuItems = [
-            { key: 'edit', label: 'Edit', icon: <EditOutlined />, onClick: () => handleEdit && handleEdit(record) },
+            { 
+              key: 'edit', 
+              label: 'Edit', 
+              icon: <EditOutlined />,
+              onClick: () => navigate(`${EditUserRoute}/${record._id}`)
+            },
             { key: 'changePassword', label: 'Change Password', icon: <KeyOutlined />, onClick: () => handleChangePassword && handleChangePassword(record) },
             { key: 'delete', label: 'Delete', icon: <DeleteOutlined />, danger: true, onClick: () => handleDelete && handleDelete(record) },
           ];

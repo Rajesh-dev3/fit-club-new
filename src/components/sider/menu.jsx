@@ -19,7 +19,7 @@ import {
   AppstoreOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { AddEmployeeRoute, AddGeneralStaffRoute, AddRoleRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AllRolesRoute, AllTrainersRoute, AllDirectorsRoute, Home, AllUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, AllPackagesRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, AllBranchesRoute, AddBranchRoute, AllCouponsRoute, AddCouponRoute, AllFeedbacksRoute, AddBiometricRoute, AllBiometricsRoute, AllInventoryRoute, AddInventoryRoute } from '../../routes/routepath';
+import { AddEmployeeRoute, AddGeneralStaffRoute, AddRoleRoute, AddUserRoute, AllEmployeesRoute, AllGeneralStaffRoute, AllRolesRoute, AllTrainersRoute, AllDirectorsRoute, Home, AllUsersRoute, AllAddOnsUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, AllPackagesRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, AllBranchesRoute, AddBranchRoute, AllCouponsRoute, AddCouponRoute, AllFeedbacksRoute, AddBiometricRoute, AllBiometricsRoute, AllInventoryRoute, AddInventoryRoute } from '../../routes/routepath';
 
 const items = [
   {
@@ -93,7 +93,7 @@ const items = [
     children: [
       { key: '9-1', label: <Link to={AllUsersRoute}>All Users</Link> },
       { key: '9-2', label: <Link to={AddUserRoute}>Add User</Link> },
-      { key: '9-3', label: "All Add-On's Users" },
+      { key: '9-3', label: <Link to={AllAddOnsUsersRoute}>All Add-On's Users</Link> },
       { key: '9-4', label: 'user-assissment' },
       { key: '9-5', label: 'Activity Log' },
       { key: '9-6', label: 'Blacklist User' },

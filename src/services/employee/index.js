@@ -37,10 +37,26 @@ export const employee = createApi({
       }),
       providesTags: ['Employee'],
     }),
+    updateEmployee: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/employees/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ['Employee'],
+    }),
+    updateEmployeeStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/employees/${id}/status`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ['Employee'],
+    }),
   
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useAddEmployeeMutation,useGetEmployeeQuery,useGetEmployeeDetailQuery,useGetEmployeeByCustomerQuery } = employee
+export const { useAddEmployeeMutation,useGetEmployeeQuery,useGetEmployeeDetailQuery,useGetEmployeeByCustomerQuery,useUpdateEmployeeMutation, useUpdateEmployeeStatusMutation } = employee

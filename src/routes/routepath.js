@@ -5,6 +5,10 @@ const AddBiometricRoute = "/add-biometric"
 const AllBiometricsRoute = "/all-biometrics"
 const Home = "/"
 const AddUserRoute = "/add-user"
+const EditUserRoute = "/edit-user"
+const EditEmployeeRoute = "/edit-employee"
+const EditGeneralStaffRoute = "/edit-general-staff"
+const EditTrainerRoute = "/edit-trainer"
 const AddEmployeeRoute = "/add-employee"
 const AllEmployeesRoute = "/all-employees"
 const AllGeneralStaffRoute = "/all-general-staff"
@@ -18,6 +22,7 @@ const AddDirectorRoute = "/add-director"
 const EditDirectorRoute = "/edit-director"
 const AllPackagesRoute = "/all-packages"
 const AddPackageRoute = "/add-package"
+const EditPackageRoute = "/edit-package"
 const AllAddOnSlotsRoute = "/all-add-on-slots"
 const AddAddOnSlotRoute = "/add-add-on-slot"
 const userFeedbackRoute = "/user-feedback"
@@ -48,6 +53,7 @@ const GeneralStaffAttendanceRoute = "/general-staff-attendance"
 const ViewFormRoute = "/view-form"
 const loginRoute = "/login"
 const AllUsersRoute = "/all-users"
+const AllAddOnsUsersRoute = "/all-add-ons-users"
 
 // Employee Detail Routes
 const EmployeeDetailAttendanceRoute = "/attendance"
@@ -99,11 +105,11 @@ const DirectorAttendancePageRoute = "/attendance"
 const DirectorBiometricAccessPageRoute = "/biometric-access"
 const EditRoleRoute = "/edit-role"
 
-export {EditDirectorRoute, EditRoleRoute, Home, AddUserRoute, AddEmployeeRoute,
+export {EditDirectorRoute, EditRoleRoute, Home, AddUserRoute, EditUserRoute, EditEmployeeRoute, EditGeneralStaffRoute, EditTrainerRoute, AddEmployeeRoute,
      AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, 
      AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, 
-     AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, AllAddOnSlotsRoute,
-      AddAddOnSlotRoute, AllAddOnPackagesRoute, AddAddOnPackageRoute, AllUsersRoute,
+     AllDirectorsRoute, AddDirectorRoute, AllPackagesRoute, AddPackageRoute, EditPackageRoute, AllAddOnSlotsRoute,
+      AddAddOnSlotRoute, AllAddOnPackagesRoute, AddAddOnPackageRoute, AllUsersRoute, AllAddOnsUsersRoute,
        DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, ViewFormRoute, loginRoute, EmployeeDetailRoute,
         EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute,
          EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, 

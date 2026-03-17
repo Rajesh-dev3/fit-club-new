@@ -1,8 +1,9 @@
 import React from 'react';
-import { Image, Tag, Button, Dropdown } from 'antd';
+import { Image, Tag, Button, Dropdown, Switch } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, MoreOutlined, KeyOutlined } from '@ant-design/icons';
+import { EditEmployeeRoute } from '../../routes/routepath';
 
-export const getEmployeeColumns = (handleView, handleEdit, handleDelete, handleChangePassword) => [
+export const getEmployeeColumns = (handleView, handleEdit, handleDelete, handleChangePassword, navigate, handleStatusToggle, statusLoading) => [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -63,10 +64,15 @@ export const getEmployeeColumns = (handleView, handleEdit, handleDelete, handleC
     key: 'status',
     width: 100,
     align: 'center',
-    render: (status) => (
-      <Tag color={status === 'active' ? 'green' : 'red'}>
-        {status === 'active' ? 'ACTIVE' : 'INACTIVE'}
-      </Tag>
+    render: (status, record) => (
+      <Switch
+        checked={status === 'active'}
+        loading={statusLoading === record._id}
+        onChange={(checked) => handleStatusToggle(record, checked)}
+        checkedChildren="On"
+        unCheckedChildren="Off"
+        size='small'
+      />
     ),
   },
   {
@@ -93,7 +99,7 @@ export const getEmployeeColumns = (handleView, handleEdit, handleDelete, handleC
           key: 'edit',
           label: 'Edit',
           icon: <EditOutlined />,
-          onClick: () => handleEdit(record),
+          onClick: () => navigate(`${EditEmployeeRoute}/${record._id}`),
         },
         {
           key: 'changePassword',

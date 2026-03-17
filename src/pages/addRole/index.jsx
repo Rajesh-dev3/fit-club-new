@@ -97,7 +97,7 @@ const AddRole = () => {
           return {
             key: menuItem.key,
             label: menuItem.label,
-            permission: menuItem.permission,
+            permission: menuItem.permission || 'USERS_READ', // Default permission if not provided
           };
         }
         
@@ -108,7 +108,7 @@ const AddRole = () => {
             return {
               key: found.key,
               label: found.label,
-              permission: found.permission,
+              permission: found.permission || 'USERS_READ', // Default permission if not provided
             };
           }
         }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select, DatePicker, Button, Card, InputNumber, Input, message } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext, useNavigate, useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useGetAllCouponQuery } from '../../../services/coupons';
 import { useGetEmployeeByCustomerQuery } from '../../../services/employee';
@@ -22,6 +22,7 @@ const typeOptions = [
 const BuyAddOnService = () => {
   const { userData } = useOutletContext();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [gstClaim, setGstClaim] = useState(false);
@@ -148,6 +149,19 @@ const BuyAddOnService = () => {
   useEffect(() => {
     calculatePaymentAmounts();
   }, [planPrice, discountAmount, gstClaim, paymentModes.length]);
+
+  // Pre-populate service type from URL parameter
+  useEffect(() => {
+    const serviceType = searchParams.get('type');
+    if (serviceType) {
+      const serviceLabel = typeOptions.find(opt => opt.value === serviceType)?.label;
+      if (serviceLabel) {
+        form.setFieldsValue({
+          addOnServiceType: serviceLabel,
+        });
+      }
+    }
+  }, [searchParams, form]);
 
   // Handle coupon selection
   const handleCouponChange = (couponId) => {
@@ -417,20 +431,6 @@ const BuyAddOnService = () => {
         </div>
 
         <div className="row">
-          <Form.Item
-            name="packageType"
-            label="Package Type"
-            rules={[{ required: true, message: 'Please select package type' }]}
-          >
-            <Select placeholder="Select package type">
-              {typeOptions.map(option => (
-                <Option key={option.value} value={option.value}>
-                  {option.label}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
           <Form.Item
             name="paymentType"
             label="Payment Type"

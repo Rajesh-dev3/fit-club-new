@@ -1,8 +1,9 @@
 import React from 'react';
-import { Image, Tag, Button, Dropdown } from 'antd';
+import { Image, Tag, Button, Dropdown, Switch } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, CheckOutlined, MoreOutlined } from '@ant-design/icons';
+import { EditTrainerRoute } from '../../routes/routepath';
 
-export const getTrainerColumns = (handleView, handleVerify, handleEdit, handleDelete) => [
+export const getTrainerColumns = (handleView, handleVerify, handleEdit, handleDelete, navigate, handleStatusToggle, statusLoading) => [
   {
     title: 'Branch Name',
     dataIndex: 'branches',
@@ -71,10 +72,15 @@ export const getTrainerColumns = (handleView, handleVerify, handleEdit, handleDe
     key: 'status',
     width: 100,
     align: 'center',
-    render: (status) => (
-      <Tag color={status === 'active' ? 'green' : 'red'}>
-        {status === 'active' ? 'ACTIVE' : 'INACTIVE'}
-      </Tag>
+    render: (status, record) => (
+      <Switch
+        checked={status === 'active'}
+        loading={statusLoading === record._id}
+        onChange={(checked) => handleStatusToggle(record, checked)}
+        checkedChildren="On"
+        unCheckedChildren="Off"
+        size='small'
+      />
     ),
   },
   {
@@ -107,7 +113,7 @@ export const getTrainerColumns = (handleView, handleVerify, handleEdit, handleDe
           key: 'edit',
           label: 'Edit',
           icon: <EditOutlined />,
-          onClick: () => handleEdit(record),
+          onClick: () => navigate(`${EditTrainerRoute}/${record._id}`),
         },
         {
           key: 'delete',

@@ -27,6 +27,22 @@ export const generalStaffApi = createApi({
       }),
       invalidatesTags: ['GeneralStaff'],
     }),
+    updateGeneralStaff: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/general-staff/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['GeneralStaff'],
+    }),
+    updateGeneralStaffStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/general-staff/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      invalidatesTags: ['GeneralStaff'],
+    }),
     staffType: builder.query({
       query: (body) => ({
         url: '/staff-types',
@@ -37,4 +53,4 @@ export const generalStaffApi = createApi({
   }),
 });
 
-export const { useGetGeneralStaffQuery, useAddGeneralStaffMutation, useStaffTypeQuery, useGetGeneralStaffDetailQuery } = generalStaffApi;
+export const { useGetGeneralStaffQuery, useAddGeneralStaffMutation, useStaffTypeQuery, useGetGeneralStaffDetailQuery, useUpdateGeneralStaffMutation, useUpdateGeneralStaffStatusMutation } = generalStaffApi;

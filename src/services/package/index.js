@@ -6,6 +6,7 @@ import { dynamicBaseQuery } from "../badRequestHandler"
 export const plans = createApi({
   reducerPath: 'plans',
   baseQuery: dynamicBaseQuery,
+  tagTypes: ['Plans'],
   endpoints: (builder) => ({
     addPlan: builder.mutation({
       query: (body) => ({
@@ -13,6 +14,7 @@ export const plans = createApi({
         method: "POST",
         body
       }),
+      invalidatesTags: ['Plans'],
     }),
     getPlans: builder.query({
       query: (body) => ({
@@ -20,6 +22,29 @@ export const plans = createApi({
         method: "GET",
         body
       }),
+      providesTags: ['Plans'],
+    }),
+    getPlanDetail: builder.query({
+      query: (id) => ({
+        url: `/plans/${id}`,
+        method: "GET",
+      }),
+      providesTags: ['Plans'],
+    }),
+    updatePlan: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/plans/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ['Plans'],
+    }),
+    getUpgradablePlans: builder.query({
+      query: ({ userId }) => ({
+        url: `/plans/upgradable/${userId}`,
+        method: "GET",
+      }),
+      providesTags: ['Plans'],
     }),
   
 
@@ -28,4 +53,4 @@ export const plans = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useAddPlanMutation,useGetPlansQuery } = plans
+export const { useAddPlanMutation,useGetPlansQuery,useGetPlanDetailQuery,useUpdatePlanMutation,useGetUpgradablePlansQuery } = plans

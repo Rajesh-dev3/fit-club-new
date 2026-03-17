@@ -52,6 +52,15 @@ export const user = createApi({
       }),
       invalidatesTags: ["user"]
     }),
+    
+    updateUser: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/users/${id}/member`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["user"]
+    }),
   
    
   }),
@@ -59,4 +68,4 @@ export const user = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useUserDetailDataQuery,useAdduserMutation, useGetAttachUserListQuery,useGetAllUserQuery, useAssignGymKitMutation } = user
+export const { useUserDetailDataQuery,useAdduserMutation, useGetAttachUserListQuery,useGetAllUserQuery, useAssignGymKitMutation, useUpdateUserMutation } = user

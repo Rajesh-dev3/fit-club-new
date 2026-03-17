@@ -12,9 +12,10 @@ import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
 import AddButton from "../../components/addButton";
 // ...existing code...
 import "./styles.scss";
-import { useGetGeneralStaffQuery } from "../../services/generalStaff";
+import { useGetGeneralStaffQuery, useUpdateGeneralStaffStatusMutation } from "../../services/generalStaff";
 import GeneralStaffAttendance from "../../components/generalStaffDetail/attendance";
 import CommonTable from "../../components/commonTable";
+
 
 const AllGeneralStaff = () => {
   const navigate = useNavigate();
@@ -34,8 +35,10 @@ const AllGeneralStaff = () => {
   });
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(null);
   
   const { data: staffData, isLoading } = useGetGeneralStaffQuery({ employeeType: 'general-staff', page, limit });
+  const [updateGeneralStaffStatus] = useUpdateGeneralStaffStatusMutation();
 
   // Handler functions must be defined before being used
   const handleView = (record) => {
@@ -64,11 +67,25 @@ const AllGeneralStaff = () => {
     setIsPasswordModalVisible(true);
   };
 
+  const handleStatusToggle = async (id, checked) => {
+    setStatusLoading(id);
+    try {
+      const status = checked ? 'ACTIVE' : 'INACTIVE';
+      await updateGeneralStaffStatus({ id, status }).unwrap();
+      // message.success(`Status updated to ${status} successfully`);
+    } catch (error) {
+      // message.error('Failed to update status');
+      console.error('Status update error:', error);
+    } finally {
+      setStatusLoading(null);
+    }
+  };
+
   // Get columns with handlers
-  const columns = getGeneralStaffColumns(handleView, handleVerify, handleEdit, handleDelete, handleChangePassword).filter(col => visibleColumns[col.key]);
+  const columns = getGeneralStaffColumns(handleView, handleVerify, handleEdit, handleDelete, handleChangePassword, navigate, handleStatusToggle, statusLoading).filter(col => visibleColumns[col.key]);
 
   // For ColumnVisibility, get all columns (without filtering)
-  const allColumns = getGeneralStaffColumns(handleView, handleVerify, handleEdit, handleDelete, handleChangePassword);
+  const allColumns = getGeneralStaffColumns(handleView, handleVerify, handleEdit, handleDelete, handleChangePassword, navigate, handleStatusToggle, statusLoading);
 
   const handleColumnToggle = (columnKey) => {
     setVisibleColumns(prev => ({
@@ -86,10 +103,10 @@ const AllGeneralStaff = () => {
     return {
       ...item,
       name: item.user?.name || '-',
-      phoneNumber: item.user?.phone || item.user?.phoneNumber || '-',
-      role: item.roleId?.name || '-',
+      phoneNumber: item.user?.phoneNumber || '-',
+      role: item.department || '-',
       branchName,
-      status: item.status || (item.user?.status === 'active' ? 'ACTIVE' : 'INACTIVE'),
+      status: item.status?.toLowerCase() || item.user?.status || 'inactive',
       staffId: item.staffId || '-',
       address: item.address || '-',
       idType: item.idType || '-',

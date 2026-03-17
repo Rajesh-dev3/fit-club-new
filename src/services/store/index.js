@@ -21,6 +21,7 @@ import { biometricApi } from '../biometric'
 import { inventoryApi } from '../inventory'
 import { invoiceApi } from '../invoice'
 import { uplineApi } from '../upline'
+import { membership } from '../membership'
 import branchReducer from '../branchSlice'
 
 export const store = configureStore({
@@ -46,6 +47,7 @@ export const store = configureStore({
     [inventoryApi.reducerPath]: inventoryApi.reducer,
     [invoiceApi.reducerPath]: invoiceApi.reducer,
     [uplineApi.reducerPath]: uplineApi.reducer,
+    [membership.reducerPath]: membership.reducer,
     branch: branchReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
@@ -71,6 +73,7 @@ export const store = configureStore({
     inventoryApi.middleware,
     invoiceApi.middleware,
     uplineApi.middleware,
+    membership.middleware,
   ),
 })
 

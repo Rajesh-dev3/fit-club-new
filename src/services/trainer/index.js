@@ -30,7 +30,23 @@ export const trainer = createApi({
       }),
       invalidatesTags: ['Trainers'],
     }),
+    updateTrainer: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/trainers/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ['Trainers'],
+    }),
+    updateTrainerStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/trainers/${id}/status`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ['Trainers'],
+    }),
   }),
 })
 
-export const { useGetTrainersQuery, useAddTrainersMutation,useGetTrainersDetailQuery } = trainer
+export const { useGetTrainersQuery, useAddTrainersMutation,useGetTrainersDetailQuery,useUpdateTrainerMutation, useUpdateTrainerStatusMutation } = trainer

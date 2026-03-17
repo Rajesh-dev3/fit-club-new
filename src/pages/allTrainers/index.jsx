@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button } from "antd";
+import { Table, Button, message } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { AddTrainerRoute, TrainerDetailAttendanceRoute } from "../../routes/routepath";
 // import { useGetTrainersQuery } from "../../services/trainer";
@@ -11,7 +11,7 @@ import ColumnVisibility from "../../components/columnVisibility";
 import AddButton from "../../components/addButton";
 // ...existing code...
 import "./styles.scss";
-import { useGetTrainersQuery } from "../../services/trainer";
+import { useGetTrainersQuery, useUpdateTrainerStatusMutation } from "../../services/trainer";
 import { getTrainerColumns } from "./columns";
 import CommonTable from "../../components/commonTable";
 
@@ -21,6 +21,7 @@ const AllTrainers = () => {
   const [limit, setLimit] = useState(10);
   const [searchText, setSearchText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [statusLoading, setStatusLoading] = useState(null);
   const [visibleColumns, setVisibleColumns] = useState({
     branchName: true,
     name: true,
@@ -35,6 +36,7 @@ const AllTrainers = () => {
   });
   
   const { data: trainersData, isLoading } = useGetTrainersQuery({ page, limit });
+  const [updateTrainerStatus] = useUpdateTrainerStatusMutation();
 
   // Handler functions must be defined before being used in getTrainerColumns
   const handleView = (record) => {
@@ -56,9 +58,23 @@ const AllTrainers = () => {
     // TODO: Show confirmation modal and call delete API
   };
 
+  const handleStatusToggle = async (record, checked) => {
+    setStatusLoading(record._id);
+    try {
+      const newStatus = checked ? 'ACTIVE' : 'INACTIVE';
+      await updateTrainerStatus({ id: record._id, status: newStatus }).unwrap();
+      // message.success(`Trainer status updated to ${newStatus}`);
+    } catch (error) {
+      // message.error('Failed to update trainer status');
+      console.error('Error updating trainer status:', error);
+    } finally {
+      setStatusLoading(null);
+    }
+  };
+
   // Use columns from columns.jsx
-  const columns = getTrainerColumns(handleView, handleVerify, handleEdit, handleDelete).filter(col => visibleColumns[col.key]);
-  const allColumns = getTrainerColumns(handleView, handleVerify, handleEdit, handleDelete);
+  const columns = getTrainerColumns(handleView, handleVerify, handleEdit, handleDelete, navigate, handleStatusToggle, statusLoading).filter(col => visibleColumns[col.key]);
+  const allColumns = getTrainerColumns(handleView, handleVerify, handleEdit, handleDelete, navigate, handleStatusToggle, statusLoading);
 
   const handleColumnToggle = (columnKey) => {
     setVisibleColumns(prev => ({
@@ -87,13 +103,18 @@ const AllTrainers = () => {
     if (Array.isArray(item.user?.branchIds) && item.user.branchIds.length > 0) {
       branchName = item.user.branchIds.map(b => b.name).join(', ');
     }
+    
     return {
       ...item,
       name: item.user?.name || '-',
       phoneNumber: item.user?.phone || item.user?.phoneNumber || '-',
       email: item.user?.email || '-',
       branchName,
-      status: item.user?.status === 'active' ? 'ACTIVE' : 'INACTIVE',
+      branches: item.user?.branchIds || [],
+      trainerType: item.specialization || [],
+      experience: item.experience || 0,
+      photo: item.photo || '',
+      status: item.user?.status || 'inactive',
       // Add more mappings if needed
     };
   }) || [];
