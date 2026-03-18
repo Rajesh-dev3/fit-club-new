@@ -10,21 +10,7 @@ import AddButton from "../../components/addButton";
 import CommonTable from "../../components/commonTable";
 import allColumns from "./columns";
 import "./styles.scss";
-
-// Dummy API hook placeholder
-// import { useGetAllAddOnPackagesQuery } from "../../services/addOnPackage";
-
-const mapPackageToRow = (pkg) => ({
-  _id: pkg._id,
-  branch: pkg.branchName || '-',
-  packageType: pkg.packageType || '-',
-  name: pkg.name || '-',
-  session: pkg.session || '-',
-  pricing: pkg.pricing || '-',
-  numberOfDays: pkg.numberOfDays || '-',
-  status: pkg.status || '-',
-});
-
+import { useGetAddOnPackagesQuery } from "../../services/package";
 import { AddAddOnPackageRoute } from "../../routes/routepath";
 
 const AllAddOnPackages = () => {
@@ -45,25 +31,36 @@ const AllAddOnPackages = () => {
     actions: true,
   });
 
-  // const { data, isLoading } = useGetAllAddOnPackagesQuery({ page, limit });
-  // For now, use dummy data
-  const data = { packages: [] };
-  const isLoading = false;
+  // API call with filters
+  const { data, isLoading } = useGetAddOnPackagesQuery({
+    type: 'addon',
+    addonType: packageTypeFilter !== 'all' ? packageTypeFilter.toLowerCase().replace(/\s+/g, '_') : undefined,
+    branchId: undefined, // Add branchId filter if needed
+  });
 
   const packagesData = useMemo(() => {
-    if (!data?.packages) return [];
-    return data.packages.map(mapPackageToRow);
+    if (!data?.data) return [];
+    return data.data.map(pkg => ({
+      _id: pkg._id,
+      branch: pkg.branchIds?.map(b => b.name).join(', ') || '-',
+      packageType: pkg.addonType ? pkg.addonType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '-',
+      name: pkg.name || '-',
+      session: pkg.slots || '-',
+      pricing: pkg.pricing || '-',
+      numberOfDays: pkg.numberOfDays || '-',
+      status: pkg.status || '-',
+    }));
   }, [data]);
 
 
   // Static package type options
   const typeOptions = [
-    { label: 'Personal Training', value: 'Personal Training' },
-    { label: 'Pilates', value: 'Pilates' },
-    { label: 'Therapy', value: 'Therapy' },
-    { label: 'EMS', value: 'EMS' },
-    { label: 'Paid Locker', value: 'Paid Locker' },
-    { label: 'MMA', value: 'MMA' },
+    { label: 'Personal Training', value: 'personal_training' },
+    { label: 'Pilates', value: 'pilates' },
+    { label: 'Therapy', value: 'therapy' },
+    { label: 'EMS', value: 'ems' },
+    { label: 'Paid Locker', value: 'paid_locker' },
+    { label: 'MMA', value: 'mma' },
   ];
 
   const filteredData = useMemo(() => {

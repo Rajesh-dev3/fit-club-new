@@ -5,6 +5,8 @@ import { useOutletContext, useNavigate, useSearchParams } from 'react-router-dom
 import dayjs from 'dayjs';
 import { useGetAllCouponQuery } from '../../../services/coupons';
 import { useGetEmployeeByCustomerQuery } from '../../../services/employee';
+import { useGetAddOnPackagesQuery } from '../../../services/package';
+import { useAddInvoiceMutation } from '../../../services/invoice';
 import ImagePicker from '../../form/ImagePicker';
 import './styles.scss';
 
@@ -34,15 +36,21 @@ const BuyAddOnService = () => {
   const [totalPaidAmount, setTotalPaidAmount] = useState(0);
   const [remainingAmount, setRemainingAmount] = useState(0);
   const [planPrice, setPlanPrice] = useState(0);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   // API hooks
   const { data: couponsData, isLoading: couponsLoading } = useGetAllCouponQuery({});
   const { data: employeesData, isLoading: employeesLoading } = useGetEmployeeByCustomerQuery(userData?._id, {
     skip: !userData?._id
   });
+  const { data: addOnPackagesData, isLoading: packagesLoading } = useGetAddOnPackagesQuery({
+    type: 'addon',
+  });
+  const [addInvoice, { isLoading: isAddingInvoice }] = useAddInvoiceMutation();
 
   // Extract data arrays from API responses
   const coupons = couponsData?.data || [];
+  const addOnPackages = addOnPackagesData?.data || [];
 
   // Calculate totals with discount and GST
   const calculateTotals = (basePrice, coupon, isGstClaim, gstPercent) => {
@@ -70,6 +78,19 @@ const BuyAddOnService = () => {
   const handlePlanPriceChange = (value) => {
     setPlanPrice(value || 0);
     calculateTotals(value || 0, selectedCoupon, gstClaim, gstPercentage);
+  };
+
+  // Handle add-on plan selection
+  const handlePlanSelect = (planId) => {
+    const plan = addOnPackages.find(p => p._id === planId);
+    if (plan) {
+      setSelectedPlan(plan);
+      form.setFieldsValue({
+        planPrice: plan.pricing,
+      });
+      setPlanPrice(plan.pricing);
+      calculateTotals(plan.pricing, selectedCoupon, gstClaim, gstPercentage);
+    }
   };
 
   // Handle payment mode change
@@ -193,58 +214,71 @@ const BuyAddOnService = () => {
       const gstAmount = gstClaim ? (afterDiscountAmount * gstPercentage) / 100 : 0;
       const totalAmount = afterDiscountAmount + gstAmount;
 
-      // Create payment terms array
-      const paymentTerms = [];
+      // Get addonType from URL or selected plan
+      const urlAddonType = searchParams.get('type');
+      let finalAddonType = selectedPlan?.addonType;
       
-      if (paymentMode === 'cash' && values.cashEmployee) {
-        paymentTerms.push({
-          modeOfPayment: 'cash',
-          amount: totalAmount,
-          receivedBy: values.cashEmployee,
-          receipt: []
-        });
-      } else if (paymentMode === 'upi' && values.upiScreenshot) {
-        paymentTerms.push({
-          modeOfPayment: 'upi',
-          amount: totalAmount,
-          receipt: [values.upiScreenshot],
-          referenceId: values.upiReferenceId || ''
-        });
-      } else if (paymentMode === 'card' && values.cardScreenshot) {
-        paymentTerms.push({
-          modeOfPayment: 'card',
-          amount: totalAmount,
-          receipt: [values.cardScreenshot]
-        });
-      } else if (paymentMode === 'cheque' && values.chequeNumber && values.bankName) {
-        paymentTerms.push({
-          modeOfPayment: 'cheque',
-          amount: totalAmount,
-          chequeNumber: values.chequeNumber,
-          bankName: values.bankName,
-          receipt: []
-        });
-      } else if (paymentMode === 'bank_transfer' && values.holderName && values.bankName && values.receiptName) {
-        paymentTerms.push({
-          modeOfPayment: 'netbanking',
-          amount: totalAmount,
-          bankHolderName: values.holderName,
-          bankName: values.bankName,
-          receiptNumber: values.receiptName
-        });
-      } else if (paymentMode === 'credit_note' && values.creditNoteAmount && values.creditNoteUpload) {
-        paymentTerms.push({
-          modeOfPayment: 'creditnote',
-          amount: values.creditNoteAmount,
-          receipt: [values.creditNoteUpload]
-        });
+      // If URL has type parameter, convert it to snake_case format
+      if (urlAddonType) {
+        finalAddonType = urlAddonType.toLowerCase().replace(/\s+/g, '_').replace(/-/g, '_');
       }
 
-      // Create the payload
+      // Create payment terms array from multiple payment modes
+      const paymentTerms = [];
+      
+      paymentModes.forEach(payment => {
+        const mode = values[`paymentMode_${payment.id}`];
+        const amount = values[`paymentAmount_${payment.id}`];
+        
+        if (!mode || !amount) return;
+
+        if (mode === 'cash') {
+          paymentTerms.push({
+            modeOfPayment: 'cash',
+            amount: amount,
+            receivedBy: values[`cashEmployee_${payment.id}`] || '',
+            receipt: []
+          });
+        } else if (mode === 'upi') {
+          paymentTerms.push({
+            modeOfPayment: 'upi',
+            amount: amount,
+            receipt: values[`upiScreenshot_${payment.id}`] ? [values[`upiScreenshot_${payment.id}`]] : [],
+            referenceId: values[`upiReferenceId_${payment.id}`] || ''
+          });
+        } else if (mode === 'card') {
+          paymentTerms.push({
+            modeOfPayment: 'card',
+            amount: amount,
+            receipt: values[`cardScreenshot_${payment.id}`] ? [values[`cardScreenshot_${payment.id}`]] : []
+          });
+        } else if (mode === 'cheque') {
+          paymentTerms.push({
+            modeOfPayment: 'cheque',
+            amount: amount,
+            chequeNumber: values[`chequeNumber_${payment.id}`] || '',
+            bankName: values[`bankName_${payment.id}`] || '',
+            receipt: []
+          });
+        } else if (mode === 'bank_transfer') {
+          paymentTerms.push({
+            modeOfPayment: 'netbanking',
+            amount: amount,
+            bankHolderName: values[`holderName_${payment.id}`] || '',
+            accountNumber: values[`accountNumber_${payment.id}`] || '',
+            ifscCode: values[`ifscCode_${payment.id}`] || '',
+            receipt: values[`transferScreenshot_${payment.id}`] ? [values[`transferScreenshot_${payment.id}`]] : []
+          });
+        }
+      });
+
+      // Create the payload for add invoice API
       const payload = {
         userId: userData._id,
-        packageType: values.packageType,
-        planPrice: planPrice,
+        planId: selectedPlan?._id,
+        type: 'addon',
+        addonType: finalAddonType,
+        pricing: planPrice,
         couponId: selectedCoupon?._id || null,
         discountAmount: discountAmt,
         afterDiscount: afterDiscountAmount,
@@ -254,25 +288,31 @@ const BuyAddOnService = () => {
         gstNumber: values.gstNumber || null,
         registeredCompanyName: values.registeredCompanyName || null,
         totalInvoiceAmount: totalAmount,
-        paymentType: values.paymentType || 'full',
+        billingAddress: values.billingAddress || userData?.member?.address,
         paymentDate: startDate,
         paymentTerm: paymentTerms,
         employeeId: values.salesPerson
       };
 
-      console.log('Add-On Service Payload:', payload);
+      // console.log('Add-On Service Invoice Payload:', payload);
       
-      message.success('Add-On Service purchased successfully!');
+      await addInvoice(payload).unwrap();
+      // message.success('Add-On Service invoice created successfully!');
       
       form.resetFields();
       setSelectedCoupon(null);
-      setPaymentMode('');
+      setSelectedPlan(null);
+      setPaymentModes([{ id: 1, mode: '', amount: '' }]);
       setGstClaim(false);
       setDiscountAmount(0);
       setPlanPrice(0);
+      setTotalPaidAmount(0);
+      setRemainingAmount(0);
+      
+      navigate(-1);
       
     } catch (error) {
-      message.error('Failed to purchase add-on service');
+      // message.error(error?.data?.message || 'Failed to create add-on service invoice');
       console.error('Error:', error);
     } finally {
       setLoading(false);
@@ -355,9 +395,45 @@ const BuyAddOnService = () => {
               )}
             </Select>
           </Form.Item>
+
+          <Form.Item
+            name="addOnPlan"
+            label="Add-On Plan"
+            rules={[{ required: true, message: 'Please select an add-on plan' }]}
+          >
+            <Select
+              placeholder="Choose add-on plan"
+              loading={packagesLoading}
+              showSearch
+              onChange={handlePlanSelect}
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+            >
+              {addOnPackages.length > 0 ? (
+                addOnPackages.map(plan => (
+                  <Option key={plan._id} value={plan._id}>
+                    {plan.name} - {plan.addonType?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} - ₹{plan.pricing}
+                  </Option>
+                ))
+              ) : (
+                <Option disabled value="">No add-on plans available</Option>
+              )}
+            </Select>
+          </Form.Item>
         </div>
 
-        <div className="row">
+        {/* <div className="row">
+          <Form.Item
+                ))
+              ) : (
+                <Option disabled value="">No sales persons available</Option>
+              )}
+            </Select>
+          </Form.Item>
+        </div>
+
+        {/* <div className="row">
           <Form.Item
             name="customerName"
             label="Customer Name"
@@ -381,9 +457,9 @@ const BuyAddOnService = () => {
               disabled
             />
           </Form.Item>
-        </div>
+        </div> */}
 
-        <div className="row">
+        {/* <div className="row">
           <Form.Item
             name="gender"
             label="Gender"
@@ -413,7 +489,7 @@ const BuyAddOnService = () => {
               <Option value={userData?.member?.state}>{userData?.member?.state}</Option>
             </Select>
           </Form.Item>
-        </div>
+        </div> */}
 
         <div className="row">
           <Form.Item
@@ -438,13 +514,11 @@ const BuyAddOnService = () => {
           >
             <Select placeholder="Select payment type">
               <Option value="fullPayment">Full Payment</Option>
-              <Option value="partial">Partial Payment</Option>
+              {/* <Option value="partial">Partial Payment</Option> */}
             </Select>
           </Form.Item>
-        </div>
 
-        <div className="row">
-          <Form.Item
+          {/* <Form.Item
             name="gstPercentage"
             label="GST Percentage"
             initialValue="5"
@@ -452,7 +526,7 @@ const BuyAddOnService = () => {
             <Select placeholder="Select GST percentage" disabled>
               <Option value="5">5%</Option>
             </Select>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             name="planPrice"
@@ -841,9 +915,9 @@ const BuyAddOnService = () => {
           <Button
             type="primary"
             htmlType="submit"
-            loading={loading}
+            loading={loading || isAddingInvoice}
             className="save-btn"
-            disabled={!planPrice || planPrice === 0}
+            disabled={!planPrice || planPrice === 0 || !selectedPlan}
           >
             Purchase Add-On Service
           </Button>

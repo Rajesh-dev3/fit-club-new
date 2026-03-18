@@ -61,13 +61,14 @@
         color: var(--sider-text);
       }
 
-      .certificate-item {
+      .certificate-item-addon {
         margin-bottom: 16px;
 
         .row {
           display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 16px;
+          grid-template-columns: 40% 40% 20% !important;
+          gap: 0;
+          column-gap: 10px;
           align-items: start;
 
           @media (max-width: 768px) {

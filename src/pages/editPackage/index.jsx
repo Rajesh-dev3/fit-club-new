@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { Form, Input, Select, Button, InputNumber, Checkbox, Row, Col, Space, Spin, message } from "antd";
+import { Form, Input, Select, Button, InputNumber, Checkbox, Row, Col, Space, Spin, message, TimePicker } from "antd";
 import { HomeOutlined, PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import "./styles.scss";
 import { useGetBranchesQuery } from "../../services/branches";
@@ -10,6 +10,7 @@ import ImagePicker from "../../components/form/ImagePicker";
 import { useGetPlanDetailQuery, useUpdatePlanMutation } from "../../services/package";
 import { useGetInventoryQuery, useGetGymKitInventoryQuery } from "../../services/inventory";
 import { useGetBranchResourcesQuery } from "../../services/biometric";
+import dayjs from "dayjs";
 
 const EditPackage = () => {
   const { id } = useParams();
@@ -20,6 +21,7 @@ const EditPackage = () => {
   const [updatePackage, { isLoading: updating }] = useUpdatePlanMutation();
   const [gymKitSelected, setGymKitSelected] = useState('no');
   const [selectedInventoryItems, setSelectedInventoryItems] = useState({});
+  const [accessType, setAccessType] = useState('peak_hours');
   
   const selectedBranches = Form.useWatch('branch', form);
   
@@ -65,6 +67,11 @@ const EditPackage = () => {
   const assessmentOptions = [
     { label: 'Yes', value: 'yes' },
     { label: 'No', value: 'no' },
+  ];
+
+  const accessTypeOptions = [
+    { label: 'Peak Hours', value: 'peak_hours' },
+    { label: 'Non-Peak Hours', value: 'non_peak_hours' },
   ];
 
   const inventoryOptions = useMemo(() => {
@@ -127,6 +134,11 @@ const EditPackage = () => {
       // Extract branch IDs
       const branchIds = pkg.branchIds?.map(b => b._id || b) || [];
       
+      // Set access type state
+      if (pkg.accessType) {
+        setAccessType(pkg.accessType);
+      }
+      
       form.setFieldsValue({
         packageType: pkg.type,
         packageName: pkg.name,
@@ -147,6 +159,11 @@ const EditPackage = () => {
         gymKit: pkg.gymKitAvailable ? 'yes' : 'no',
         selectedInventory: inventorySelection,
         selectedBiometric: pkg.machineIds?.map(m => m._id || m) || [],
+        accessType: pkg.accessType || 'peak_hours',
+        nonPeakHours: pkg.nonPeakHours?.map(slot => ({
+          from: slot.from ? dayjs(slot.from) : null,
+          to: slot.to ? dayjs(slot.to) : null
+        })) || [{ from: null, to: null }],
       });
     }
   }, [packageData, form]);
@@ -249,6 +266,13 @@ const EditPackage = () => {
       ...(values.freezable === 'yes' && {
         freezableDays: values.freezeDays,
         freezableSlot: values.freezeSlot,
+      }),
+      accessType: values.accessType || 'peak_hours',
+      ...(values.accessType === 'non_peak_hours' && values.nonPeakHours && {
+        nonPeakHours: values.nonPeakHours.map(slot => ({
+          from: slot.from ? slot.from.toISOString() : null,
+          to: slot.to ? slot.to.toISOString() : null
+        })),
       }),
       branchIds: Array.isArray(values.branch) ? values.branch : [values.branch],
       benefits: values.benefitPoints ? values.benefitPoints.map(bp => ({ type: bp.point })) : [],
@@ -435,6 +459,79 @@ const EditPackage = () => {
               }}
             </Form.Item>
           </div>
+
+          {/* Access Type Section */}
+          <div className="form-row-single">
+            <Form.Item
+              label="Access Type"
+              name="accessType"
+              rules={[{ required: true, message: 'Please select access type' }]}
+            >
+              <Select
+                placeholder="Select access type"
+                options={accessTypeOptions}
+                onChange={(value) => setAccessType(value)}
+              />
+            </Form.Item>
+          </div>
+
+          {/* Conditional: Non-Peak Hours Time Fields */}
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) => prevValues.accessType !== currentValues.accessType}
+          >
+            {({ getFieldValue }) =>
+              getFieldValue('accessType') === 'non_peak_hours' ? (
+                <>
+                  <div style={{ marginBottom: '16px' }}>
+                    <h4 style={{ marginBottom: '12px' }}>Non-Peak Hours</h4>
+                  </div>
+                  <Form.List name="nonPeakHours">
+                    {(fields, { add, remove }) => (
+                      <>
+                        {fields.map(({ key, name, ...restField }) => (
+                          <div key={key} className="form-row" style={{ marginBottom: '12px' }}>
+                            <Form.Item
+                              {...restField}
+                              label="From Time"
+                              name={[name, 'from']}
+                              rules={[{ required: true, message: 'Please select start time' }]}
+                            >
+                              <TimePicker format="HH:mm" placeholder="10:00" style={{ width: '100%' }} />
+                            </Form.Item>
+                            <Form.Item
+                              {...restField}
+                              label="To Time"
+                              name={[name, 'to']}
+                              rules={[{ required: true, message: 'Please select end time' }]}
+                            >
+                              <TimePicker format="HH:mm" placeholder="17:00" style={{ width: '100%' }} />
+                            </Form.Item>
+                            {fields.length > 1 && (
+                              <MinusCircleOutlined
+                                onClick={() => remove(name)}
+                                style={{ fontSize: '20px', color: 'red', marginTop: '30px', cursor: 'pointer' }}
+                              />
+                            )}
+                          </div>
+                        ))}
+                        <Form.Item>
+                          <Button
+                            type="dashed"
+                            onClick={() => add()}
+                            icon={<PlusOutlined />}
+                            style={{ width: '100%' }}
+                          >
+                            Add Time Slot
+                          </Button>
+                        </Form.Item>
+                      </>
+                    )}
+                  </Form.List>
+                </>
+              ) : null
+            }
+          </Form.Item>
 
           <div className="form-row">
             <Form.Item

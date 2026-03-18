@@ -16,9 +16,16 @@ export const membership = createApi({
       }),
       providesTags: ['Membership'],
     }),
+    getUserAddOns: builder.query({
+      query: (userId) => ({
+        url: `/memberships/user/${userId}/addons`,
+        method: "GET",
+      }),
+      providesTags: ['Membership'],
+    }),
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetUserMembershipQuery } = membership
+export const { useGetUserMembershipQuery, useGetUserAddOnsQuery } = membership

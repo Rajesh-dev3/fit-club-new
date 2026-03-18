@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { Form, Input, Select, Button, InputNumber, Checkbox, Row, Col, Space } from "antd";
+import { Form, Input, Select, Button, InputNumber, Checkbox, Row, Col, Space, TimePicker } from "antd";
 import { HomeOutlined, PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import "./styles.scss";
 import { useGetBranchesQuery } from "../../services/branches";
@@ -18,6 +18,7 @@ const AddPackage = () => {
   const [triggerAddPackage, { isLoading }] = useAddPlanMutation();
   const [gymKitSelected, setGymKitSelected] = useState('no');
   const [selectedInventoryItems, setSelectedInventoryItems] = useState({});
+  const [accessType, setAccessType] = useState('peak_hours');
   
   // Watch for branch changes
   const selectedBranches = Form.useWatch('branch', form);
@@ -54,7 +55,7 @@ const AddPackage = () => {
     { label: 'Membership', value: 'membership' },
     { label: 'Trial', value: 'trial' },
     { label: 'Membership Transfer', value: 'membership_transfer' },
-    { label: 'Add On Package', value: 'add_on_package' },
+    // { label: 'Add On Package', value: 'add_on_package' },
   ];
 
   const gymKitOptions = [
@@ -65,6 +66,11 @@ const AddPackage = () => {
   const assessmentOptions = [
     { label: 'Yes', value: 'yes' },
     { label: 'No', value: 'no' },
+  ];
+
+  const accessTypeOptions = [
+    { label: 'Peak Hours', value: 'peak_hours' },
+    { label: 'Non-Peak Hours', value: 'non_peak_hours' },
   ];
 
   const inventoryOptions = useMemo(() => {
@@ -239,8 +245,16 @@ const AddPackage = () => {
           freezableDays: values.freezeDays,
           freezableSlot: values.freezeSlot,
         }),
+        accessType: values.accessType || 'peak_hours',
+        ...(values.accessType === 'non_peak_hours' && {
+          nonPeakHours: values.nonPeakHours || [],
+        }),
         branchIds: Array.isArray(values.branch) ? values.branch : [values.branch],
         benefits: values.benefitPoints ? values.benefitPoints.map(bp => ({ type: bp.point })) : [],
+        complementaryServices: values.complementaryServices ? values.complementaryServices.map(cs => ({
+          serviceType: cs.serviceType.toLowerCase().replace(/\s+/g, '_'),
+          numberOfSessions: cs.sessions
+        })) : [],
         photos: values.banner ? [values.banner] : [],
         description: values.description || '',
         preferredGender: values.preferredGender || 'any',
@@ -281,8 +295,16 @@ const AddPackage = () => {
         freezableDays: values.freezeDays,
         freezableSlot: values.freezeSlot,
       }),
+      accessType: values.accessType || 'peak_hours',
+      ...(values.accessType === 'non_peak_hours' && {
+        nonPeakHours: values.nonPeakHours || [],
+      }),
       branchIds: Array.isArray(values.branch) ? values.branch : [values.branch],
       benefits: values.benefitPoints ? values.benefitPoints.map(bp => ({ type: bp.point })) : [],
+      complementaryServices: values.complementaryServices ? values.complementaryServices.map(cs => ({
+        serviceType: cs.serviceType.toLowerCase().replace(/\s+/g, '_'),
+        numberOfSessions: cs.sessions
+      })) : [],
       photos: values.banner ? [values.banner] : [],
       description: values.description || '',
       preferredGender: values.preferredGender || 'any',
@@ -303,6 +325,7 @@ const AddPackage = () => {
     };
 
     try {
+      // console.log('Add Package Payload:', payload);
       await triggerAddPackage(payload).unwrap();
       nav(AllPackagesRoute);
     } catch (error) {
@@ -339,7 +362,8 @@ const AddPackage = () => {
           className="trainer-form"
           initialValues={{
             packageType: "membership",
-            freezable: "no"
+            freezable: "no",
+            accessType: "peak_hours"
           }}
         >
           {/* Row 1: Package Type + Package Name (for Membership/Trial) */}
@@ -538,6 +562,30 @@ const AddPackage = () => {
                       </Form.Item>
                     </div>
 
+                    {/* Conditional: Number of Assessments (only when Assessment is Yes) */}
+                    <Form.Item
+                      noStyle
+                      shouldUpdate={(prevValues, currentValues) => prevValues.assessment !== currentValues.assessment}
+                    >
+                      {({ getFieldValue }) =>
+                        getFieldValue('assessment') === 'yes' ? (
+                          <div className="form-row-single">
+                            <Form.Item
+                              label="Number of Assessments"
+                              name="numberOfAssessments"
+                              rules={[{ required: true, message: 'Please enter number of assessments' }]}
+                            >
+                              <InputNumber
+                                placeholder="Enter number of assessments"
+                                min={1}
+                                style={{ width: '100%' }}
+                              />
+                            </Form.Item>
+                          </div>
+                        ) : null
+                      }
+                    </Form.Item>
+
                     {/* Row: Upgrade Limit + Advance Renew Days */}
                     <div className="form-row">
                       <Form.Item
@@ -624,6 +672,79 @@ const AddPackage = () => {
                       </Form.Item>
                     </div>
 
+                    {/* Row: Access Type */}
+                    <div className="form-row-single">
+                      <Form.Item
+                        label="Access Type"
+                        name="accessType"
+                        rules={[{ required: true, message: 'Please select access type' }]}
+                      >
+                        <Select
+                          placeholder="Select access type"
+                          options={accessTypeOptions}
+                          onChange={(value) => setAccessType(value)}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {/* Conditional: Non-Peak Hours Time Fields */}
+                    <Form.Item
+                      noStyle
+                      shouldUpdate={(prevValues, currentValues) => prevValues.accessType !== currentValues.accessType}
+                    >
+                      {({ getFieldValue }) =>
+                        getFieldValue('accessType') === 'non_peak_hours' ? (
+                          <>
+                            <div style={{ marginBottom: '16px' }}>
+                              <h4 style={{ marginBottom: '12px' }}>Non-Peak Hours</h4>
+                            </div>
+                            <Form.List name="nonPeakHours" initialValue={[{ from: '', to: '' }]}>
+                              {(fields, { add, remove }) => (
+                                <>
+                                  {fields.map(({ key, name, ...restField }) => (
+                                    <div key={key} className="form-row" style={{ marginBottom: '12px' }}>
+                                      <Form.Item
+                                        {...restField}
+                                        label="From Time"
+                                        name={[name, 'from']}
+                                        rules={[{ required: true, message: 'Please select start time' }]}
+                                      >
+                                        <TimePicker format="HH:mm" placeholder="10:00" style={{ width: '100%' }} />
+                                      </Form.Item>
+                                      <Form.Item
+                                        {...restField}
+                                        label="To Time"
+                                        name={[name, 'to']}
+                                        rules={[{ required: true, message: 'Please select end time' }]}
+                                      >
+                                        <TimePicker format="HH:mm" placeholder="17:00" style={{ width: '100%' }} />
+                                      </Form.Item>
+                                      {fields.length > 1 && (
+                                        <MinusCircleOutlined
+                                          onClick={() => remove(name)}
+                                          style={{ fontSize: '20px', color: 'red', marginTop: '30px', cursor: 'pointer' }}
+                                        />
+                                      )}
+                                    </div>
+                                  ))}
+                                  <Form.Item>
+                                    <Button
+                                      type="dashed"
+                                      onClick={() => add()}
+                                      icon={<PlusOutlined />}
+                                      style={{ width: '100%' }}
+                                    >
+                                      Add Time Slot
+                                    </Button>
+                                  </Form.Item>
+                                </>
+                              )}
+                            </Form.List>
+                          </>
+                        ) : null
+                      }
+                    </Form.Item>
+
                     {/* Conditional Freeze Fields */}
                     <Form.Item
                       noStyle
@@ -650,30 +771,6 @@ const AddPackage = () => {
                             >
                               <InputNumber
                                 placeholder="Enter freeze slot"
-                                min={1}
-                                style={{ width: '100%' }}
-                              />
-                            </Form.Item>
-                          </div>
-                        ) : null
-                      }
-                    </Form.Item>
-
-                    {/* Conditional: Number of Assessments (only when Assessment is Yes) */}
-                    <Form.Item
-                      noStyle
-                      shouldUpdate={(prevValues, currentValues) => prevValues.assessment !== currentValues.assessment}
-                    >
-                      {({ getFieldValue }) =>
-                        getFieldValue('assessment') === 'yes' ? (
-                          <div className="form-row-single">
-                            <Form.Item
-                              label="Number of Assessments"
-                              name="numberOfAssessments"
-                              rules={[{ required: true, message: 'Please enter number of assessments' }]}
-                            >
-                              <InputNumber
-                                placeholder="Enter number of assessments"
                                 min={1}
                                 style={{ width: '100%' }}
                               />
@@ -838,6 +935,73 @@ const AddPackage = () => {
                       </Form.List>
                     </div>
 
+                    {/* Complementary Add-On Services */}
+                    <div className="certificates-section">
+                      <h3 style={{ color: 'var(--sider-text)', marginBottom: 16 }}>Complementary Add-On Services</h3>
+                      <Form.List name="complementaryServices" initialValue={[]}>
+                        {(fields, { add, remove }) => (
+                          <>
+                            {fields.map(({ key, name, ...restField }) => (
+                              <div key={key} className="certificate-item">
+                                <div className="row" style={{ alignItems: 'flex-end' }}>
+                                  <Form.Item
+                                    {...restField}
+                                    name={[name, 'serviceType']}
+                                    label="Service Type"
+                                    rules={[{ required: true, message: 'Please select service type' }]}
+                                    style={{ flex: 1 }}
+                                  >
+                                    <Select placeholder="Select service type">
+                                      <Select.Option value="Personal Training">Personal Training</Select.Option>
+                                      <Select.Option value="Pilates">Pilates</Select.Option>
+                                      <Select.Option value="Therapy">Therapy</Select.Option>
+                                      <Select.Option value="EMS">EMS</Select.Option>
+                                      <Select.Option value="Paid Locker">Paid Locker</Select.Option>
+                                      <Select.Option value="MMA">MMA</Select.Option>
+                                    </Select>
+                                  </Form.Item>
+
+                                  <Form.Item
+                                    {...restField}
+                                    name={[name, 'sessions']}
+                                    label="Number of Sessions"
+                                    rules={[{ required: true, message: 'Please enter number of sessions' }]}
+                                    style={{ flex: 1 }}
+                                  >
+                                    <InputNumber
+                                      placeholder="Enter sessions"
+                                      min={1}
+                                      style={{ width: '100%' }}
+                                    />
+                                  </Form.Item>
+
+                                  <Button
+                                    type="link"
+                                    danger
+                                    icon={<MinusCircleOutlined />}
+                                    onClick={() => remove(name)}
+                                    style={{ marginBottom: 24 }}
+                                  >
+                                    Remove
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                            <Form.Item>
+                              <Button 
+                                type="dashed" 
+                                onClick={() => add()} 
+                                block 
+                                icon={<PlusOutlined />}
+                              >
+                                Add Complementary Service
+                              </Button>
+                            </Form.Item>
+                          </>
+                        )}
+                      </Form.List>
+                    </div>
+
                     {/* Add On Package Specific Fields */}
                     <div className="form-separator" style={{ margin: '24px 0', borderBottom: '2px solid var(--border-color)' }}></div>
                     <h3 style={{ color: 'var(--sider-text)', marginBottom: 16 }}>Add-On Package Details</h3>
@@ -912,6 +1076,30 @@ const AddPackage = () => {
                         />
                       </Form.Item>
                     </div>
+
+                    {/* Conditional: Number of Assessments (only when Assessment is Yes) */}
+                    <Form.Item
+                      noStyle
+                      shouldUpdate={(prevValues, currentValues) => prevValues.assessment !== currentValues.assessment}
+                    >
+                      {({ getFieldValue }) =>
+                        getFieldValue('assessment') === 'yes' ? (
+                          <div className="form-row-single">
+                            <Form.Item
+                              label="Number of Assessments"
+                              name="numberOfAssessments"
+                              rules={[{ required: true, message: 'Please enter number of assessments' }]}
+                            >
+                              <InputNumber
+                                placeholder="Enter number of assessments"
+                                min={1}
+                                style={{ width: '100%' }}
+                              />
+                            </Form.Item>
+                          </div>
+                        ) : null
+                      }
+                    </Form.Item>
 
                     {/* Conditional: Membership-specific fields (only when Package Type is Membership) */}
                     {packageType === 'membership' && (
@@ -999,30 +1187,6 @@ const AddPackage = () => {
                       </>
                     )}
 
-                    {/* Conditional: Number of Assessments (only when Assessment is Yes) */}
-                    <Form.Item
-                      noStyle
-                      shouldUpdate={(prevValues, currentValues) => prevValues.assessment !== currentValues.assessment}
-                    >
-                      {({ getFieldValue }) =>
-                        getFieldValue('assessment') === 'yes' ? (
-                          <div className="form-row-single">
-                            <Form.Item
-                              label="Number of Assessments"
-                              name="numberOfAssessments"
-                              rules={[{ required: true, message: 'Please enter number of assessments' }]}
-                            >
-                              <InputNumber
-                                placeholder="Enter number of assessments"
-                                min={1}
-                                style={{ width: '100%' }}
-                              />
-                            </Form.Item>
-                          </div>
-                        ) : null
-                      }
-                    </Form.Item>
-
                     {/* Number of Valid Days */}
                     <div className="form-row-single">
                       <Form.Item
@@ -1037,6 +1201,79 @@ const AddPackage = () => {
                         />
                       </Form.Item>
                     </div>
+
+                    {/* Row: Access Type */}
+                    <div className="form-row-single">
+                      <Form.Item
+                        label="Access Type"
+                        name="accessType"
+                        rules={[{ required: true, message: 'Please select access type' }]}
+                      >
+                        <Select
+                          placeholder="Select access type"
+                          options={accessTypeOptions}
+                          onChange={(value) => setAccessType(value)}
+                        />
+                      </Form.Item>
+                    </div>
+
+                    {/* Conditional: Non-Peak Hours Time Fields */}
+                    <Form.Item
+                      noStyle
+                      shouldUpdate={(prevValues, currentValues) => prevValues.accessType !== currentValues.accessType}
+                    >
+                      {({ getFieldValue }) =>
+                        getFieldValue('accessType') === 'non_peak_hours' ? (
+                          <>
+                            <div style={{ marginBottom: '16px' }}>
+                              <h4 style={{ marginBottom: '12px' }}>Non-Peak Hours</h4>
+                            </div>
+                            <Form.List name="nonPeakHours" initialValue={[{ from: '', to: '' }]}>
+                              {(fields, { add, remove }) => (
+                                <>
+                                  {fields.map(({ key, name, ...restField }) => (
+                                    <div key={key} className="form-row" style={{ marginBottom: '12px' }}>
+                                      <Form.Item
+                                        {...restField}
+                                        label="From Time"
+                                        name={[name, 'from']}
+                                        rules={[{ required: true, message: 'Please select start time' }]}
+                                      >
+                                        <TimePicker format="HH:mm" placeholder="10:00" style={{ width: '100%' }} />
+                                      </Form.Item>
+                                      <Form.Item
+                                        {...restField}
+                                        label="To Time"
+                                        name={[name, 'to']}
+                                        rules={[{ required: true, message: 'Please select end time' }]}
+                                      >
+                                        <TimePicker format="HH:mm" placeholder="17:00" style={{ width: '100%' }} />
+                                      </Form.Item>
+                                      {fields.length > 1 && (
+                                        <MinusCircleOutlined
+                                          onClick={() => remove(name)}
+                                          style={{ fontSize: '20px', color: 'red', marginTop: '30px', cursor: 'pointer' }}
+                                        />
+                                      )}
+                                    </div>
+                                  ))}
+                                  <Form.Item>
+                                    <Button
+                                      type="dashed"
+                                      onClick={() => add()}
+                                      icon={<PlusOutlined />}
+                                      style={{ width: '100%' }}
+                                    >
+                                      Add Time Slot
+                                    </Button>
+                                  </Form.Item>
+                                </>
+                              )}
+                            </Form.List>
+                          </>
+                        ) : null
+                      }
+                    </Form.Item>
 
                     {/* Row 3: HSN Code + Branch */}
                     <div className="form-row">
@@ -1152,7 +1389,7 @@ const AddPackage = () => {
 
                     {/* Benefit Points - Multiple */}
                     <div className="certificates-section">
-                      <h3 style={{ color: 'var(--sider-text)', marginBottom: 16 }}>Benefit Points</h3>
+                      <h3 style={{ color: 'var(--sider-text)', marginBottom: 16,marginTop:"0" }}>Benefit Points</h3>
                       <Form.List name="benefitPoints">
                         {(fields, { add, remove }) => (
                           <>
@@ -1183,6 +1420,75 @@ const AddPackage = () => {
                             <Form.Item>
                               <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
                                 Add Benefit Point
+                              </Button>
+                            </Form.Item>
+                          </>
+                        )}
+                      </Form.List>
+                    </div>
+
+                    {/* Complementary Add-On Services */}
+                    <div className="certificates-section">
+                      <h3 style={{ color: 'var(--sider-text)', marginBottom: 16,marginTop:"0" }}>Complementary Add-On Services</h3>
+                      <Form.List name="complementaryServices" initialValue={[]}>
+                        {(fields, { add, remove }) => (
+                          <>
+                            {fields.map(({ key, name, ...restField }) => (
+                              <div key={key} className="certificate-item-addon">
+                                <div className="row" style={{ alignItems: 'flex-end' }}>
+                                  <Form.Item
+                                    {...restField}
+                                    name={[name, 'serviceType']}
+                                    label="Service Type"
+                                    rules={[{ required: true, message: 'Please select service type' }]}
+                                    // style={{ flex: 1 }}
+                                  >
+                                    <Select placeholder="Select service type">
+                                      <Select.Option value="Personal Training">Personal Training</Select.Option>
+                                      <Select.Option value="Pilates">Pilates</Select.Option>
+                                      <Select.Option value="Therapy">Therapy</Select.Option>
+                                      <Select.Option value="EMS">EMS</Select.Option>
+                                      <Select.Option value="Paid Locker">Paid Locker</Select.Option>
+                                      <Select.Option value="MMA">MMA</Select.Option>
+                                    </Select>
+                                  </Form.Item>
+
+                                  <Form.Item
+                                    {...restField}
+                                    name={[name, 'sessions']}
+                                    label="Number of Sessions"
+                                    rules={[{ required: true, message: 'Please enter number of sessions' }]}
+                                    style={{ width: '100%' }}
+                                    // style={{ flex: 1 }}
+                                  >
+                                    <InputNumber
+                                      placeholder="Enter sessions"
+                                      min={1}
+                                      style={{ width: '100%' }}
+                                    />
+                                  </Form.Item>
+
+                                  <Button
+                                    type="link"
+                                    danger
+                                    icon={<MinusCircleOutlined />}
+                                    onClick={() => remove(name)}
+                                    
+                                    style={{ marginBottom: 24,border:"1px solid red",padding:"8px 16px",height:"auto",width:"90%" }}
+                                  >
+                                    Remove
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                            <Form.Item>
+                              <Button 
+                                type="dashed" 
+                                onClick={() => add()} 
+                                block 
+                                icon={<PlusOutlined />}
+                              >
+                                Add Complementary Service
                               </Button>
                             </Form.Item>
                           </>

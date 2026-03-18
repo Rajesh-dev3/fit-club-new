@@ -46,6 +46,20 @@ export const plans = createApi({
       }),
       providesTags: ['Plans'],
     }),
+    getAddOnPackages: builder.query({
+      query: ({ type, addonType, branchId }) => {
+        const params = new URLSearchParams();
+        if (type) params.append('type', type);
+        if (addonType) params.append('addonType', addonType);
+        if (branchId) params.append('branchId', branchId);
+        
+        return {
+          url: `/plans?${params.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ['Plans'],
+    }),
   
 
   }),
@@ -53,4 +67,4 @@ export const plans = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useAddPlanMutation,useGetPlansQuery,useGetPlanDetailQuery,useUpdatePlanMutation,useGetUpgradablePlansQuery } = plans
+export const { useAddPlanMutation,useGetPlansQuery,useGetPlanDetailQuery,useUpdatePlanMutation,useGetUpgradablePlansQuery,useGetAddOnPackagesQuery } = plans

@@ -90,6 +90,7 @@ import UpgradePlan from "../components/userDetail/upgradePlan";
 import AdvanceRenew from "../components/userDetail/advanceRenew";
 import BuyAddOnService from "../components/userDetail/buyAddOnService";
 import AddOnService from "../components/userDetail/addOnService";
+import SelectAddOnService from "../components/userDetail/selectAddOnService";
 import PayDueAmount from "../components/userDetail/payDueAmount";
 import {ErrorBoundary} from "../components/errorBoundery";
 import EditBranch from "../pages/editBranch";
@@ -203,6 +204,7 @@ export const router = createBrowserRouter([
           { path: "advance-renew", element: <AdvanceRenew /> },
           { path: "pay-due-amount", element: <PayDueAmount /> },
           { path: "addon-service", element: <AddOnService /> },
+          { path: "select-addon-service", element: <SelectAddOnService /> },
           { path: "buy-addon-service", element: <BuyAddOnService /> },
         
           { path: UserDetailMembershipRoute.slice(1), element: <UserMembership /> },

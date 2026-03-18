@@ -1,12 +1,14 @@
 
 import  { useState } from "react";
-import { Button, Form, Input, Select, InputNumber } from "antd";
-import {  HomeOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Select, InputNumber, message } from "antd";
+import {  HomeOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useGetBranchesQuery } from "../../services/branches";
+import { useAddPlanMutation } from "../../services/package";
 import PageBreadcrumb from "../../components/breadcrumb";
 import { AllAddOnPackagesRoute, Home } from "../../routes/routepath";
 import "./styles.scss";
 import ImagePicker from "../../components/form/ImagePicker";
+import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 
 const typeOptions = [
@@ -20,9 +22,12 @@ const typeOptions = [
 
 const AddAddOnPackage = () => {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
   const [fileList, setFileList] = useState([]);
   const [selectedPackageType, setSelectedPackageType] = useState("");
+  const [benefitPoints, setBenefitPoints] = useState([{ id: 1, value: "" }]);
   const { data: branchesData, isLoading: branchesLoading } = useGetBranchesQuery();
+  const [addPlan, { isLoading: isSubmitting }] = useAddPlanMutation();
 
   const handleUploadChange = ({ fileList }) => setFileList(fileList);
 
@@ -34,9 +39,68 @@ const AddAddOnPackage = () => {
     }
   };
 
-  const onFinish = (values) => {
-    // Handle form submission
-    console.log(values);
+  const addBenefitPoint = () => {
+    const newId = Math.max(...benefitPoints.map(p => p.id), 0) + 1;
+    setBenefitPoints([...benefitPoints, { id: newId, value: "" }]);
+  };
+
+  const removeBenefitPoint = (id) => {
+    if (benefitPoints.length > 1) {
+      setBenefitPoints(benefitPoints.filter(point => point.id !== id));
+    }
+  };
+
+  const onFinish = async (values) => {
+    try {
+      // Collect benefit points from form values
+      const benefits = benefitPoints
+        .map(point => {
+          const value = values[`benefitPoint_${point.id}`];
+          return value ? { type: value } : null;
+        })
+        .filter(Boolean);
+
+      // Map addonType based on packageType
+      const addonTypeMap = {
+        "Personal Training": "personal_training",
+        "Pilates": "pilates",
+        "Therapy": "therapy",
+        "EMS": "ems",
+        "Paid Locker": "paid_locker",
+        "MMA": "mma"
+      };
+
+      const payload = {
+        name: values.name,
+        pricing: values.price,
+        numberOfDays: values.numberOfValidDate,
+        type: "addon",
+        addonType: addonTypeMap[values.packageType] || "personal_training",
+        branchIds: [values.branch],
+        
+        hsnSac: values.hsnSacCode || "",
+        description: values.benefitHeadline || "",
+
+        slots: values.sessions || 0,
+        upgradeLimit: values.upgradeLimit || 0,
+        advanceRenewDays: values.advanceRenewDays || 0,
+
+        benefits: benefits,
+
+        photos: values.photo ? [values.photo] : [],
+      };
+
+      console.log('Add On Package Payload:', payload);
+
+      const response = await addPlan(payload).unwrap();
+      // message.success('Add-On Package created successfully!');
+      form.resetFields();
+      setBenefitPoints([{ id: 1, value: "" }]);
+      navigate(AllAddOnPackagesRoute);
+    } catch (error) {
+      // message.error(error?.data?.message || 'Failed to create add-on package');
+      console.error('Error:', error);
+    }
   };
  const breadcrumbItems = [
     { label: <HomeOutlined />, to: Home },
@@ -168,8 +232,51 @@ const AddAddOnPackage = () => {
             </Form.Item>
           </div>
         )}
+
+        {/* Benefit Points Section */}
+        <div className="benefit-points-section">
+          <h3 style={{ color: 'var(--primary)', marginBottom: '16px' }}>Benefit Points</h3>
+          {benefitPoints.map((point, index) => (
+            <div key={point.id} className="row" style={{ alignItems: 'flex-end', marginBottom: '16px' }}>
+              <Form.Item
+                name={`benefitPoint_${point.id}`}
+                label={index === 0 ? "Point" : ""}
+                rules={[{ required: true, message: "Point is required" }]}
+                style={{ flex: 1, marginBottom: 0 }}
+              >
+                <Input placeholder="Enter benefit point" />
+              </Form.Item>
+              <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
+                {index === benefitPoints.length - 1 && (
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={addBenefitPoint}
+                  >
+                    Add
+                  </Button>
+                )}
+                {benefitPoints.length > 1 && (
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => removeBenefitPoint(point.id)}
+                  >
+                    Delete
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="footer-buttons">
-          <Button type="primary" htmlType="submit" className="save-btn">
+          <Button 
+            type="primary" 
+            htmlType="submit" 
+            className="save-btn"
+            loading={isSubmitting}
+          >
             Submit
           </Button>
         </div>

@@ -90,6 +90,13 @@
       margin: 0;
     }
 
+    .plan-type {
+      font-size: 12px;
+      color: #999;
+      margin: 4px 0 0 0;
+      text-transform: capitalize;
+    }
+
     .view-btn {
       background: #E8F4FF;
       color: #1890ff;
@@ -134,7 +141,7 @@
 
 /* Body */
 .card-body {
-  padding: 16px 10px 20px;
+  padding: 0px 10px 20px;
   animation: slideDown 0.3s ease-in-out;
 
   .plan-title {

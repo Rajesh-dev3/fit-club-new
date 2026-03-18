@@ -33,8 +33,8 @@ const UserDetailPage = () => {
   const getMenuItems = () => {
     const baseMenuItems = [
       { id: 'attendance', label: 'Attendance', path: 'attendance' },
-      { id: 'membership', label: 'Membership', path: 'membership' },
-      { id: 'buyMembership', label: 'Add invoice', path: 'buy-membership' },
+      { id: 'membership', label: 'Membership Plans', path: 'membership' },
+      { id: 'buyMembership', label: 'Membership Invoice', path: 'buy-membership' },
       { id: 'addOnService', label: 'Add On Service', path: 'addon-service' },
       { id: 'assessment', label: 'Assessment', path: 'assessment' },
       { id: 'refundHistory', label: 'Refund History', path: 'refund-history' },

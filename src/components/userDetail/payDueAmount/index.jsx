@@ -299,8 +299,9 @@ const PayDueAmount = () => {
             label="Invoice Date"
             name="invoiceDate"
             rules={[{ required: true, message: 'Please select invoice date' }]}
-          >
+            >
             <DatePicker 
+            disabled
               format="DD-MM-YYYY" 
               style={{ width: '100%', height: '46px' }} 
             />

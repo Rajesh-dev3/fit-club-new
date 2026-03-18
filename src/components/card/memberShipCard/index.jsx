@@ -73,27 +73,30 @@ const MembershipCard = ({ membershipData, isLoading }) => {
                 <p className="branch-name">Fitclub {membership.branchId?.name || 'N/A'}</p>
               </div>
               <div className="header-right">
-                {/* Show upgrade info if any invoice has upgrade data, otherwise show plan name */}
-                {membership.invoices?.some(inv => inv.upgradedFromPlan && inv.upgradedToPlan) ? (
-                  <h2 className="plan-title">
-                    {membership.invoices.find(inv => inv.upgradedFromPlan && inv.upgradedToPlan)?.upgradedFromPlan.name} 
-                    <span style={{ position: 'relative', margin: '0 8px', display: 'inline-block', width: '20px', textAlign: 'center' }}>
-                      {/* <span style={{ 
-                        position: 'absolute', 
-                        top: '-12px', 
-                        left: '50%', 
-                        transform: 'translateX(-50%)', 
-                        fontSize: '10px', 
-                        whiteSpace: 'nowrap',
-                        color: 'var(--muted, #666)'
-                      }}>upgrade</span> */}
-                      <span style={{ fontSize: '18px', fontWeight: '300' }}>→</span>
-                    </span> 
-                    {membership.invoices.find(inv => inv.upgradedFromPlan && inv.upgradedToPlan)?.upgradedToPlan.name}
-                  </h2>
-                ) : (
-                  <h2 className="plan-title">{membership.planId?.name || 'N/A'}</h2>
-                )}
+                <div>
+                  {/* Show upgrade info if any invoice has upgrade data, otherwise show plan name */}
+                  {membership.invoices?.some(inv => inv.upgradedFromPlan && inv.upgradedToPlan) ? (
+                    <h2 className="plan-title">
+                      {membership.invoices.find(inv => inv.upgradedFromPlan && inv.upgradedToPlan)?.upgradedFromPlan.name} 
+                      <span style={{ position: 'relative', margin: '0 8px', display: 'inline-block', width: '20px', textAlign: 'center' }}>
+                        {/* <span style={{ 
+                          position: 'absolute', 
+                          top: '-12px', 
+                          left: '50%', 
+                          transform: 'translateX(-50%)', 
+                          fontSize: '10px', 
+                          whiteSpace: 'nowrap',
+                          color: 'var(--muted, #666)'
+                        }}>upgrade</span> */}
+                        <span style={{ fontSize: '18px', fontWeight: '300' }}>→</span>
+                      </span> 
+                      {membership.invoices.find(inv => inv.upgradedFromPlan && inv.upgradedToPlan)?.upgradedToPlan.name}
+                    </h2>
+                  ) : (
+                    <h2 className="plan-title">{membership.planId?.name || 'N/A'}</h2>
+                  )}
+                  <p className="plan-type">{membership.type || 'membership'}</p>
+                </div>
                 <button
                   className="view-btn"
                   onClick={() => toggleCard(membership._id)}
