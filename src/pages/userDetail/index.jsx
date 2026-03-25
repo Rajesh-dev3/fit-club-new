@@ -112,9 +112,9 @@ const UserDetailPage = () => {
       {/* ================= PROFILE CARD ================= */}
       <div className="profile-card">
         <div className="left">
-          <div className="avatar">
+          <div className={`avatar ${userData?.status?.toLowerCase()}`}>
             <img src={member.photo || userImg} alt="employee" />
-            <span className="status">{userData?.status}</span>
+            <span className={`status ${userData?.status?.toLowerCase()}`}>{userData?.status}</span>
           </div>
         </div>
 

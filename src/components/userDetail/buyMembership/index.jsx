@@ -70,7 +70,7 @@ const BuyMembership = () => {
           </div>
         ) : (
           <div className="action-buttons">
-            {isUpgrade && !hasDueAmount && (
+            {isUpgrade && (
               <Button 
                 type="primary" 
                 size="large" 

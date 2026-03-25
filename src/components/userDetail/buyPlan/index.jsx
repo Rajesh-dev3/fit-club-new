@@ -214,6 +214,18 @@ const BuyPlan = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
+      // Validate partial payment - must be at least 50%
+      if (paymentType === 'partial') {
+        const afterDiscountAmount = selectedPackage?.pricing - discountAmount;
+        const minimumPayment = afterDiscountAmount * 0.5;
+        
+        if (totalPaidAmount < minimumPayment) {
+          message.error(`For partial payment, you must pay at least 50% (₹${minimumPayment.toFixed(2)})`);
+          setLoading(false);
+          return;
+        }
+      }
+
       // Calculate dates
       const startDate = values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
       const expiryDate = values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : 
@@ -797,11 +809,11 @@ const BuyPlan = () => {
           ))}
           
           {/* Remaining Balance Display - Only show for partial payment */}
-          {selectedPackage && paymentType === 'fullPayment' && (
+          {selectedPackage && paymentType === 'partial' && (
             <div className="remaining-balance">
-              <span className={`balance-text ${remainingAmount > 0 ? 'remaining' : 'complete'}`}>
-                <strong>Remaining Balance: ₹{remainingAmount.toFixed(2)}</strong>
-              </span>
+              <div style={{ marginBottom: '8px', color: '#ff4d4f', fontSize: '13px' }}>
+                <strong>Note:</strong> For partial payment, minimum 50% payment is required.
+              </div>
             </div>
           )}
         </div>
@@ -844,12 +856,6 @@ const BuyPlan = () => {
                   <span>₹{totalPaidAmount.toFixed(2)}</span>
                 </div>
               </>
-            )}
-            {paymentType === 'fullPayment' && (
-              <div className={`summary-row ${remainingAmount > 0 ? 'remaining-amount' : 'complete-amount'}`}>
-                <span><strong>Remaining Balance:</strong></span>
-                <span>₹{remainingAmount.toFixed(2)}</span>
-              </div>
             )}
             {selectedPackage.description && (
               <div className="summary-row full-width">

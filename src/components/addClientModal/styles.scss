@@ -1,0 +1,200 @@
+.add-client-modal {
+  :global(.ant-modal-content) {
+    padding: 0;
+    border-radius: 12px;
+    background: var(--card-bg);
+  }
+.ant-modal-container{
+    padding: 20px;
+}
+  :global(.ant-modal-close) {
+    top: 20px;
+    right: 20px;
+
+    :global(.anticon) {
+      color: var(--sider-text);
+    }
+  }
+
+  .add-client-content {
+
+
+    .modal-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--sider-text);
+      margin: 0 0 10px 0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+
+      .form-label {
+        display: block;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--sider-text);
+        margin-bottom: 8px;
+
+        .required {
+          color: #e74c3c;
+          margin-left: 2px;
+        }
+      }
+
+      .required-text {
+        position: absolute;
+        right: 0;
+        top: 0;
+        font-size: 14px;
+        color: var(--placeholder);
+        font-style: italic;
+      }
+
+      .form-input {
+        background: var(--input-bg);
+        border: 1px solid var(--muted);
+        border-radius: 8px;
+        font-size: 15px;
+        color: var(--sider-text);
+        height: 48px;
+
+        &::placeholder {
+          color: var(--placeholder);
+        }
+
+        &:focus,
+        &:hover {
+          background: var(--input-bg);
+          border-color: var(--muted);
+        }
+      }
+
+      .input-with-icon {
+        position: relative;
+
+        .copy-icon {
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 18px;
+          color: #17A2B8;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover {
+            color: #138496;
+          }
+        }
+      }
+
+      .helper-text {
+        margin: 8px 0 0 0;
+        font-size: 14px;
+        color: var(--sider-text);
+
+        .learn-more {
+          color: #17A2B8;
+          text-decoration: none;
+          font-weight: 500;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .phone-input-wrapper {
+        display: flex;
+        gap: 0;
+        background: var(--input-bg);
+        border: 1px solid var(--muted);
+        border-radius: 8px;
+        overflow: hidden;
+
+        &:focus-within {
+          border-color: var(--muted);
+        }
+
+        .country-code {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0 16px;
+          background: var(--input-bg);
+          border-right: 1px solid var(--muted);
+          cursor: pointer;
+          min-width: 120px;
+
+          .flag {
+            font-size: 20px;
+          }
+
+          .code {
+            font-size: 15px;
+            color: var(--sider-text);
+            font-weight: 500;
+          }
+
+          .dropdown-arrow {
+            font-size: 10px;
+            color: var(--placeholder);
+            margin-left: auto;
+          }
+        }
+
+        .phone-input {
+          flex: 1;
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          font-size: 15px;
+          color: var(--sider-text);
+          height: 52px;
+
+          &::placeholder {
+            color: var(--placeholder);
+          }
+
+          &:focus,
+          &:hover {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+          }
+        }
+
+        :global(.ant-input-focused),
+        :global(.ant-input:focus) {
+          box-shadow: none;
+        }
+      }
+    }
+
+    .save-button {
+      width: 100%;
+      height: 56px;
+      background: #17A2B8;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      &:hover {
+        background: #138496;
+      }
+
+      :global(.anticon) {
+        font-size: 18px;
+      }
+    }
+  }
+}

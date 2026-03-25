@@ -5,6 +5,7 @@ import { UserDetailAttendanceRoute, ViewFormRoute, EditUserRoute } from "../../r
 import { useState } from 'react';
 import React from 'react';
 import { useAssignGymKitMutation } from "../../services/user";
+import TimerColumn from "../addOnLiveDashboard/TimerColumn";
 
 function statusColor(status) {
   switch (status) {
@@ -415,6 +416,20 @@ const getallColumns = () => [
 
 const getAddOnsUserColumns = (handleEdit, handleDelete, handleChangePassword, navigate) => [
   {
+    title: "S.No",
+    dataIndex: "sno",
+    key: "sno",
+    width: 60,
+    render: (text, record, index) => index + 1,
+  },
+  {
+    title: "Timer",
+    dataIndex: "timer",
+    key: "timer",
+    width: 100,
+    render: () => <TimerColumn initialTime={0} />,
+  },
+  {
     title: "Branch",
     dataIndex: "branch",
     key: "branch",
@@ -491,10 +506,34 @@ const getAddOnsUserColumns = (handleEdit, handleDelete, handleChangePassword, na
     },
   },
   {
+    title: "Plan Sessions",
+    dataIndex: "sessions",
+    key: "planSessions",
+    render: (text, record) => {
+      if (record.usedSessions !== undefined && record.remainingSessions !== undefined) {
+        return `${record.usedSessions}/${record.remainingSessions}`;
+      }
+      return text || '-';
+    },
+  },
+  {
     title: "Trainer",
     dataIndex: "trainer",
     key: "trainer",
     render: (text) => text || '-',
+  },
+  {
+    title: "Payment Type",
+    dataIndex: "paymentType",
+    key: "paymentType",
+    render: (text) => {
+      if (!text) return '-';
+      return (
+        <Tag color={text === 'complete' ? 'green' : text === 'partial' ? 'orange' : 'blue'}>
+          {text.toUpperCase()}
+        </Tag>
+      );
+    },
   },
   {
     title: "Sales Person",

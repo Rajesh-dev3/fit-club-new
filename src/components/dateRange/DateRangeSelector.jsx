@@ -12,6 +12,7 @@ const DateRangeSelector = ({ onChange }) => {
     key: 'selection',
   });
   const [show, setShow] = useState(false);
+  const [position, setPosition] = useState('left');
   const pickerRef = useRef(null);
   
   // Media queries for responsive behavior
@@ -28,6 +29,20 @@ const DateRangeSelector = ({ onChange }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [show]);
+
+  useEffect(() => {
+    if (show && pickerRef.current) {
+      const rect = pickerRef.current.getBoundingClientRect();
+      const pickerWidth = isMobile ? 320 : isTablet ? 400 : 640;
+      const spaceOnRight = window.innerWidth - rect.right;
+      
+      if (spaceOnRight < pickerWidth && rect.left > pickerWidth) {
+        setPosition('right');
+      } else {
+        setPosition('left');
+      }
+    }
+  }, [show, isMobile, isTablet]);
 
   const handleSelect = (ranges) => {
     setRange(ranges.selection);
@@ -82,7 +97,7 @@ const DateRangeSelector = ({ onChange }) => {
             className="date-range-overlay"
             onClick={() => setShow(false)}
           />
-          <div className="date-range-picker-container">
+          <div className={`date-range-picker-container ${position}`}>
             <DateRangePicker
               ranges={[range]}
               onChange={handleSelect}

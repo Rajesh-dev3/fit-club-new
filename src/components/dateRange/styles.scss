@@ -86,18 +86,38 @@
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.3);
-    z-index: 999;
+    z-index: 9999;
   }
 
   .date-range-picker-container {
     position: absolute;
-    z-index: 1000;
+    z-index: 10000;
     top: 110%;
-    left: 0;
     background: var(--card-bg);
     border-radius: 8px;
     box-shadow: var(--boxShadow);
     overflow: hidden;
+
+    &.left {
+      left: 0;
+      right: auto;
+    }
+
+    &.right {
+      right: 0;
+      left: auto;
+    }
+
+    // Mobile styles - center on screen
+    @media (max-width: 768px) {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 95vw;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
     border: 1px solid var(--muted);
     
     // Responsive positioning

@@ -178,10 +178,15 @@ export const getInvoicesColumns = (handleEdit, handleDelete, handleView) => [
   },
   {
     title: 'Taxable amount(₹)',
-    dataIndex: 'afterDiscount',
+    dataIndex: 'totalAmount',
     key: 'taxableAmount',
     width: 140,
-    render: (amount) => amount ? `₹${amount.toLocaleString()}` : '₹0',
+    render: (totalAmount, record) => {
+      // Calculate taxable amount = totalAmount - (CGST + SGST)
+      const gstAmount = record.gstAmount || 0;
+      const taxableAmount = totalAmount - gstAmount;
+      return taxableAmount ? `₹${taxableAmount.toLocaleString()}` : '₹0';
+    },
   },
   {
     title: 'CGST',

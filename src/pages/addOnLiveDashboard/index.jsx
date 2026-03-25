@@ -8,8 +8,8 @@ import StatusTabs from "../../components/statusTabs";
 import SearchBar from "../../components/searchBar";
 import ColumnVisibility from "../../components/columnVisibility";
 import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
-import { getAddOnsUserColumns } from "./columns";
-// ...existing code...
+import { getAddOnsUserColumns } from "../allAddOnsUsers/columns";
+import DateRangeSelector from "../../components/dateRange/DateRangeSelector";
 import "./styles.scss";
 import CommonTable from "../../components/commonTable";
 
@@ -20,9 +20,7 @@ const mapUserToRow = (user) => {
   return {
     _id: user._id,
     name: user.name,
-    branch: user?.branchIds
-?.length > 0 ? user.branchIds
-[0]?.name : '-',
+    branch: user?.branchIds?.length > 0 ? user.branchIds[0]?.name : '-',
     phoneNumber: user.phoneNumber,
     assessmentRatio: '-',
     salesPerson: '-',
@@ -40,27 +38,37 @@ const mapUserToRow = (user) => {
   };
 };
 
-const AllAddOnsUsers = () => {
+const AddOnLiveDashboard = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [searchText, setSearchText] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [remainingDays, setRemainingDays] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [dateRange, setDateRange] = useState(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const typeOptions = [
+    { label: "All Categories", value: "all" },
+    { label: "Personal Training", value: "Personal Training" },
+    { label: "Pilates", value: "Pilates" },
+    { label: "Therapy", value: "Therapy" },
+    { label: "EMS", value: "EMS" },
+    { label: "Paid Locker", value: "Paid Locker" },
+    { label: "MMA", value: "MMA" },
+  ];
   const [visibleColumns, setVisibleColumns] = useState({
+    sno: true,
+    timer: true,
     branch: true,
     name: true,
     phoneNumber: true,
     profile: true,
     gender: true,
     category: true,
-    planInfo: true,
-    planSessions: true,
     trainer: true,
-    salesPerson: true,
-    startDate: true,
-    endDate: true,
+    paymentType: true,
     actions: true,
   });
 
@@ -117,6 +125,7 @@ const AllAddOnsUsers = () => {
           sessions: 12,
           usedSessions: 9,
           remainingSessions: 3,
+          paymentType: 'complete',
         }
       },
       {
@@ -142,6 +151,7 @@ const AllAddOnsUsers = () => {
           sessions: 8,
           usedSessions: 5,
           remainingSessions: 3,
+          paymentType: 'partial',
         }
       },
       {
@@ -167,6 +177,7 @@ const AllAddOnsUsers = () => {
           sessions: 10,
           usedSessions: 7,
           remainingSessions: 3,
+          paymentType: 'complete',
         }
       },
     ],
@@ -199,6 +210,7 @@ const AllAddOnsUsers = () => {
         category: user.category || '-',
         planInfo: currentMembership.planName || 'N/A',
         trainer: user.trainer?.name || '-',
+        paymentType: currentMembership.paymentType || '-',
         salesPerson: user.salesPerson?.name || '-',
         startDate: currentMembership.startDate ? new Date(currentMembership.startDate).toLocaleDateString() : '-',
         endDate: currentMembership.expiryDate ? new Date(currentMembership.expiryDate).toLocaleDateString() : '-',
@@ -218,8 +230,8 @@ const AllAddOnsUsers = () => {
   function statusColor(status) {
     switch (status) {
       case 'active': return 'green';
-      case 'pending': return 'orange';
-      case 'inactive': return 'red';
+      case 'live': return 'orange';
+      case 'completed': return 'red';
       case 'freezed': return 'blue';
       case 'block': return 'volcano';
       default: return 'default';
@@ -240,16 +252,24 @@ const AllAddOnsUsers = () => {
     let data = usersData;
     if (activeTab !== 'all') data = data.filter(u => u.status === activeTab);
     if (remainingDays !== 'all') data = data.filter(u => u.remainingDays !== '-' && u.remainingDays <= parseInt(remainingDays));
+    if (selectedCategory !== 'all') data = data.filter(u => u.category === selectedCategory);
+    if (dateRange && dateRange.startDate && dateRange.endDate) {
+      data = data.filter(u => {
+        if (!u.startDate || u.startDate === '-') return false;
+        const userDate = new Date(u.startDate);
+        return userDate >= dateRange.startDate && userDate <= dateRange.endDate;
+      });
+    }
     if (searchText) data = data.filter(u => u.name && u.name.toLowerCase().includes(searchText.toLowerCase()));
     return data;
-  }, [usersData, activeTab, remainingDays, searchText]);
+  }, [usersData, activeTab, remainingDays, selectedCategory, dateRange, searchText]);
 
   // Tabs data with count from API statusCounts
   const tabsData = [
     { key: 'all', label: 'All', count: data?.statusCounts?.all || 0 },
-    { key: 'active', label: 'Active', count: data?.statusCounts?.active || 0 },
+    { key: 'Live', label: 'Live', count: data?.statusCounts?.active || 0 },
     // { key: 'pending', label: 'Pending', count: data?.statusCounts?.pending || 0 },
-    { key: 'inactive', label: 'Inactive', count: data?.statusCounts?.inactive || 0 },
+    { key: 'Completed', label: 'Completed', count: data?.statusCounts?.inactive || 0 },
     // { key: 'freezed', label: 'Freezed', count: data?.statusCounts?.freezed || 0 },
     // { key: 'blocked', label: 'Block', count: data?.statusCounts?.blocked || 0 },
     // { key: 'advance', label: 'Advance', count: data?.statusCounts?.advance || 0 },
@@ -263,7 +283,6 @@ const AllAddOnsUsers = () => {
 
   return (
     <div className="all-users-page">
-    
       <div className="header-section">
         <SearchBar
           value={searchText}
@@ -275,24 +294,21 @@ const AllAddOnsUsers = () => {
           onTabChange={setActiveTab}
           tabs={tabsData}
         />
-        {/* <Select
-          value={remainingDays}
-          onChange={setRemainingDays}
-          className="remaining-days-filter"
-          style={{ width: 180, height: 41 }}
-        >
-          <Select.Option value="all">All Remaining Days</Select.Option>
-          <Select.Option value="7">7 Days</Select.Option>
-          <Select.Option value="15">15 Days</Select.Option>
-          <Select.Option value="30">30 Days</Select.Option>
-        </Select> */}
+        <Select
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+          className="category-filter"
+          style={{ width: 200, height: 41 }}
+          options={typeOptions}
+        />
+        <DateRangeSelector onChange={setDateRange} />
         <ColumnVisibility
           columns={columnsWithHandlers}
           visibleColumns={visibleColumns}
           onColumnToggle={handleColumnToggle}
         />
       </div>
-      <div className="users-table-wrapper">
+      <div className="users-table-wrapper add-on-live-dashboard">
         <CommonTable
           columns={columns}
           dataSource={filteredData || []}
@@ -324,4 +340,4 @@ const AllAddOnsUsers = () => {
   );
 };
 
-export default AllAddOnsUsers;
+export default AddOnLiveDashboard;

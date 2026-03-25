@@ -10,7 +10,7 @@ import {
   createBrowserRouter,
   Navigate,
 } from "react-router-dom";
-import { AddEmployeeRoute, AddUserRoute, EditUserRoute, EditEmployeeRoute, EditGeneralStaffRoute, EditTrainerRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, EditDirectorRoute, AllPackagesRoute, AddPackageRoute, EditPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, AllAddOnsUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, ViewFormRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute, DirectorDetailPageRoute, DirectorAttendancePageRoute, DirectorBiometricAccessPageRoute, AddAddOnPackageRoute, AddBiometricRoute, AllBiometricsRoute, AllInventoryRoute, AddInventoryRoute, AllInvoiceRoute, AddInvoiceRoute, EditInvoiceRoute, PartialInvoiceRoute, InvoiceDetailRoute } from "./routepath";
+import { AddEmployeeRoute, AddUserRoute, EditUserRoute, EditEmployeeRoute, EditGeneralStaffRoute, EditTrainerRoute, AllEmployeesRoute, AllGeneralStaffRoute, AddGeneralStaffRoute, AllTrainersRoute, AddTrainerRoute, AllRolesRoute, AddRoleRoute, AllDirectorsRoute, AddDirectorRoute, EditDirectorRoute, AllPackagesRoute, AddPackageRoute, EditPackageRoute, AllAddOnSlotsRoute, AddAddOnSlotRoute, AllAddOnPackagesRoute, Home, loginRoute, AllUsersRoute, AllAddOnsUsersRoute, DirectorAttendanceRoute, UserAttendanceRoute, EmployeeAttendanceRoute, TrainerAttendanceRoute, GeneralStaffAttendanceRoute, ViewFormRoute, EmployeeDetailRoute, EmployeeDetailAttendanceRoute, EmployeeDetailEmployeeIdRoute, EmployeeDetailSalaryRoute, EmployeeDetailSalesHistoryRoute, EmployeeDetailParkingHistoryRoute, EmployeeDetailBiometricAccessRoute, EmployeeDetailAddBiometricAccessRoute, GeneralStaffDetailRoute, GeneralStaffDetailAttendanceRoute, GeneralStaffDetailIdRoute, GeneralStaffDetailSalaryRoute, GeneralStaffDetailBiometricAccessRoute, GeneralStaffDetailAddBiometricAccessRoute, TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, TrainerDetailClassesRoute, TrainerDetailTransactionsRoute, TrainerDetailParkingHistoryRoute, TrainerDetailBiometricAccessRoute, TrainerDetailAddBiometricAccessRoute, UserDetailAttendanceRoute, UserDetailMembershipRoute, UserDetailAddonPackageRoute, UserDetailAssessmentRoute, UserDetailRefundHistoryRoute, UserDetailParkingHistoryRoute, UserDetailDietsPlanRoute, UserDetailBiometricAccessRoute, UserDetailRoute, AllBranchesRoute, AddBranchRoute, EditBranchRoute, UserDetailMembershipFreezabilityRoute, UserDetailMembershipDaysRoute, DirectorDetailPageRoute, DirectorAttendancePageRoute, DirectorBiometricAccessPageRoute, AddAddOnPackageRoute, AddBiometricRoute, AllBiometricsRoute, AllInventoryRoute, AddInventoryRoute, AllInvoiceRoute, AddInvoiceRoute, EditInvoiceRoute, PartialInvoiceRoute, InvoiceDetailRoute, AddOnSessionDetailRoute, AddOnLiveDashboardRoute, WalkInIncomingRoute, AddWalkInRoute, ClientsRoute } from "./routepath";
 import AddBranch from "../pages/addBranch";
 import AllBranches from "../pages/allBranches";
 import AddBiometric from "../pages/addBiometric";
@@ -108,6 +108,11 @@ import AddInvoice from "../pages/addInvoice";
 import EditInvoice from "../pages/editInvoice";
 import PartialInvoice from "../pages/partialInvoice";
 import InvoiceDetailPage from "../pages/invoiceDetail";
+import AddOnSessionDetail from "../pages/addOnSessionDetail";
+import AddOnLiveDashboard from "../pages/addOnLiveDashboard";
+import WalkInIncoming from "../pages/walkInIncoming";
+import AddWalkIn from "../pages/addWalkIn";
+import Clients from "../pages/clients";
 
 export const router = createBrowserRouter([
   {
@@ -136,6 +141,10 @@ export const router = createBrowserRouter([
       { path: `${EditPackageRoute}/:id`, element:<EditPackage/> },
       { path: AllUsersRoute, element:<AllUsers/> },
       { path: AllAddOnsUsersRoute, element:<AllAddOnsUsers/> },
+      { path: AddOnLiveDashboardRoute, element:<AddOnLiveDashboard/> },
+      { path: WalkInIncomingRoute, element:<WalkInIncoming/> },
+      { path: AddWalkInRoute, element:<AddWalkIn/> },
+      { path: ClientsRoute, element:<Clients/> },
       { path: `${ViewFormRoute}/:id`, element:<ViewForm/> },
       { path: AllAddOnPackagesRoute, element: <AllAddOnPackages/> },
       { path: AddAddOnPackageRoute, element: <AddAddOnPackage/> },
@@ -206,6 +215,7 @@ export const router = createBrowserRouter([
           { path: "addon-service", element: <AddOnService /> },
           { path: "select-addon-service", element: <SelectAddOnService /> },
           { path: "buy-addon-service", element: <BuyAddOnService /> },
+          { path: `addon-service${AddOnSessionDetailRoute}/:membershipId`, element: <AddOnSessionDetail /> },
         
           { path: UserDetailMembershipRoute.slice(1), element: <UserMembership /> },
           { path: UserDetailMembershipFreezabilityRoute.slice(1), element: <FreezabilityForm /> },
@@ -308,6 +318,7 @@ export const router = createBrowserRouter([
       { path: `${EditInvoiceRoute}/:id`, element: <EditInvoice /> },
       { path: PartialInvoiceRoute, element: <PartialInvoice /> },
       { path: `${InvoiceDetailRoute}/:id`, element: <InvoiceDetailPage /> },
+      { path: `${AddOnSessionDetailRoute}/:id`, element: <AddOnSessionDetail /> },
       { path: `${EditRoleRoute}/:id`, element: <EditRole /> },
 
     ]

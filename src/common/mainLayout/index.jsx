@@ -71,7 +71,7 @@ const MainLayout = () => {
           toggleMobileDrawer={toggleMobileDrawer}
         />
 
-        <Content style={{ padding: 15,overflowY:"scroll", background: 'var(--content-bg)', color: 'var(--sider-text)' }}>
+        <Content style={{ padding: 15,overflowY:"scroll", background: 'var(--content-bg)', color: 'var(--sider-text)',position:"relative" }}>
           <Outlet />
         </Content>
 

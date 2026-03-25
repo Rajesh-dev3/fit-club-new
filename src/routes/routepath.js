@@ -43,6 +43,11 @@ const AddInvoiceRoute = "/add-invoice"
 const EditInvoiceRoute = "/edit-invoice"
 const PartialInvoiceRoute = "/partial-invoice"
 const InvoiceDetailRoute = "/invoice-detail"
+const AddOnSessionDetailRoute = "/add-on-session-detail"
+const AddOnLiveDashboardRoute = "/add-on-live-dashboard"
+const WalkInIncomingRoute = "/walk-in-incoming"
+const AddWalkInRoute = "/add-walk-in"
+const ClientsRoute = "/clients"
 
 const EmployeeDetailRoute = "/employee-detail"
 const DirectorAttendanceRoute = "/director-attendance"
@@ -143,5 +148,10 @@ TrainerDetailRoute, TrainerDetailAttendanceRoute, TrainerDetailCoachIdRoute, Tra
   AddInvoiceRoute,
   EditInvoiceRoute,
   PartialInvoiceRoute,
-  InvoiceDetailRoute
+  InvoiceDetailRoute,
+  AddOnSessionDetailRoute,
+  AddOnLiveDashboardRoute,
+  WalkInIncomingRoute,
+  AddWalkInRoute,
+  ClientsRoute
  }

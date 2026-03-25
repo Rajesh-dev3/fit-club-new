@@ -51,6 +51,10 @@ const UpgradePlan = () => {
   useEffect(() => {
     if (userData) {
       const member = userData.member || {};
+      
+      // Get paid amount from current membership invoice
+      const paidAmount = userData.currentMembership?.invoice?.paidAmount || 0;
+      
       form.setFieldsValue({
         invoiceDate: dayjs(),
         customerName: userData.name,
@@ -62,9 +66,13 @@ const UpgradePlan = () => {
         gstClaim: 'No',
         paymentType: 'fullPayment',
         existingDueAmount: userData.totalDueAmount || 0,
+        previousInvoiceAmount: paidAmount,
       });
+      
+      // Trigger calculation after setting previous invoice amount
+      setTimeout(() => calculateAmounts(), 0);
     }
-  }, [userData, form]);
+  }, [userData]);
 
   // Calculate amounts when package or GST changes
   const calculateAmounts = () => {
@@ -73,14 +81,16 @@ const UpgradePlan = () => {
     const differenceAmount = newPlanPrice - previousInvoiceAmount;
 
     let totalPayable = differenceAmount;
+    let gstAmount = 0;
     
     if (gstClaim === 'Yes' && gstPercentage) {
-      const gstAmount = (differenceAmount * gstPercentage) / 100;
+      gstAmount = (differenceAmount * gstPercentage) / 100;
       totalPayable = differenceAmount + gstAmount;
     }
 
     form.setFieldsValue({
       differenceAmount,
+      gstAmount,
       totalPayableAmount: totalPayable,
       dueAmount: paymentType === 'fullPayment' ? 0 : totalPayable,
     });
@@ -325,7 +335,7 @@ const UpgradePlan = () => {
           onFinish={handleSubmit}
           className="upgrade-form"
         >
-          <div className="form-row form-row-three">
+          <div className="form-row">
             <Form.Item
               name="invoiceDate"
               label="Invoice Date"
@@ -342,16 +352,16 @@ const UpgradePlan = () => {
               <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               name="mobileNo"
               label="Mobile No."
               rules={[{ required: true, message: 'Mobile number is required' }]}
             >
               <Input placeholder="Mobile Number" disabled />
-            </Form.Item>
+            </Form.Item> */}
           </div>
 
-          <div className="form-row">
+          {/* <div className="form-row">
             <Form.Item
               name="customerName"
               label="Customer Name"
@@ -366,9 +376,9 @@ const UpgradePlan = () => {
             >
               <InputNumber style={{ width: '100%' }} placeholder="Age" disabled />
             </Form.Item>
-          </div>
+          </div> */}
 
-          <div className="form-row">
+          {/* <div className="form-row">
             <Form.Item
               name="gender"
               label="Gender"
@@ -388,14 +398,14 @@ const UpgradePlan = () => {
                 <Option value="Delhi">Delhi</Option>
               </Select>
             </Form.Item>
-          </div>
+          </div> */}
 
-          <Form.Item
+          {/* <Form.Item
             name="billingAddress"
             label="Billing Address"
           >
             <TextArea rows={3} placeholder="Billing Address" disabled />
-          </Form.Item>
+          </Form.Item> */}
 
           <div className="form-row">
             <Form.Item

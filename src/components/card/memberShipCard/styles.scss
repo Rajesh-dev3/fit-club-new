@@ -14,11 +14,13 @@
   overflow: hidden;
   // min-height: 180px;
   
-  &:hover{
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-    transform: scale3d(1.01, 1.01, 1.01);
+  &.addon-card {
+    &:hover{
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+      transform: scale3d(1.01, 1.01, 1.01);
+    }
   }
 
   &.collapsed {

@@ -1,0 +1,58 @@
+@use '../../styles/breakpoints.scss' as *;
+
+.all-users-page {
+  width: 100%;
+//   padding: 20px;
+
+  .header-section {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    
+    @include mobile {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .remaining-days-filter,
+  .category-filter,
+  .date-filter {
+    @include mobile {
+      width: 100% !important;
+    }
+  }
+
+  .users-table-wrapper {
+    background: var(--card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    &.add-on-live-dashboard{
+        .ant-table-cell
+        {
+
+            padding: 10px;
+        }
+    }
+  }
+}
+
+.ant-tag-orange {
+  color: #fa8c16;
+  background: #fff7e6;
+  border-color: #ffd591;
+}
+
+.ant-tag-blue {
+  color: #1890ff;
+  background: #e6f7ff;
+  border-color: #91d5ff;
+}
+
+.ant-tag-volcano {
+  color: #fa541c;
+  background: #fff2e8;
+  border-color: #ffbb96;
+}

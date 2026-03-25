@@ -1,20 +1,43 @@
 import React, { useState } from "react";
-import { Spin } from "antd";
+import { Spin, Button } from "antd";
 import { DownOutlined } from "@ant-design/icons";
+import { useNavigate, useParams } from "react-router-dom";
 import "./styles.scss";
 import { logo, whiteLogo } from "../../../assets";
 import { useTheme } from "../../../context/ThemeContext";
 import dayjs from "dayjs";
+import FreezeAddonModal from "../../modals/FreezeAddonModal";
+import { AddOnSessionDetailRoute, UserDetailRoute } from "../../../routes/routepath";
 
 const MembershipCard = ({ membershipData, isLoading }) => {
   const {theme} = useTheme();
+  const navigate = useNavigate();
+  const { id: userId } = useParams();
   const [expandedCards, setExpandedCards] = useState({});
+  const [freezeModalVisible, setFreezeModalVisible] = useState(false);
+  const [selectedMembership, setSelectedMembership] = useState(null);
 
   const toggleCard = (membershipId) => {
     setExpandedCards(prev => ({
       ...prev,
       [membershipId]: !prev[membershipId]
     }));
+  };
+
+  const handleFreezeClick = (membership) => {
+    setSelectedMembership(membership);
+    setFreezeModalVisible(true);
+  };
+
+  const handleFreezeModalClose = () => {
+    setFreezeModalVisible(false);
+    setSelectedMembership(null);
+  };
+
+  const handleCardClick = (membership) => {
+    if (membership.type === 'addon') {
+      navigate(`${UserDetailRoute}/${userId}/addon-service${AddOnSessionDetailRoute}/${membership._id}`);
+    }
   };
   
   if (isLoading) {
@@ -52,8 +75,9 @@ const MembershipCard = ({ membershipData, isLoading }) => {
         return (
           <div 
             key={membership._id} 
-            className={`membership-card ${isExpanded ? 'expanded' : 'collapsed'}`}
-            style={{ border: borderColor }}
+            className={`membership-card ${isExpanded ? 'expanded' : 'collapsed'} ${membership.type === 'addon' ? 'addon-card' : ''}`}
+            style={{ border: borderColor, cursor: membership.type === 'addon' ? 'pointer' : 'default' }}
+            onClick={() => membership.type === 'addon' && handleCardClick(membership)}
           >
             {/* Top Ribbon */}
             {isActive && (
@@ -99,7 +123,10 @@ const MembershipCard = ({ membershipData, isLoading }) => {
                 </div>
                 <button
                   className="view-btn"
-                  onClick={() => toggleCard(membership._id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleCard(membership._id);
+                  }}
                 >
                   View <DownOutlined style={{ 
                     fontSize: '12px', 
@@ -126,27 +153,61 @@ const MembershipCard = ({ membershipData, isLoading }) => {
                     </div>
                   )}
                   
-                  <p><strong>Plan Amount:</strong> <span>₹{membership.planId?.pricing || 0}</span></p>
+                  <p><strong>Invoice Amount:</strong> <span>₹{membership.invoices?.[0]?.paidAmount || membership.planId?.pricing || 0}</span></p>
                   <p><strong>Duration:</strong> <span>{membership.planId?.numberOfDays || 0} days</span></p>
-                  <p><strong>Freeze Slots:</strong> <span>{membership.freezableSlot || 0}</span></p>
-                  <p><strong>Freeze Days:</strong> <span>{membership.freezableDays || 0}</span></p>
+                  
+                  {/* Show sessions for add-on type, freeze info for membership type */}
+                  {membership.type === 'addon' ? (
+                    <p><strong>Sessions:</strong> <span>{membership.usedSlots || 0}/{membership.remainingSlots || 0}</span></p>
+                  ) : (
+                    <>
+                      <p><strong>Freeze Slots:</strong> <span>{membership.freezableSlot || 0}</span></p>
+                      <p><strong>Freeze Days:</strong> <span>{membership.freezableDays || 0}</span></p>
+                    </>
+                  )}
+                  
                   <p><strong>Start:</strong> <span>{formatDate(membership.startDate)}</span></p>
                   <p><strong>Expiry:</strong> <span>{formatDate(membership.expiryDate)}</span></p>
                   <p><strong>Status:</strong> <span style={{ textTransform: 'capitalize', color: isActive ? '#52c41a' : '#999' }}>{membership.status}</span></p>
                   {membership.upgradeLabel && (
                     <p><strong>Label:</strong> <span style={{ textTransform: 'capitalize' }}>{membership.upgradeLabel.replace(/_/g, ' ')}</span></p>
                   )}
+                  
+                  {/* Freeze button for add-on type */}
+                  {membership.type === 'addon' && (
+                    <div style={{ marginTop: '16px' }}>
+                      <Button 
+                        type="primary" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFreezeClick(membership);
+                        }}
+                        style={{ width: '100%' }}
+                      >
+                        Freeze Add-On
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
-                <div className="freeze">
-                  <p>Freeze Slots</p>
-                  <span className="arrow">⌄</span>
-                </div>
+                {membership.type !== 'addon' && (
+                  <div className="freeze">
+                    <p>Freeze Slots</p>
+                    <span className="arrow">⌄</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
         );
       })}
+      
+      {/* Freeze Modal */}
+      <FreezeAddonModal
+        visible={freezeModalVisible}
+        onCancel={handleFreezeModalClose}
+        selectedMembership={selectedMembership}
+      />
     </div>
   );
 };

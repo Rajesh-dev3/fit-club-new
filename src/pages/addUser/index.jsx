@@ -647,9 +647,9 @@ const [trigger,{data}] = useAdduserMutation();
                 >
                   <Select
                     options={[
-                      { label: "Standard (cm/kg)", value: "standardMeasure" },
-                      { label: "Metric (m/kg)", value: "metricMeasure" },
-                      { label: "Other", value: "other" },
+                      { label: "Standard (ft/pound)", value: "standardMeasure" },
+                      { label: "Metric (cm/kg)", value: "metricMeasure" },
+                      // { label: "Other", value: "other" },
                     ]}
                   />
                 </Form.Item>
@@ -669,14 +669,14 @@ const [trigger,{data}] = useAdduserMutation();
                         <Col span={8}>
                           <Form.Item
                             name="height"
-                            label={val === "metric" ? "Height (m)" : "Height (cm)"}
+                            label={val === "standardMeasure" ? "Height (ft)" : "Height (cm)"}
                           >
                             <Input placeholder="Enter height" />
                           </Form.Item>
                         </Col>
 
                         <Col span={8}>
-                          <Form.Item name="weight" label="Weight (kg)">
+                          <Form.Item name="weight" label={val === "standardMeasure" ? "Weight (pound)" : "Weight (kg)"}>
                             <Input placeholder="Enter weight" />
                           </Form.Item>
                         </Col>

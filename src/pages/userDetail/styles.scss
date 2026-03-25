@@ -28,6 +28,18 @@
           border: 3px solid #22c55e;
           object-fit: cover;
         }
+
+        &.active img {
+          border-color: #22c55e;
+        }
+
+        &.inactive img {
+          border-color: #ef4444;
+        }
+
+        &.pending img {
+          border-color: #eab308;
+        }
   
         .status {
           position: absolute;
@@ -40,6 +52,21 @@
           padding: 4px 14px;
           border-radius: 20px;
           text-transform: capitalize;
+
+          &.active {
+            background: #22c55e;
+            border: 3px solid #22c55e;
+          }
+
+          &.inactive {
+            background: #ef4444;
+            border: 3px solid #ef4444;
+          }
+
+          &.pending {
+            background: #eab308;
+            border: 3px solid #eab308;
+          }
         }
       }
     }
